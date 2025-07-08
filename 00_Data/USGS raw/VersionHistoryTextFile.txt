@@ -1,0 +1,43 @@
+Version History for USGS Data Release
+“Nutrient and sediment concentrations, loads, yields, and rainfall characteristics at USGS surface and subsurface-tile edge-of-field agricultural monitoring sites in Great Lakes States”
+
+Citation: Matthew J. Komiskey, Todd D. Stuntebeck, Luke C. Loken, Krista A. Hood, Mari E. Danz, Cynthia M. Rachol, Chad A. Toussant, Edward G. Dobrowolski, Andrew J. Kowalczk, Ryan P. Ennis, Sarah A. Mahanic, Matthew J. Hardebeck, Isaac J. Mevis, and Rebecca B. Carvin, 2021, Nutrient and sediment concentrations, loads, yields, and rainfall characteristics at USGS surface and subsurface-tile edge-of-field agricultural monitoring sites in Great Lakes States (ver. 3.0, September 2024): U.S. Geological Survey, https://doi.org/10.5066/P9LO8O70.
+
+Revision History
+First release: May 2021
+Revision 2.0: September 2022
+Revision 2.1: September 2023
+Revision 3.0: November 2024
+
+Revision 2.0
+This revision adds water years 2020 and 2021 and an additional Discovery Farms site to the previous data release. The entire Michigan Tile 2 (MI-TL2) discharge record has been revised, see details below.
+
+Changes from previous version
+1) Updated EOF_Site_Table.csv with revised dates, recalculated site years of data, and added one new site
+2) Added data for water years 2020 and 2021 to multiple sites, see EOF_Site_Table.csv for information
+3) Discovery Farms added a new site, AO3, and one year of data (water year 2021)
+4) MI-TL2 data revision for water years 2015-2021
+
+MI-TL2 revision explanation:
+The discharge record for the period from 6/30/2015 through 10/01/2022 was re-evaluated and corrected for periods of super critical flow and backwater. In May of 2022 a camera was installed which revealed that during some periods of very high flow, gage heights values drop to low or zero values due to super-critical flow conditions. Prior to this imagery, the low/zero gage heights were presumed correct. The discharge record for the entire period of record was re-opened, and corrections were made during these periods. In these instances, the maximum flow was determined to be 1.0 cfs, as calculated by utilizing max GH and velocity during a period of functioning velocity meter and comparison to a similar 6” tile site with a good gage/discharge relationship and corresponding good velocity record (441605088115703). This maximum flow value of 1.0 cfs was used when gage height values dropped to zero or below. Lesser discharge was estimated when gage height values dropped less significantly. A total of 34 events were edited for super-critical flow throughout the period of record. Also, as part of the record review, it was determined that the discharge for events with backwater conditions had been under-estimated. The discharge record for the entire period of record was re-opened, and corrections were made during these periods. Flow during these periods were estimated to reach a steady state with maximum value of ~0.25 cfs which corresponds to 0.5ft of GH. It has been observed at other tile sites with velocity meter discharge data that during periods of backwater, flow continues to exit the pipe at a somewhat steady state. It was also estimated that pipe-full conditions were reached during backwater events due to the magnitude of runoff observed. A total of 13 events were edited for backwater conditions throughout the period of record.
+
+Revision 2.1
+The site table was revised in version 2.1, all other tables remained unchanged. In the site table, values under USGS_Station_Number and USGS_Station_Number_for_Precipitation were incorrect. All other tables in the data release were checked and still had the correct station numbers. This update fixes the incorrect station IDs in EOF_Site_Table.csv.
+
+Revision 3.0
+This revision adds water years 2022 and 2023 and 3 additional sites to the previous data release. The Indiana Tile 2 (IN-TL2) discharge record was revised, see details below. 
+
+Changes from previous version
+1) Updated Site Table with revised dates, recalculated site years of data, and added three new sites
+2) Added data for water years 2022 and 2023 to multiple sites, see EOF_Site_Table.csv for information
+3) Added a column with the estimated flow fraction to the All_EOF_StormEvenLoadsRainCalculated.csv 
+4) Added "USGS-" to the beginning of all station IDs to prevent leading zeroes from being deleted and other automatic formatting by some software
+5) Additional sites include MI-TL3, MT1, and MT2. See EOF_Site_Table.csv for details
+6) IN-TL2 data revision for water years 2015-2023
+7) Corrected 'less than' notation for combined storms, see details below 
+
+IN-TL2 revision explanation:
+Adjustments to the stage-discharge computation rating at the drain tile west of Bull Rapids road near Harlan, IN site 411228084541702 were made for the period of record from October 1, 2015 to September 30, 2023, due to equipment malfunction at the site.
+
+Less than remark explanation:
+We identified an error in noting less than values (<) in the 'remark' column of the "All_EOF_StormEventLoadsRainCalculated.csv" table. In this table, flow events are combined that occur within 2 hours of each other. Specifically, loads and yields are summed, and concentrations are combined using flow-weighted means. Previously, situations with one or more sub-flow event with a concentration reported below the analytical detection level (i.e., noted as '<' in the remark field) had not been properly reported. The code has been revised and the table now includes a "<" in the remark field if any concentration associated with a flow event was reported below the detection level. The reported values in the flow-weighted concentrations, summed loads, and summed yields have not changed. The only change is including a "<" in the remark field in combined flow events where at least one concentration was reported below the detection level.  
