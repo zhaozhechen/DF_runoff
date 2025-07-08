@@ -1,4 +1,4 @@
-# \# Discovery Farm Runoff Generation
+\# Discovery Farm Runoff Generation
 
 This repo is for Discovery Farm Runoff Generation Project. The overall topic of this project is to explore the effects of practices/land cover use on P-Q relationships and nutrients.
 
