@@ -33,19 +33,27 @@ Output_path <- here("Results","DF Metadata")
 # -------- Main ------------
 # Make map of all DF sites
 # For Land cover
-g <- Site_plot("LandCover")
+Site_plot("LandCover")
 # For Monitoring
-g <- Site_plot("Monitoring")
+Site_plot("Monitoring")
 # For FarmEnterprise
-g <- Site_plot("FarmEnterprise")
+Site_plot("FarmEnterprise")
 # For CropRotation
-g <- Site_plot("CropRotation")
+Site_plot("CropRotation")
 # For tillage
-g <- Site_plot("Tillage")
+Site_plot("Tillage")
 # For Manure
-g <- Site_plot("Manure")
+Site_plot("Manure")
 # For Tile
-g <- Site_plot("Tile")
+Site_plot("Tile")
+
+# Make bar plots for all DF field-year
+Year_plot("Type")
+Year_plot("Tillage")
+Year_plot("Irrigation")
+Year_plot("Manure")
+Year_plot("Crop")
+Year_plot("PreviousCrop")
 
 
 

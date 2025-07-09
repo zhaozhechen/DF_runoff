@@ -70,8 +70,11 @@ DF_map <- function(varname){
 }
 
 # This function makes bar plot of number of sites for each variable
-DF_bar <- function(varname){
-  g <- ggplot(data=DF_meta_Site,
+# Input include:
+# varname: The target varname
+# df: The data frame
+DF_bar <- function(varname,df){
+  g <- ggplot(data=df,
               aes(y=.data[[varname]],
                   fill = .data[[varname]]))+
     geom_bar(color="black")+
@@ -89,8 +92,17 @@ DF_bar <- function(varname){
 # varname: The target variable name in the DF_meta_Site df
 Site_plot <- function(varname){
   g_map <- DF_map(varname)
-  g_bar <- DF_bar(varname)  
+  g_bar <- DF_bar(varname,DF_meta_Site)  
   g <- plot_grid(g_map,g_bar,nrow=1,
                  rel_widths = c(1.8,1))
   print_g(g,paste0("DF_Site_",varname),16,6)
 }
+
+# This function is to plot bar plots for field-year data
+Year_plot <- function(varname){
+  g_bar <- DF_bar(varname,DF_meta_Year)
+  print_g(g_bar,paste0("DF_Year_",varname),6,5)
+}
+
+
+
