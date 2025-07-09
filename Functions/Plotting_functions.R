@@ -17,13 +17,13 @@ my_theme <- theme(
   #legend.key.size = unit(6,"cm"),
   #aspect.ratio = 1/1,
   #legend.key.size = unit(0.3,'cm'),
-  legend.text = element_text(size=14),
-  plot.title = element_text(size=14),
+  legend.text = element_text(size=18),
+  plot.title = element_text(size=18),
   axis.text = element_blank(),
   axis.title = element_blank(),
   axis.ticks = element_blank(),
   legend.position = "right",
-  legend.title = element_text(size=14)
+  legend.title = element_text(size=18)
 )
 
 # This function is to print pdf and png figure
@@ -54,7 +54,8 @@ DF_map <- function(varname){
                shape = 21,
                color="black",
                alpha=0.7)+
-    scale_fill_brewer(palette = "Set2")+my_theme+
+    scale_fill_brewer(palette = "Set3")+
+    my_theme+
     geom_label_repel(data=DF_meta_Site,
                      aes(x=LONG_approx,y=LAT_approx,label=SiteID),
                      point.padding = 0,
@@ -62,7 +63,9 @@ DF_map <- function(varname){
                      box.padding = 0.25,
                      min.segment.length = 0,
                      max.overlaps = 30,
-                     segment.color="black")
+                     segment.color="black")+
+    guides(fill = guide_legend(override.aes = list(size = 6,shape=21)),
+           size=guide_legend(override.aes = list(shape=21)))
   return(g)
 }
 
@@ -72,11 +75,22 @@ DF_bar <- function(varname){
               aes(y=.data[[varname]],
                   fill = .data[[varname]]))+
     geom_bar(color="black")+
-    scale_fill_brewer(palette = "Set2")+
+    scale_fill_brewer(palette = "Set3")+
     my_theme+
     theme(panel.border = element_rect(colour="black",fill=NA),
-          axis.text = element_text(size=14),
+          axis.text = element_text(size=18),
           legend.position = "none")+
     ggtitle(varname)
   return(g)
+}
+
+# This function combines map of the target variable and distribution of the target variable
+# Input include:
+# varname: The target variable name in the DF_meta_Site df
+Site_plot <- function(varname){
+  g_map <- DF_map(varname)
+  g_bar <- DF_bar(varname)  
+  g <- plot_grid(g_map,g_bar,nrow=1,
+                 rel_widths = c(1.8,1))
+  print_g(g,paste0("DF_Site_",varname),16,6)
 }

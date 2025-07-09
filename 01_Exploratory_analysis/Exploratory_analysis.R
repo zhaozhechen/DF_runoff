@@ -32,9 +32,22 @@ Output_path <- here("Results","DF Metadata")
 
 # -------- Main ------------
 # Make map of all DF sites
-# Color by LandCover
-g_LC <- DF_map("LandCover")
-g_LC_bar <- DF_bar("LandCover")
+# For Land cover
+g <- Site_plot("LandCover")
+# For Monitoring
+g <- Site_plot("Monitoring")
+# For FarmEnterprise
+g <- Site_plot("FarmEnterprise")
+# For CropRotation
+g <- Site_plot("CropRotation")
+# For tillage
+g <- Site_plot("Tillage")
+# For Manure
+g <- Site_plot("Manure")
+# For Tile
+g <- Site_plot("Tile")
+
+
 
 
 

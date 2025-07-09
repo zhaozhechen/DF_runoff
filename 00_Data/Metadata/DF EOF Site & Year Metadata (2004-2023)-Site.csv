@@ -9,36 +9,36 @@ Heisner,H3,WY2005-WY2007,3,No,Surface,WI,Iowa,42.888111,-90.127889,Dairy,Corn-Ba
 Koepke,KP1,WY2006-WY2008,3,No,Tile,WI,Waukesha,43.187556,-88.46925,Dairy,Corn-Soybean-Alfalfa,Cultivated Crops,No,Yes,Yes,47,Theresa silt loam,C,Well drained,2,?,Drainage area 100 in USGS data?
 Koepke,KP2,WY2006-WY2008,3,No,Tile,WI,Waukesha,43.187639,-88.469694,Dairy,Corn-Soybean-Alfalfa,Cultivated Crops,No,Yes,Yes,43,Brookston silt loam,C/D,Poorly drained,2,?,Drainage area 40 in USGS data?
 Koepke,KP3,WY2006-WY2008,3,No,Surface,WI,Waukesha,43.186417,-88.469833,Dairy,Corn-Soybean-Alfalfa,Cultivated Crops,No,Yes,Yes,6.1,Brookston silt loam,C/D,Poorly drained,2,Yes,
+Marathon 1,MT1,WY2022-WY2023,2,Yes,Surface,WI,Marathon,45.0324444,-90.102,Dairy,Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,7.7,Loyal silt loam,C/D,Moderately well drained,4.1,Yes,
+Saxon,K3,WY2005-WY2006,2,No,Surface,WI,Manitowoc,43.906611,-87.781056,Grain,Corn-Soybean,Cultivated Crops,Yes,Yes,No,14.7,Kewaunee loam,D,Well drained,3,Yes,USGS says area 17.6; Basin draining not on Discovery Farms farm property; no farm/management data collected
+Jersey Valley,JF1,WY2011-WY2017,7,No,Surface,WI,Vernon,43.702556,-90.819361,Dairy,Corn-Alfalfa,Cultivated Crops,No,Yes,No,10.3,Brinkman silt loam,B,Moderately well drained,5.1,No,Basin delineation issues
+Jersey Valley,JF4,WY2011-WY2017,7,No,Surface,WI,Vernon,43.719583,-90.770306,Dairy,Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,14,NewGlarus silt loam,C,Well drained,5.2,Yes,
+Jersey Valley,JF5,WY2011-WY2017,7,No,Surface,WI,Vernon,43.714056,-90.770222,Dairy,Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,33.4,Brinkman silt loam,B,Moderately well drained,6.3,Yes,
+Dry Run,WF-1,WY2011-WY2017,7,No,Surface,WI,St. Croix,45.082833,-92.382833,Dairy and Grain,Corn-Soybean,Cultivated Crops,Yes,Yes,No,42.1,Santiago silt loam,B,Well drained,4.4,Yes,
+Dry Run,WF-2,WY2011-WY2017,7,No,Surface,WI,St. Croix,45.020833,-92.300306,Dairy,Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,6.7,Freeon silt loam heavy substratum,B/D,Moderately well drained,5.3,No,???
+Rebout,RE1,WY2015-WY2021,7,No,Surface,WI,Rock,42.669,-89.083722,Grain,Corn-Soybean,Cultivated Crops,Yes,No,No,9.4,Winnebago silt loam,B,Well drained,3,Yes,
+Rebout,RE5,WY2015-WY2021,7,No,Surface,WI,Rock,42.664917,-89.120611,Grain,Corn-Soybean,Cultivated Crops,Yes,No,No,9.7,Kidder silt loam,B,Well drained,3,Yes,
+Arndt,AR1,WY2017-WY2021,5,No,Surface,WI,Rock,42.627694,-88.990944,Beef and cash crop (grain and specialty),Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,18.5,Warsaw silt loam,B,Well drained,1.9,Yes,
+Arndt,AR2,WY2017-WY2021,5,No,Surface,WI,Rock,42.612806,-88.9985,Beef and cash crop (grain and specialty),Corn-Seed Corn-Vegetables-Mint,Cultivated Crops,Yes,Yes,No,5.8,Oshtemo sandy loam,A,Well drained,,Yes,
+Tile Monitoring,DK1A,WY2018-WY2020,3,No,Tile,WI,Door,44.677111,-87.398972,Dairy and Canning Crops,Corn-Alfalfa-Green Beans-Wheat,Cultivated Crops,Yes,Yes,Yes,19.4,Onaway-Ossineke fine sandy loam,C,Well drained,2.77,Yes,
+Tile Monitoring,MA1A,WY2018-WY2020,3,No,Tile,WI,Manitowoc,43.997167,-87.957528,Dairy and Grain,Corn-Soybean,Cultivated Crops,Yes,Yes,Yes,7.1,Hochheim loam,D,Well drained,5.88,Yes,
+Tile Monitoring,SH1A,WY2018-WY2020,3,No,Tile,WI,Shawno,44.837139,-88.310111,Dairy,Corn-Alfalfa,Cultivated Crops,Yes,Yes,Yes,37.3,Onaway-Ossineke fine sandy loam,C,Well drained,2.52,Yes,
+Lake Redstone,RS1,WY2019-WY2023,4,No,Surface,WI,Juneau,43.660861,-90.084639,Beef,Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,2.1,Norden silt loam,C,Well drained,11,Yes,
+Lake Redstone,RS2,WY2019-WY2023,4,No,Surface,WI,Sauk,43.639167,-90.110694,Beef,Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,1.9,La Farge silt loam,C,Well drained,7,Yes,
+Kewaunee,KD1,WY2019-WY2023,5,Yes,Surface,WI,Kewaunee,44.40127778,-87.6955556,Dairy,Corn,Cultivated Crops,No,Yes,No,2.63,Waymor silt loam,C,Well drained,3.92,Yes,Grassed waterway added Aug 2020
+Kewaunee,KD2,WY2019-WY2023,5,Yes,Surface,WI,Kewaunee,44.36527778,-87.54988889,Dairy,Corn,Cultivated Crops,No,Yes,No,19.8,Hortonville silt loam,C,Well drained,3.96,Yes,Waterway renovation Aug 2020
+Antigo 1,AO1,WY2019-WY2023,5,Yes,Surface,WI,Langlade,45.17238889,-89.1136111,Potato,Potato-Alfalfa,Cultivated Crops,Yes,No,No,22.2,Antigo silt loam,B,Well drained,1.9,Yes,
+Antigo 2,AO2,WY2019-WY2023,5,Yes,Surface,WI,Langlade,45.2019444,-89.0718056,Potato and vegetable,Potato-Alfalfa-Green Bean-Corn,Cultivated Crops,Yes,No,No,56.2,Antigo silt loam,B,Well drained,2.4,Yes,
+Antigo 3,AO3,WY2021-WY2023,3,Yes,Surface,WI,Langlade,45.227,-89.065,Potato and vegetable,Potato-Alfalfa-Green Bean-Corn,Cultivated Crops,Yes,No,No,22.4,Antigo silt loam,B,Well drained,2.5,Yes,
+Jersey Valley,JF6,WY2011-WY2017,7,No,Surface,WI,Monroe,43.740389,-90.771833,NA,NA,"Developed, Low Intensity",No,No,No,48,Mt. Carrol silt loam,B,Well drained,6.6,No,Urban land cover
+Dry Run,WF-3,WY2014-WY2017,4,No,Surface,WI,St. Croix,45.076861,-92.305389,CRP,NA,Grassland/Herbaceous,No,No,No,16.1,Santiago silt loam,B,Well drained,6.8,No,Natural land cover
 Saxon,K1,WY2005-WY2006,2,No,Stream,WI,Manitowoc,43.906583,-87.780889,Dairy,Grass Pasture,Pasture/Hay,No,Yes,Unknown,495,Kewaunee loam,Unknown,Unknown,Unknown,No,
 Saxon,K2,WY2005-WY2006,2,No,Stream,WI,Manitowoc,43.912639,-87.770694,Dairy,Grass Pasture,Pasture/Hay,No,Yes,Unknown,641,Kewaunee loam,Unknown,Unknown,Unknown,No,
-Saxon,K3,WY2005-WY2006,2,No,Surface,WI,Manitowoc,43.906611,-87.781056,Grain,Corn-Soybean,Cultivated Crops ,Yes,Yes,No,14.7,Kewaunee loam,D,Well drained,3,Yes,USGS says area 17.6; Basin draining not on Discovery Farms farm property; no farm/management data collected
 Saxon,K4,WY2006,1,No,Tile,WI,Manitowoc,43.912639,-87.770861,Dairy,Grass Pasture,Pasture/Hay,No,Yes,Yes,641,Kewaunee loam,C/D,Well drained,4.4,Yes,"data collected Jan 1 2005 to Nov 30 2007, moved Oct 1 - Nov 30, 2007 data to WY2005 to complete water year"
 Saxon,K5/K6,WY2007-WY2011,5,No,Paired,WI,Manitowoc,43.910667,-87.777583,Dairy,Grass Pasture,Pasture/Hay,Yes,Yes,Yes,15.2,Kewaunee loam,D,Well drained,3,Yes,FY2009 tile blow out; assumed zero flow for Oct 1 to Nov 8 2007; no data reported in 2009 because of backwater conditions
 Saxon,K7,WY2007-WY2011,5,No,Surface,WI,Manitowoc,43.912306,-87.773556,Dairy,Grass Pasture,Pasture/Hay,Yes,Yes,Yes,12,Kewaunee loam,D,Well drained,3,Yes,
 Saxon,K8,WY2008-WY2011,4,No,Surface,WI,Manitowoc,43.903361,-87.787611,Dairy,Grass Pasture,Pasture/Hay,No,Yes,No,5,Kewaunee loam,C,Well drained,6,Yes,No tile in basin but in surrounding area in waterways
-Jersey Valley,JF1,WY2011-WY2017,7,No,Surface,WI,Vernon,43.702556,-90.819361,Dairy,Corn-Alfalfa,Cultivated Crops ,No,Yes,No,10.3,Brinkman silt loam,B,Moderately well drained,5.1,No,Basin delineation issues
 Jersey Valley,JF2,WY2011-WY2017,7,No,Surface,WI,Vernon,43.71225,-90.785444,Beef,Grass Pasture,Pasture/Hay,No,Yes,No,16,Pepin silt loam,B,Well drained,8.6,Yes,
-Jersey Valley,JF3,WY2011-WY2017,7,No,Surface,WI,Vernon,43.712722,-90.782667,CRP,NA,Wooded,No,No,No,25.3,Pepin silt loam,B,Well drained,12.1,No,Natural land cover
-Jersey Valley,JF4,WY2011-WY2017,7,No,Surface,WI,Vernon,43.719583,-90.770306,Dairy,Corn-Alfalfa,Cultivated Crops ,Yes,Yes,No,14,NewGlarus silt loam,C,Well drained,5.2,Yes,
-Jersey Valley,JF5,WY2011-WY2017,7,No,Surface,WI,Vernon,43.714056,-90.770222,Dairy,Corn-Alfalfa,Cultivated Crops ,Yes,Yes,No,33.4,Brinkman silt loam,B,Moderately well drained,6.3,Yes,
-Jersey Valley,JF6,WY2011-WY2017,7,No,Surface,WI,Monroe,43.740389,-90.771833,NA,NA,"Developed, Low Intensity",No,No,No,48,Mt. Carrol silt loam,B,Well drained,6.6,No,Urban land cover
-Dry Run,WF-1,WY2011-WY2017,7,No,Surface,WI,St. Croix,45.082833,-92.382833,Dairy and Grain,Corn-Soybean,Cultivated Crops ,Yes,Yes,No,42.1,Santiago silt loam,B,Well drained,4.4,Yes,
-Dry Run,WF-2,WY2011-WY2017,7,No,Surface,WI,St. Croix,45.020833,-92.300306,Dairy,Corn-Alfalfa,Cultivated Crops ,Yes,Yes,No,6.7,Freeon silt loam heavy substratum,B/D,Moderately well drained,5.3,No,???
-Dry Run,WF-3,WY2014-WY2017,4,No,Surface,WI,St. Croix,45.076861,-92.305389,CRP,NA,Grassland/Herbaceous,No,No,No,16.1,Santiago silt loam,B,Well drained,6.8,No,Natural land cover
-Rebout,RE1,WY2015-WY2021,7,No,Surface,WI,Rock,42.669,-89.083722,Grain,Corn-Soybean,Cultivated Crops ,Yes,No,No,9.4,Winnebago silt loam,B,Well drained,3,Yes,
-Rebout,RE5,WY2015-WY2021,7,No,Surface,WI,Rock,42.664917,-89.120611,Grain,Corn-Soybean,Cultivated Crops ,Yes,No,No,9.7,Kidder silt loam,B,Well drained,3,Yes,
-Arndt,AR1,WY2017-WY2021,5,No,Surface,WI,Rock,42.627694,-88.990944,Beef and cash crop (grain and specialty),Corn-Alfalfa,Cultivated Crops ,Yes,Yes,No,18.5,Warsaw silt loam,B,Well drained,1.9,Yes,
-Arndt,AR2,WY2017-WY2021,5,No,Surface,WI,Rock,42.612806,-88.9985,Beef and cash crop (grain and specialty),Corn-Seed Corn-Vegetables-Mint,Cultivated Crops ,Yes,Yes,No,5.8,Oshtemo sandy loam,A,Well drained,,Yes,
-Tile Monitoring,DK1A,WY2018-WY2020,3,No,Tile,WI,Door,44.677111,-87.398972,Dairy and Canning Crops,Corn-Alfalfa-Green Beans-Wheat,Cultivated Crops ,Yes,Yes,Yes,19.4,Onaway-Ossineke fine sandy loam,C,Well drained,2.77,Yes,
-Tile Monitoring,MA1A,WY2018-WY2020,3,No,Tile,WI,Manitowoc,43.997167,-87.957528,Dairy and Grain,Corn-Soybean,Cultivated Crops ,Yes,Yes,Yes,7.1,Hochheim loam,D,Well drained,5.88,Yes,
-Tile Monitoring,SH1A,WY2018-WY2020,3,No,Tile,WI,Shawno,44.837139,-88.310111,Dairy,Corn-Alfalfa,Cultivated Crops ,Yes,Yes,Yes,37.3,Onaway-Ossineke fine sandy loam,C,Well drained,2.52,Yes,
-Lake Redstone,RS1,WY2019-WY2023,4,No,Surface,WI,Juneau,43.660861,-90.084639,Beef,Corn-Alfalfa,Cultivated Crops ,Yes,Yes,No,2.1,Norden silt loam,C,Well drained,11,Yes,
-Lake Redstone,RS2,WY2019-WY2023,4,No,Surface,WI,Sauk,43.639167,-90.110694,Beef,Corn-Alfalfa,Cultivated Crops ,Yes,Yes,No,1.9,La Farge silt loam,C,Well drained,7,Yes,
-Kewaunee,KD1,WY2019-WY2023,5,Yes,Surface,WI,Kewaunee,44.40127778,-87.6955556,Dairy,Corn,Cultivated Crops ,No,Yes,No,2.63,Waymor silt loam,C,Well drained,3.92,Yes,Grassed waterway added Aug 2020
-Kewaunee,KD2,WY2019-WY2023,5,Yes,Surface,WI,Kewaunee,44.36527778,-87.54988889,Dairy,Corn,Cultivated Crops ,No,Yes,No,19.8,Hortonville silt loam,C,Well drained,3.96,Yes,Waterway renovation Aug 2020
-Antigo 1,AO1,WY2019-WY2023,5,Yes,Surface,WI,Langlade,45.17238889,-89.1136111,Potato,Potato-Alfalfa,Cultivated Crops ,Yes,No,No,22.2,Antigo silt loam,B,Well drained,1.9,Yes,
-Antigo 2,AO2,WY2019-WY2023,5,Yes,Surface,WI,Langlade,45.2019444,-89.0718056,Potato and vegetable,Potato-Alfalfa-Green Bean-Corn,Cultivated Crops ,Yes,No,No,56.2,Antigo silt loam,B,Well drained,2.4,Yes,
-Antigo 3,AO3,WY2021-WY2023,3,Yes,Surface,WI,Langlade,45.227,-89.065,Potato and vegetable,Potato-Alfalfa-Green Bean-Corn,Cultivated Crops ,Yes,No,No,22.4,Antigo silt loam,B,Well drained,2.5,Yes,
-Marathon 1,MT1,WY2022-WY2023,2,Yes,Surface,WI,Marathon,45.0324444,-90.102,Dairy,Corn-Alfalfa,Cultivated Crops,Yes,Yes,No,7.7,Loyal silt loam,C/D,Moderately well drained,4.1,Yes,
 Marathon 2,MT2,WY2022-WY2023,1,No,Surface,WI,Marathon,44.92705556,-90.0401389,Dairy,Grass Pasture,Pasture/Hay,No,Yes,No,5.2,Loyal silt loam,C/D,Moderately well drained,2.4,Yes,Site abandoned May 2023
 Marathon 3,MT3,WY2023-WY2023,0,Yes,Surface,WI,Marathon,44.93250556,-90.15158889,Heifer Raising,Grass Pasture,Pasture/Hay,No,Yes,No,NA,NA,NA,NA,NA,Yes,Site installed fall 2023
+Jersey Valley,JF3,WY2011-WY2017,7,No,Surface,WI,Vernon,43.712722,-90.782667,CRP,NA,Wooded,No,No,No,25.3,Pepin silt loam,B,Well drained,12.1,No,Natural land cover
