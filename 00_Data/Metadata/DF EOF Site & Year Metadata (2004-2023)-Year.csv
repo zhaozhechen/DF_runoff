@@ -1,203 +1,203 @@
-﻿ProjectName,SiteYear,SiteID,Year,Type,SiteIDPair,Tillage,NoTillFarm,Manure,Irrigation,Crop,PreviousCrop
-Pagel,P1 2004,P1,2004,Surface,P1/P4,None,No,Yes,No,Alfalfa,Alfalfa
-Pagel,P1 2005,P1,2005,Surface,P1/P4,Conventional,No,Yes,No,Corn Silage,Alfalfa
-Pagel,P1 2006,P1,2006,Surface,P1/P4,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P1 2007,P1,2007,Surface,P1/P4,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P1 2008,P1,2008,Surface,P1/P4,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P2 2004,P2,2004,Surface,NA,None,No,Yes,No,Alfalfa,Alfalfa
-Pagel,P2 2005,P2,2005,Surface,NA,Conventional,No,Yes,No,Corn Silage,Alfalfa
-Pagel,P2 2006,P2,2006,Surface,NA,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P3 2004,P3,2004,Surface,P3/P5,None,No,Yes,No,Alfalfa,Alfalfa
-Pagel,P3 2005,P3,2005,Surface,P3/P5,Conventional,No,Yes,No,Corn Silage,Alfalfa
-Pagel,P3 2006,P3,2006,Surface,P3/P5,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P3 2007,P3,2007,Surface,P3/P5,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P3 2008,P3,2008,Surface,P3/P5,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P4 2005,P4,2005,Tile,P1/P4,Conventional,No,Yes,No,Corn Silage,Alfalfa
-Pagel,P4 2006,P4,2006,Tile,P1/P4,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P4 2007,P4,2007,Tile,P1/P4,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P4 2008,P4,2008,Tile,P1/P4,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P5 2005,P5,2005,Tile,P3/P5,Conventional,No,Yes,No,Corn Silage,Alfalfa
-Pagel,P5 2006,P5,2006,Tile,P3/P5,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P5 2007,P5,2007,Tile,P3/P5,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Pagel,P5 2008,P5,2008,Tile,P3/P5,Conventional,No,Yes,No,Corn Silage,Corn Silage
-Riechers,R1 2004,R1,2004,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R1 2005,R1,2005,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Riechers,R1 2006,R1,2006,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Riechers,R1 2007,R1,2007,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R1 2008,R1,2008,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Riechers,R1 2009,R1,2009,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Riechers,R1 2010,R1,2010,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R2 2004,R2,2004,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R2 2005,R2,2005,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Riechers,R2 2006,R2,2006,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Riechers,R2 2007,R2,2007,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R2 2008,R2,2008,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Riechers,R2 2009,R2,2009,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Riechers,R2 2010,R2,2010,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R3 2004,R3,2004,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Riechers,R3 2005,R3,2005,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Riechers,R3 2006,R3,2006,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R3 2007,R3,2007,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Riechers,R3 2008,R3,2008,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Riechers,R3 2009,R3,2009,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Riechers,R3 2010,R3,2010,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Heisner,H3 2005,H3,2005,Surface,NA,Conventional,No,Yes,No,Forage Mix,Forage Mix
-Heisner,H3 2006,H3,2006,Surface,NA,Conventional,No,Yes,No,Forage Mix,Forage Mix
-Heisner,H3 2007,H3,2007,Surface,NA,Conventional,No,Yes,No,Forage Mix,Forage Mix
-Koepke,KP1 2006,KP1,2006,Tile,NA,No-Till,Yes,Yes,Unknown,Alfalfa,Alfalfa
-Koepke,KP1 2007,KP1,2007,Tile,NA,No-Till,Yes,Yes,Unknown,Corn,Alfalfa
-Koepke,KP1 2008,KP1,2008,Tile,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Koepke,KP2 2006,KP2,2006,Tile,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Koepke,KP2 2007,KP2,2007,Tile,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Koepke,KP2 2008,KP2,2008,Tile,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Koepke,KP3 2006,KP3,2006,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Corn
-Koepke,KP3 2007,KP3,2007,Surface,NA,No-Till,Yes,Yes,Unknown,Soybean,Corn
-Koepke,KP3 2008,KP3,2008,Surface,NA,No-Till,Yes,Yes,Unknown,Corn,Soybean
-Saxon,K3 2005,K3,2005,Surface,NA,Conventional,No,Yes,No,Corn,Corn
-Saxon,K3 2006,K3,2006,Surface,NA,Conventional,No,Yes,No,Corn,Corn
-Saxon,K4 2005,K4,2005,Tile,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K4 2006,K4,2006,Tile,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K5 2008,K5,2008,Surface,K5/K6,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K5 2009,K5,2009,Surface,K5/K6,Pasture Renovation,Yes,Yes,No,Pasture,Pasture
-Saxon,K5 2010,K5,2010,Surface,K5/K6,Pasture Renovation,Yes,Yes,No,Pasture,Pasture
-Saxon,K5 2011,K5,2011,Surface,K5/K6,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K6 2007,K6,2007,Tile,K5/K6,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K6 2008,K6,2008,Tile,K5/K6,Pasture Renovation,Yes,Yes,No,Pasture,Pasture
-Saxon,K6 2010,K6,2010,Tile,K5/K6,Pasture Renovation,Yes,Yes,No,Pasture,Pasture
-Saxon,K6 2011,K6,2011,Tile,K5/K6,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K7 2008,K7,2008,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K7 2009,K7,2009,Surface,NA,Pasture Renovation,Yes,Yes,No,Pasture,Pasture
-Saxon,K7 2010,K7,2010,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K7 2011,K7,2011,Surface,NA,Pasture Renovation,Yes,Yes,No,Pasture,Pasture
-Saxon,K8 2008,K8,2008,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K8 2009,K8,2009,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K8 2010,K8,2010,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Saxon,K8 2011,K8,2011,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF1 2011,JF1,2011,Surface,NA,No-Till,Yes,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF1 2012,JF1,2012,Surface,NA,No-Till,Yes,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF1 2013,JF1,2013,Surface,NA,No-Till,Yes,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF1 2014,JF1,2014,Surface,NA,No-Till,Yes,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF1 2015,JF1,2015,Surface,NA,No-Till,Yes,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF1 2016,JF1,2016,Surface,NA,No-Till,Yes,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF2 2011,JF2,2011,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF2 2012,JF2,2012,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF2 2013,JF2,2013,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF2 2014,JF2,2014,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF2 2015,JF2,2015,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF2 2016,JF2,2016,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF3 2011,JF3,2011,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF3 2012,JF3,2012,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF3 2013,JF3,2013,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF3 2014,JF3,2014,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF3 2015,JF3,2015,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF3 2016,JF3,2016,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF4 2011,JF4,2011,Surface,NA,Reduced,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF4 2012,JF4,2012,Surface,NA,Reduced,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF4 2013,JF4,2013,Surface,NA,Reduced,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF4 2014,JF4,2014,Surface,NA,Reduced,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF4 2015,JF4,2015,Surface,NA,Reduced,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF4 2016,JF4,2016,Surface,NA,Reduced,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF5 2011,JF5,2011,Surface,NA,Conventional,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF5 2012,JF5,2012,Surface,NA,Conventional,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF5 2013,JF5,2013,Surface,NA,Conventional,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF5 2014,JF5,2014,Surface,NA,Conventional,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF5 2015,JF5,2015,Surface,NA,Conventional,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF5 2016,JF5,2016,Surface,NA,Conventional,No,Yes,No,Forage Mix,Mix
-Jersey Valley,JF6 2012,JF6,2012,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF6 2013,JF6,2013,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF6 2014,JF6,2014,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF6 2015,JF6,2015,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF6 2016,JF6,2016,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF1 2017,JF1,2017,Surface,NA,No-Till,Yes,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF2 2017,JF2,2017,Surface,NA,Pasture,Yes,Yes,No,Pasture,Pasture
-Jersey Valley,JF3 2017,JF3,2017,Surface,NA,NA,NA,NA,NA,NA,NA
-Jersey Valley,JF4 2017,JF4,2017,Surface,NA,Reduced,No,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF5 2017,JF5,2017,Surface,NA,Conventional,No,Yes,No,Forage Mix,Forage Mix
-Jersey Valley,JF6 2017,JF6,2017,Surface,NA,NA,NA,NA,NA,NA,NA
-Dry Run,WF1 2011,WF1,2011,Surface,NA,Conventional,No,Yes,Yes,Corn,Corn
-Dry Run,WF1 2012,WF1,2012,Surface,NA,Conventional,No,Yes,Yes,Corn,Corn
-Dry Run,WF1 2013,WF1,2013,Surface,NA,Conventional,No,Yes,Yes,Corn,Corn
-Dry Run,WF1 2014,WF1,2014,Surface,NA,Reduced,No,Yes,Yes,Soybean,Corn
-Dry Run,WF1 2015,WF1,2015,Surface,NA,Conventional,No,Yes,Yes,Corn,Soybean
-Dry Run,WF1 2016,WF1,2016,Surface,NA,Conventional,No,Yes,Yes,Corn,Corn
-Dry Run,WF2 2011,WF2,2011,Surface,NA,Conventional,No,Yes,No,Corn,Soybean
-Dry Run,WF2 2012,WF2,2012,Surface,NA,Conventional,No,Yes,No,Alfalfa,Corn
-Dry Run,WF2 2013,WF2,2013,Surface,NA,None,No,Yes,No,Alfalfa,Alfalfa
-Dry Run,WF2 2014,WF2,2014,Surface,NA,None,No,Yes,No,Alfalfa,Alfalfa
-Dry Run,WF2 2015,WF2,2015,Surface,NA,Conventional,No,Yes,No,Corn,Alfalfa
-Dry Run,WF2 2016,WF2,2016,Surface,NA,Conventional,No,Yes,No,Corn,Corn
-Dry Run,WF3 2014,WF3,2014,Surface,NA,NA,NA,NA,NA,NA,NA
-Dry Run,WF3 2015,WF3,2015,Surface,NA,NA,NA,NA,NA,NA,NA
-Dry Run,WF3 2016,WF3,2016,Surface,NA,NA,NA,NA,NA,NA,NA
-Dry Run,WF1 2017,WF1,2017,Surface,NA,None,No,Yes,Yes,Corn,Corn
-Dry Run,WF2 2017,WF2,2017,Surface,NA,Conventional,No,Yes,No,Corn,Corn
-Dry Run,WF3 2017,WF3,2017,Surface,NA,NA,NA,NA,NA,NA,NA
-Rebouts,RE1 2015,RE1,2015,Surface,NA,Reduced,No,No,No,Corn,Soybean
-Rebouts,RE1 2016,RE1,2016,Surface,NA,Reduced,No,No,No,Corn,Corn
-Rebouts,RE1 2017,RE1,2017,Surface,NA,None,No,No,No,Soybean,Corn
-Rebouts,RE1 2018,RE1,2018,Surface,NA,Reduced,No,No,No,Corn,Soybean
-Rebouts,RE1 2019,RE1,2019,Surface,NA,Reduced,No,No,No,Corn,Corn
-Rebouts,RE1 2020,RE1,2020,Surface,NA,None,No,No,No,Soybean,Corn
-Rebouts,RE1 2021,RE1,2021,Surface,NA,Reduced,No,No,No,Corn,Soybean
-Rebouts,RE5 2015,RE5,2015,Surface,NA,None,No,No,No,Soybean,Corn
-Rebouts,RE5 2016,RE5,2016,Surface,NA,Reduced,No,No,No,Corn,Soybean
-Rebouts,RE5 2017,RE5,2017,Surface,NA,None,No,No,No,Soybean,Corn
-Rebouts,RE5 2018,RE5,2018,Surface,NA,Reduced,No,No,No,Corn,Soybean
-Rebouts,RE5 2019,RE5,2019,Surface,NA,Reduced,No,No,No,Corn,Corn
-Rebouts,RE5 2020,RE5,2020,Surface,NA,None,No,No,No,Soybean,Corn
-Rebouts,RE5 2021,RE5,2021,Surface,NA,Reduced,No,No,No,Corn,Soybean
-Arndt,AR1 2017,AR1,2017,Surface,NA,Conventional,No,Yes,Yes,Alfalfa,Corn
-Arndt,AR1 2018,AR1,2018,Surface,NA,None,No,Yes,Yes,Alfalfa,Alfalfa
-Arndt,AR1 2019,AR1,2019,Surface,NA,None,No,Yes,Yes,Alfalfa,Alfalfa
-Arndt,AR1 2020,AR1,2020,Surface,NA,None,No,Yes,Yes,Alfalfa,Alfalfa
-Arndt,AR1 2021,AR1,2021,Surface,NA,Conventional,No,Yes,Yes,Corn,Alfalfa
-Arndt,AR2 2017,AR2,2017,Surface,NA,Conventional,No,Yes,Yes,Seed Corn,Pea/Green Bean
-Arndt,AR2 2018,AR2,2018,Surface,NA,Conventional,No,Yes,Yes,Corn,Seed Corn
-Arndt,AR2 2019,AR2,2019,Surface,NA,Conventional,No,Yes,Yes,Corn,Corn
-Arndt,AR2 2020,AR2,2020,Surface,NA,Conventional,No,Yes,Yes,Corn,Corn
-Arndt,AR2 2021,AR2,2021,Surface,NA,Conventional,No,Yes,Yes,Corn,Corn
-Tile Monitoring,DK1A 2018,DK1A,2018,Tile,NA,None,No,No,No,Wheat,Green Beans
-Tile Monitoring,DK1A 2019,DK1A,2019,Tile,NA,Conventional,No,Yes,No,Corn Silage,Wheat
-Tile Monitoring,DK1A 2020,DK1A,2020,Tile,NA,Conventional,No,No,No,Sorghum/Sudan,Corn Silage
-Tile Monitoring,MA1A 2018,MA1A,2018,Tile,NA,Conventional,No,Yes,No,Corn,Soybean
-Tile Monitoring,MA1A 2019,MA1A,2019,Tile,NA,Conventional,No,No,No,Soybean,Corn
-Tile Monitoring,MA1A 2020,MA1A,2020,Tile,NA,Conventional,No,Yes,No,Corn Silage,Soybean
-Tile Monitoring,SH1A 2018,SH1A,2018,Tile,NA,Reduced,No,No,No,Alfalfa,Corn Silage
-Tile Monitoring,SH1A 2019,SH1A,2019,Tile,NA,None,No,Yes,No,Alfalfa,Alfalfa
-Tile Monitoring,SH1A 2020,SH1A,2020,Tile,NA,None,No,Yes,No,Alfalfa,Alfalfa
-Lake Redstone,RS1 2019,RS1,2019,Surface,NA,Conventional,No,Yes,No,Cover Crop Mix,Corn
-Lake Redstone,RS1 2020,RS1,2020,Surface,NA,Reduced,No,No,No,Alfalfa,Cover Crop Mix
-Lake Redstone,RS1 2021,RS1,2021,Surface,NA,None,No,No,No,Alfalfa,Alfalfa
-Lake Redstone,RS1 2022,RS1,2022,Surface,NA,None,No,No,No,Alfalfa,Alfalfa
-Lake Redstone,RS1 2023,RS1,2023,Surface,NA,None,No,No,No,Alfalfa,Alfalfa
-Lake Redstone, RS2 2019,RS2,2019,Surface,NA,Conventional,No,No,No,Corn,Corn
-Lake Redstone,RS2 2020,RS2,2020,Surface,NA,Reduced,No,No,No,Grass,Corn
-Lake Redstone,RS2 2021,RS2,2021,Surface,NA,None,No,No,No,Grass,Grass
-Lake Redstone,RS2 2022,RS2,2022,Surface,NA,None,No,No,No,Soybean,Grass
-Lake Redstone,RS2 2023,RS2,2023,Surface,NA,None,No,No,No,Corn,Soybean
-Kewaunee 1,KD1 2019,KD1,2019,Surface,NA,No-Till,Yes,No,No,Corn Silage,Corn Silage
-Kewaunee 1,KD1 2020,KD1,2020,Surface,NA,No-Till,Yes,No,No,Corn Silage,Corn Silage
-Kewaunee 1,KD1 2021,KD1,2021,Surface,NA,No-Till,Yes,Yes,No,Corn Silage,Corn Silage
-Kewaunee 1,KD1 2022,KD1,2022,Surface,NA,No-Till,Yes,Yes,No,Corn Silage,Corn Silage
-Kewaunee 1,KD1 2023,KD1,2023,Surface,NA,No-Till,Yes,Yes,No,Corn Silage,Corn Silage
-Kewaunee 2,KD2 2019,KD2,2019,Surface,NA,None,Yes,Yes,No,Corn Silage,Corn Silage
-Kewaunee 2,KD2 2020,KD2,2020,Surface,NA,Conventional,Yes,Yes,No,Soybean,Corn Silage
-Kewaunee 2,KD2 2021,KD2,2021,Surface,NA,None,Yes,Yes,No,Corn Silage,Soybean
-Kewaunee 2,KD2 2022,KD2,2022,Surface,NA,None,Yes,Yes,No,Corn Silage,Corn Silage
-Kewaunee 2,KD2 2023,KD2,2023,Surface,NA,None,Yes,Yes,No,Corn Silage,Corn Silage
-Anitgo 1,AO1 2019,AO1,2019,Surface,NA,Conventional,No,No,Yes,Potato,Alfalfa
-Anitgo 1,AO1 2020,AO1,2020,Surface,NA,Reduced,No,No,Yes,Alfalfa/grass,Potato
-Anitgo 1,AO1 2021,AO1,2021,Surface,NA,None,No,No,Yes,Alfalfa/grass,Alfalfa/grass
-Anitgo 1,AO1 2022,AO1,2022,Surface,NA,None,No,No,Yes,Alfalfa/grass,Alfalfa/grass
-Anitgo 1,AO1 2023,AO1,2023,Surface,NA,Conventional,No,No,Yes,Potato,Alfalfa/grass
-Anitgo 2,AO2 2019,AO2,2019,Surface,NA,Reduced,No,No,Yes,Alfalfa,Snap Bean
-Anitgo 2,AO2 2020,AO2,2020,Surface,NA,None,No,No,Yes,Alfalfa,Alfalfa
-Anitgo 2,AO2 2021,AO2,2021,Surface,NA,Conventional,No,No,Yes,Potato,Alfalfa
-Anitgo 2,AO2 2022,AO2,2022,Surface,NA,Conventional,No,No,Yes,Snap Bean,Potato
-Anitgo 2,AO2 2023,AO2,2023,Surface,NA,None,No,No,Yes,Alfalfa,Snap Bean
-Anitgo 3,AO3 2021,AO3,2021,Surface,NA,Conventional,No,No,Yes,Potato,Red Clover
-Anitgo 3,AO3 2022,AO3,2022,Surface,NA,Conventional,No,No,No,Snap Bean,Potato
-Anitgo 3,AO3 2023,AO3,2023,Surface,NA,Conventional,No,No,Yes,Alfalfa,Snap Bean
-Marathon 1,MT1 2022,MT1,2022,Surface,NA,None,No,Yes,No,Corn Silage,Corn Silage
-Marathon 1,MT1 2023,MT1,2023,Surface,NA,Reduced,No,Yes,No,Alfalfa,Corn Silage
-Marathon 2,MT2 2022,MT2,2022,Surface,NA,No-Till,Yes,Yes,No,Pasture,Pasture
+﻿ProjectName,SiteYear,SiteID,Year,Type,SiteIDPair
+Pagel,P1 2004,P1,2004,Surface,P1/P4
+Pagel,P1 2005,P1,2005,Surface,P1/P4
+Pagel,P1 2006,P1,2006,Surface,P1/P4
+Pagel,P1 2007,P1,2007,Surface,P1/P4
+Pagel,P1 2008,P1,2008,Surface,P1/P4
+Pagel,P2 2004,P2,2004,Surface,NA
+Pagel,P2 2005,P2,2005,Surface,NA
+Pagel,P2 2006,P2,2006,Surface,NA
+Pagel,P3 2004,P3,2004,Surface,P3/P5
+Pagel,P3 2005,P3,2005,Surface,P3/P5
+Pagel,P3 2006,P3,2006,Surface,P3/P5
+Pagel,P3 2007,P3,2007,Surface,P3/P5
+Pagel,P3 2008,P3,2008,Surface,P3/P5
+Pagel,P4 2005,P4,2005,Tile,P1/P4
+Pagel,P4 2006,P4,2006,Tile,P1/P4
+Pagel,P4 2007,P4,2007,Tile,P1/P4
+Pagel,P4 2008,P4,2008,Tile,P1/P4
+Pagel,P5 2005,P5,2005,Tile,P3/P5
+Pagel,P5 2006,P5,2006,Tile,P3/P5
+Pagel,P5 2007,P5,2007,Tile,P3/P5
+Pagel,P5 2008,P5,2008,Tile,P3/P5
+Riechers,R1 2004,R1,2004,Surface,NA
+Riechers,R1 2005,R1,2005,Surface,NA
+Riechers,R1 2006,R1,2006,Surface,NA
+Riechers,R1 2007,R1,2007,Surface,NA
+Riechers,R1 2008,R1,2008,Surface,NA
+Riechers,R1 2009,R1,2009,Surface,NA
+Riechers,R1 2010,R1,2010,Surface,NA
+Riechers,R2 2004,R2,2004,Surface,NA
+Riechers,R2 2005,R2,2005,Surface,NA
+Riechers,R2 2006,R2,2006,Surface,NA
+Riechers,R2 2007,R2,2007,Surface,NA
+Riechers,R2 2008,R2,2008,Surface,NA
+Riechers,R2 2009,R2,2009,Surface,NA
+Riechers,R2 2010,R2,2010,Surface,NA
+Riechers,R3 2004,R3,2004,Surface,NA
+Riechers,R3 2005,R3,2005,Surface,NA
+Riechers,R3 2006,R3,2006,Surface,NA
+Riechers,R3 2007,R3,2007,Surface,NA
+Riechers,R3 2008,R3,2008,Surface,NA
+Riechers,R3 2009,R3,2009,Surface,NA
+Riechers,R3 2010,R3,2010,Surface,NA
+Heisner,H3 2005,H3,2005,Surface,NA
+Heisner,H3 2006,H3,2006,Surface,NA
+Heisner,H3 2007,H3,2007,Surface,NA
+Koepke,KP1 2006,KP1,2006,Tile,NA
+Koepke,KP1 2007,KP1,2007,Tile,NA
+Koepke,KP1 2008,KP1,2008,Tile,NA
+Koepke,KP2 2006,KP2,2006,Tile,NA
+Koepke,KP2 2007,KP2,2007,Tile,NA
+Koepke,KP2 2008,KP2,2008,Tile,NA
+Koepke,KP3 2006,KP3,2006,Surface,NA
+Koepke,KP3 2007,KP3,2007,Surface,NA
+Koepke,KP3 2008,KP3,2008,Surface,NA
+Saxon,K3 2005,K3,2005,Surface,NA
+Saxon,K3 2006,K3,2006,Surface,NA
+Saxon,K4 2005,K4,2005,Tile,NA
+Saxon,K4 2006,K4,2006,Tile,NA
+Saxon,K5 2008,K5,2008,Surface,K5/K6
+Saxon,K5 2009,K5,2009,Surface,K5/K6
+Saxon,K5 2010,K5,2010,Surface,K5/K6
+Saxon,K5 2011,K5,2011,Surface,K5/K6
+Saxon,K6 2007,K6,2007,Tile,K5/K6
+Saxon,K6 2008,K6,2008,Tile,K5/K6
+Saxon,K6 2010,K6,2010,Tile,K5/K6
+Saxon,K6 2011,K6,2011,Tile,K5/K6
+Saxon,K7 2008,K7,2008,Surface,NA
+Saxon,K7 2009,K7,2009,Surface,NA
+Saxon,K7 2010,K7,2010,Surface,NA
+Saxon,K7 2011,K7,2011,Surface,NA
+Saxon,K8 2008,K8,2008,Surface,NA
+Saxon,K8 2009,K8,2009,Surface,NA
+Saxon,K8 2010,K8,2010,Surface,NA
+Saxon,K8 2011,K8,2011,Surface,NA
+Jersey Valley,JF1 2011,JF1,2011,Surface,NA
+Jersey Valley,JF1 2012,JF1,2012,Surface,NA
+Jersey Valley,JF1 2013,JF1,2013,Surface,NA
+Jersey Valley,JF1 2014,JF1,2014,Surface,NA
+Jersey Valley,JF1 2015,JF1,2015,Surface,NA
+Jersey Valley,JF1 2016,JF1,2016,Surface,NA
+Jersey Valley,JF2 2011,JF2,2011,Surface,NA
+Jersey Valley,JF2 2012,JF2,2012,Surface,NA
+Jersey Valley,JF2 2013,JF2,2013,Surface,NA
+Jersey Valley,JF2 2014,JF2,2014,Surface,NA
+Jersey Valley,JF2 2015,JF2,2015,Surface,NA
+Jersey Valley,JF2 2016,JF2,2016,Surface,NA
+Jersey Valley,JF3 2011,JF3,2011,Surface,NA
+Jersey Valley,JF3 2012,JF3,2012,Surface,NA
+Jersey Valley,JF3 2013,JF3,2013,Surface,NA
+Jersey Valley,JF3 2014,JF3,2014,Surface,NA
+Jersey Valley,JF3 2015,JF3,2015,Surface,NA
+Jersey Valley,JF3 2016,JF3,2016,Surface,NA
+Jersey Valley,JF4 2011,JF4,2011,Surface,NA
+Jersey Valley,JF4 2012,JF4,2012,Surface,NA
+Jersey Valley,JF4 2013,JF4,2013,Surface,NA
+Jersey Valley,JF4 2014,JF4,2014,Surface,NA
+Jersey Valley,JF4 2015,JF4,2015,Surface,NA
+Jersey Valley,JF4 2016,JF4,2016,Surface,NA
+Jersey Valley,JF5 2011,JF5,2011,Surface,NA
+Jersey Valley,JF5 2012,JF5,2012,Surface,NA
+Jersey Valley,JF5 2013,JF5,2013,Surface,NA
+Jersey Valley,JF5 2014,JF5,2014,Surface,NA
+Jersey Valley,JF5 2015,JF5,2015,Surface,NA
+Jersey Valley,JF5 2016,JF5,2016,Surface,NA
+Jersey Valley,JF6 2012,JF6,2012,Surface,NA
+Jersey Valley,JF6 2013,JF6,2013,Surface,NA
+Jersey Valley,JF6 2014,JF6,2014,Surface,NA
+Jersey Valley,JF6 2015,JF6,2015,Surface,NA
+Jersey Valley,JF6 2016,JF6,2016,Surface,NA
+Jersey Valley,JF1 2017,JF1,2017,Surface,NA
+Jersey Valley,JF2 2017,JF2,2017,Surface,NA
+Jersey Valley,JF3 2017,JF3,2017,Surface,NA
+Jersey Valley,JF4 2017,JF4,2017,Surface,NA
+Jersey Valley,JF5 2017,JF5,2017,Surface,NA
+Jersey Valley,JF6 2017,JF6,2017,Surface,NA
+Dry Run,WF1 2011,WF1,2011,Surface,NA
+Dry Run,WF1 2012,WF1,2012,Surface,NA
+Dry Run,WF1 2013,WF1,2013,Surface,NA
+Dry Run,WF1 2014,WF1,2014,Surface,NA
+Dry Run,WF1 2015,WF1,2015,Surface,NA
+Dry Run,WF1 2016,WF1,2016,Surface,NA
+Dry Run,WF2 2011,WF2,2011,Surface,NA
+Dry Run,WF2 2012,WF2,2012,Surface,NA
+Dry Run,WF2 2013,WF2,2013,Surface,NA
+Dry Run,WF2 2014,WF2,2014,Surface,NA
+Dry Run,WF2 2015,WF2,2015,Surface,NA
+Dry Run,WF2 2016,WF2,2016,Surface,NA
+Dry Run,WF3 2014,WF3,2014,Surface,NA
+Dry Run,WF3 2015,WF3,2015,Surface,NA
+Dry Run,WF3 2016,WF3,2016,Surface,NA
+Dry Run,WF1 2017,WF1,2017,Surface,NA
+Dry Run,WF2 2017,WF2,2017,Surface,NA
+Dry Run,WF3 2017,WF3,2017,Surface,NA
+Rebouts,RE1 2015,RE1,2015,Surface,NA
+Rebouts,RE1 2016,RE1,2016,Surface,NA
+Rebouts,RE1 2017,RE1,2017,Surface,NA
+Rebouts,RE1 2018,RE1,2018,Surface,NA
+Rebouts,RE1 2019,RE1,2019,Surface,NA
+Rebouts,RE1 2020,RE1,2020,Surface,NA
+Rebouts,RE1 2021,RE1,2021,Surface,NA
+Rebouts,RE5 2015,RE5,2015,Surface,NA
+Rebouts,RE5 2016,RE5,2016,Surface,NA
+Rebouts,RE5 2017,RE5,2017,Surface,NA
+Rebouts,RE5 2018,RE5,2018,Surface,NA
+Rebouts,RE5 2019,RE5,2019,Surface,NA
+Rebouts,RE5 2020,RE5,2020,Surface,NA
+Rebouts,RE5 2021,RE5,2021,Surface,NA
+Arndt,AR1 2017,AR1,2017,Surface,NA
+Arndt,AR1 2018,AR1,2018,Surface,NA
+Arndt,AR1 2019,AR1,2019,Surface,NA
+Arndt,AR1 2020,AR1,2020,Surface,NA
+Arndt,AR1 2021,AR1,2021,Surface,NA
+Arndt,AR2 2017,AR2,2017,Surface,NA
+Arndt,AR2 2018,AR2,2018,Surface,NA
+Arndt,AR2 2019,AR2,2019,Surface,NA
+Arndt,AR2 2020,AR2,2020,Surface,NA
+Arndt,AR2 2021,AR2,2021,Surface,NA
+Tile Monitoring,DK1A 2018,DK1A,2018,Tile,NA
+Tile Monitoring,DK1A 2019,DK1A,2019,Tile,NA
+Tile Monitoring,DK1A 2020,DK1A,2020,Tile,NA
+Tile Monitoring,MA1A 2018,MA1A,2018,Tile,NA
+Tile Monitoring,MA1A 2019,MA1A,2019,Tile,NA
+Tile Monitoring,MA1A 2020,MA1A,2020,Tile,NA
+Tile Monitoring,SH1A 2018,SH1A,2018,Tile,NA
+Tile Monitoring,SH1A 2019,SH1A,2019,Tile,NA
+Tile Monitoring,SH1A 2020,SH1A,2020,Tile,NA
+Lake Redstone,RS1 2019,RS1,2019,Surface,NA
+Lake Redstone,RS1 2020,RS1,2020,Surface,NA
+Lake Redstone,RS1 2021,RS1,2021,Surface,NA
+Lake Redstone,RS1 2022,RS1,2022,Surface,NA
+Lake Redstone,RS1 2023,RS1,2023,Surface,NA
+Lake Redstone, RS2 2019,RS2,2019,Surface,NA
+Lake Redstone,RS2 2020,RS2,2020,Surface,NA
+Lake Redstone,RS2 2021,RS2,2021,Surface,NA
+Lake Redstone,RS2 2022,RS2,2022,Surface,NA
+Lake Redstone,RS2 2023,RS2,2023,Surface,NA
+Kewaunee 1,KD1 2019,KD1,2019,Surface,NA
+Kewaunee 1,KD1 2020,KD1,2020,Surface,NA
+Kewaunee 1,KD1 2021,KD1,2021,Surface,NA
+Kewaunee 1,KD1 2022,KD1,2022,Surface,NA
+Kewaunee 1,KD1 2023,KD1,2023,Surface,NA
+Kewaunee 2,KD2 2019,KD2,2019,Surface,NA
+Kewaunee 2,KD2 2020,KD2,2020,Surface,NA
+Kewaunee 2,KD2 2021,KD2,2021,Surface,NA
+Kewaunee 2,KD2 2022,KD2,2022,Surface,NA
+Kewaunee 2,KD2 2023,KD2,2023,Surface,NA
+Anitgo 1,AO1 2019,AO1,2019,Surface,NA
+Anitgo 1,AO1 2020,AO1,2020,Surface,NA
+Anitgo 1,AO1 2021,AO1,2021,Surface,NA
+Anitgo 1,AO1 2022,AO1,2022,Surface,NA
+Anitgo 1,AO1 2023,AO1,2023,Surface,NA
+Anitgo 2,AO2 2019,AO2,2019,Surface,NA
+Anitgo 2,AO2 2020,AO2,2020,Surface,NA
+Anitgo 2,AO2 2021,AO2,2021,Surface,NA
+Anitgo 2,AO2 2022,AO2,2022,Surface,NA
+Anitgo 2,AO2 2023,AO2,2023,Surface,NA
+Anitgo 3,AO3 2021,AO3,2021,Surface,NA
+Anitgo 3,AO3 2022,AO3,2022,Surface,NA
+Anitgo 3,AO3 2023,AO3,2023,Surface,NA
+Marathon 1,MT1 2022,MT1,2022,Surface,NA
+Marathon 1,MT1 2023,MT1,2023,Surface,NA
+Marathon 2,MT2 2022,MT2,2022,Surface,NA
