@@ -88,6 +88,10 @@ eof_all$storm_end <- mdy_hm(eof_all$storm_end)
 eof_all$field_year <- water_year(eof_all$storm_start,origin="usgs")
 eof_all$month <- month(eof_all$storm_start)
 
+# Rename storm
+eof_all <- eof_all %>%
+  mutate(storm = ifelse(storm == 1,"Storm","Non-storm"))
+
 # Total number of events
 n_total <- nrow(usgs_eof)
 # Number of events that are not classified as "storm": the flow is not associated with rainfall or snowmelt

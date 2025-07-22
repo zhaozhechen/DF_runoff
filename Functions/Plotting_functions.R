@@ -7,8 +7,9 @@ library(ggplot2)
 library(cowplot)
 library(RColorBrewer)
 library(ggrepel)
+library(gghalves)
 
-# Theme for all plots
+# Theme for maps
 my_theme <- theme(
   #axis.line=element_line(color="black"),
   panel.background = element_blank(),
@@ -25,6 +26,13 @@ my_theme <- theme(
   legend.position = "right",
   legend.title = element_text(size=18)
 )
+
+# Theme for other plots
+my_theme2 <- my_theme+
+  theme(panel.border = element_rect(colour="black",fill=NA),
+        axis.text = element_text(size=18),
+        legend.position = "none",
+        axis.title = element_text(size=18))
 
 # This function is to print pdf and png figure
 # Input is the figure g,title,width, and height
@@ -79,10 +87,7 @@ DF_bar <- function(varname,df){
                   fill = .data[[varname]]))+
     geom_bar(color="black")+
     scale_fill_brewer(palette = "Set3")+
-    my_theme+
-    theme(panel.border = element_rect(colour="black",fill=NA),
-          axis.text = element_text(size=18),
-          legend.position = "none")+
+    my_theme2+
     ggtitle(varname)
   return(g)
 }
@@ -104,5 +109,27 @@ Year_plot <- function(varname){
   print_g(g_bar,paste0("DF_Year_",varname),6,5)
 }
 
-
+# This function is to make boxplots for target variables grouped by storm vs non-storm
+var_storm_compare <- function(varname,df,my_title){
+  # Summarize eof_df based on the grouping criteria
+  eof_summary <- df %>%
+    group_by(Field_Name,storm) %>%
+    summarise(var_sum = sum(.data[[varname]],na.rm=TRUE)) %>%
+    group_by(Field_Name) %>%
+    mutate(
+      total = sum(var_sum),
+      contribution = var_sum/total*100)
+  
+  # Make boxplots for comparison
+  g <- ggplot(data=eof_summary,aes(x=storm,y=contribution,color=storm,fill=storm))+
+    geom_half_violin(alpha = 0.5, color=NA)+
+    geom_boxplot(width = 0.1,color="black",outlier.color = NA)+
+    geom_jitter(aes(x=as.numeric(as.factor(storm))+0.2),
+                position = position_jitter(width=0.1))+
+    my_theme2+
+    labs(y = "Contribution (%)",x="")+
+    ggtitle(my_title)
+  
+  return(g)
+}
 
