@@ -103,6 +103,10 @@ DF_site_info <- DF_site_info %>%
   filter(Field_Name %in% usgs_eof$Field_Name) %>%
   left_join(event_n,by="Field_Name")
 
+# Combine DF_site_info with eof_all
+eof_all <- eof_all %>%
+  left_join(DF_site_info,by="Field_Name")
+
 # Output the processed df
 write.csv(eof_all,here("00_Data","Processed_data/DF_EOF_All.csv"))
 write.csv(DF_site_info,here("00_Data","Processed_data/DF_site_info.csv"))

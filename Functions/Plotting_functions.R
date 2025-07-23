@@ -28,11 +28,27 @@ my_theme <- theme(
 )
 
 # Theme for other plots
-my_theme2 <- my_theme+
+my_theme2 <- theme(
+  panel.border = element_rect(colour="black",fill=NA),
+  axis.text = element_text(size=18),
+  legend.position = "none",
+  axis.title = element_text(size=18),
+  axis.line=element_line(color="black"),
+  panel.background = element_blank(),
+  legend.key = element_blank(),
+  legend.text = element_text(size=18),
+  plot.title = element_text(size=18),
+  legend.title = element_text(size=18)
+)
+  
+  
+  
+  my_theme+
   theme(panel.border = element_rect(colour="black",fill=NA),
         axis.text = element_text(size=18),
         legend.position = "none",
-        axis.title = element_text(size=18))
+        axis.title = element_text(size=18),
+        axis.ticks.length = unit(30,"pt"))
 
 # This function is to print pdf and png figure
 # Input is the figure g,title,width, and height
@@ -133,3 +149,32 @@ var_storm_compare <- function(varname,df,my_title){
   return(g)
 }
 
+# This function is to plot variables across different groups
+var_compare_group <- function(varname,group_var,df,x_title,y_title){
+  # log transformation of the target value
+  df[[varname]] <- log(df[[varname]])
+
+  g <- ggplot(df,aes(x=factor(.data[[group_var]]),y=.data[[varname]],color=frozen,fill=frozen))+
+   # geom_half_violin(alpha = 0.5,color=NA)+
+    geom_boxplot(width = 0.1,color="black",outlier.color = NA)+
+    geom_jitter(aes(x=as.numeric(as.factor(.data[[group_var]]))+0.2),
+                position = position_jitter(width=0.1),
+                alpha=0.7)+
+    my_theme2+
+    labs(x=x_title,y=y_title,color="",fill="")
+  return(g)  
+}
+
+# This function is to make plots for all target variables across the same group
+var_compare_group_all <- function(varname_ls,group_var,df,x_title,y_title_ls,w,h,g_title){
+  g_all <- list()
+  for(i in 1:length(varname_ls)){
+    g <- var_compare_group(varname_ls[i],group_var,df,x_title,y_title_ls[i])
+    g_all[[i]] <- g
+  }
+  g_all[[length(varname_ls)]] <- g_all[[length(varname_ls)]] + theme(legend.position = "bottom")
+  # Put them together
+  g_all <- plot_grid(plotlist = g_all,ncol=1)
+  print_g(g_all,g_title,w,h)
+  return(g_all)
+}

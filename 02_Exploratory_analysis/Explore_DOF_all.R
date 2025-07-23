@@ -16,6 +16,7 @@ source(here("Functions/Plotting_functions.R"))
 Output_path <- here("Results/DF Exploratory/")
 
 # ------- Main ------
+
 # Explore the contribution of non-storm events to annual total at each site ----------
 # For all sites
 # sum of non-storm vs storm runoff volume across the sites
@@ -52,12 +53,33 @@ g_filtered <- plot_grid(g_runoff,g_nitrate_nitrite,g_ammonia,g_TN,g_ON,
                         ncol = 3)
 print_g(g_filtered,"Storm_vs_Nonstorm_filtered",12,8)
 
+# Explore the distribution of each variable in groups -------------
+# Note: the data are log transformed
+varname_ls <- c("runoff_volume","runoff_in","nitrate_plus_nitrite_conc_mgL","ammonia_plus_ammonium_conc_mgL","total_nitrogen_conc_mgL","organic_nitrogen_conc_mgL")
+y_title_ls <- c("log Q cf",
+                "log Q in",
+                "log NO3+NO2 (mg/L)",
+                "log NH4+NH3 (mg/L)",
+                "log TN (mg/L)",
+                "log ON (mg/L)")
+# Across month
+g_month <- var_compare_group_all(varname_ls = varname_ls,group_var = "month",
+                                 df=eof_df,x_title = "Month",y_title_ls = y_title_ls,10,18,g_title = "Var_across_month")
 
-# Explore the distribution of each variable at each site in different months
+# Across manure
+g_manure <- var_compare_group_all(varname_ls = varname_ls,group_var = "Manure.y",
+                                  df=eof_df,x_title = "Manure",y_title_ls = y_title_ls,10,18,g_title = "Var_across_manure")
 
-# Explore the variability of each variable
+# Across Tillage
+g_tillage <- var_compare_group_all(varname_ls = varname_ls,group_var = "Tillage.y",
+                                  df=eof_df,x_title = "Tillage",y_title_ls = y_title_ls,10,18,g_title = "Var_across_tillage")
 
-# Explore the distribution of each variable across different site properties
+# P-Q slopes & P-nutrient slopes -----------------------
+ggplot(data=eof_df,aes())
+
+
+
+
 
 
 
