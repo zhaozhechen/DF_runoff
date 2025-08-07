@@ -74,8 +74,30 @@ g_manure <- var_compare_group_all(varname_ls = varname_ls,group_var = "Manure.y"
 g_tillage <- var_compare_group_all(varname_ls = varname_ls,group_var = "Tillage.y",
                                   df=eof_df,x_title = "Tillage",y_title_ls = y_title_ls,10,18,g_title = "Var_across_tillage")
 
+
+# Check sites with only storm events, compare with USGS continuous data ------------
+# Test at AO1
+# USGS site: https://waterdata.usgs.gov/monitoring-location/USGS-451021089064901/#dataTypeId=daily-00060-0&period=periodOfRecord
+Site_ID <- "AO1"
+site_df <- eof_df[eof_df$Field_Name == "AO1",] %>%
+  select(storm_start,storm_end,runoff_volume)
+site_df$storm_start <- ifelse(nchar(site_df$storm_start) < 19,
+                              paste(site_df$storm_start,"00:00:00"),
+                              site_df$storm_start)
+site_df$storm_end <- ifelse(nchar(site_df$storm_end) < 19,
+                              paste(site_df$storm_end,"00:00:00"),
+                              site_df$storm_end)
+site_df <- site_df %>%
+  mutate(storm_start = as.POSIXct(storm_start,format = "%Y-%m-%d %H:%M:%S"),
+         storm_end = as.POSIXct(storm_end,format = "%Y-%m-%d %H:%M:%S"))
+
+g <- ggplot(data=site_df)+
+  geom_segment(aes(x=storm_start,xend = storm_end,y=0,yend=runoff_volume))+
+  my_theme2
+
+
 # P-Q slopes & P-nutrient slopes -----------------------
-ggplot(data=eof_df,aes())
+#ggplot(data=eof_df,aes())
 
 
 

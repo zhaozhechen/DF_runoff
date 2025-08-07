@@ -178,3 +178,12 @@ var_compare_group_all <- function(varname_ls,group_var,df,x_title,y_title_ls,w,h
   print_g(g_all,g_title,w,h)
   return(g_all)
 }
+
+# This function is to make plots for TS of variable
+var_TS <- function(df,varname){
+  
+  
+  
+}
+
+
