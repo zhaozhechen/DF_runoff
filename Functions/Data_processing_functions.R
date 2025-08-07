@@ -11,11 +11,12 @@ read_tif <- function(zip_folder){
   zip_filenames <- unzip(zip_folder,list=TRUE)
   # Get the tif file
   tif_filename <- zip_filenames$Name[grepl("\\.tif$",zip_filenames$Name)]
-  # Extract this tif file to a temperaty directory
-  tmp_dir <- tempdir()
-  unzip(zip_folder,files=tif_filename,exdir = tmp_dir)
+  # Create a temporary file path fo this tif
+  tmp_tif_path <- tempfile(fileext = ".tif")
+  # Extract this tif file to this temporary file
+  unzip(zip_folder,files=tif_filename,exdir = dirname(tmp_tif_path))
+  tif_full_path <- file.path(dirname(tmp_tif_path),tif_filename)
   # Read the tif
-  tif_path <- file.path(tmp_dir,tif_filename)
-  r <- rast(tif_path)
-  return(r)
+  r <- rast(tif_full_path)
+  return(list(r,tif_full_path))
 }

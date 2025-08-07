@@ -42,9 +42,13 @@ for(year in 2003:2023){
     # Get zip file path
     zip_folder <- paste0(year_folder,"prism_",varname,"_us_30s_",date,".zip")
     # Read in the tif file in this folder
-    tif_raster <- read_tif(zip_folder)
+    tif_raster_out <- read_tif(zip_folder)
+    tif_raster <- tif_raster_out[[1]]
+    tif_full_path <- tif_raster_out[[2]]
     # Extract value from the raster for those sites
     values <- extract(tif_raster,Site_coor)[,2]
+    # Clean up the tif file
+    file.remove(tif_full_path)
     # Store in in the matrix
     output_matrix <- rbind(output_matrix,values)
     print(date)
