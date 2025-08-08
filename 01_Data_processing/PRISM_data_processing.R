@@ -16,7 +16,7 @@ Output_path <- here("00_Data/Processed_data")
 # Source functions for data processing
 source(here("Functions","Data_processing_functions.R"))
 
-varname <- "ppt"
+varname <- "tmean"
 
 #  --------- Main --------
 # Get the coordinates of the sites
@@ -25,7 +25,10 @@ names(Site_coor) <- c("lon","lat")
 
 # Initialize a vector to store all dates
 day_ls_all <- c()
-for(year in 2003:2023){
+# Initialize a matrix to store output
+output_matrix <- matrix(NA,ncol=nrow(Site_info),nrow=0)
+
+for(year in 2004:2023){
   year_folder <- paste0(PRISM_path,varname,"_daily/",year,"/")
   # Get all days in this year
   day_ls <- format(seq(from = as.Date(paste0(year,"-01-01")),
@@ -35,8 +38,6 @@ for(year in 2003:2023){
   # Add this day list to all day list
   day_ls_all <- c(day_ls_all,day_ls)
   
-  # Initialize a matrix to store output
-  output_matrix <- matrix(NA,ncol=nrow(Site_info),nrow=0)
   # Loop over each date
   for(date in day_ls){
     # Get zip file path
@@ -61,7 +62,7 @@ colnames(output_matrix) <- Site_info$`Site ID`
 output_df <- as.data.frame(output_matrix)
 output_df$Date <- day_ls_all
 # Output this data frame
-write.csv(output_df,paste0(Output_path,"/DF_PRISM_ppt.csv"))
+write.csv(output_df,paste0(Output_path,"/DF_PRISM_",varname,".csv"))
 
 
 
