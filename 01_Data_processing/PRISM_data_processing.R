@@ -22,21 +22,31 @@ varname <- "ppt"
 Site_coor <- Site_info[,c("LONG_approx","LAT_approx")]
 names(Site_coor) <- c("lon","lat")
 
-# Initialize a vector to store all dates
-day_ls_all <- c()
-# Initialize a matrix to store output
-output_matrix <- matrix(NA,ncol=nrow(Site_info),nrow=0)
+# Make a vector for all dates
+years <- 2003:2023
+year_day_ls <- lapply(years,function(year)
+  format(seq(from = as.Date(paste0(year,"-01-01")),
+             to = as.Date(paste0(year,"-12-31")),
+             by = "day"),
+         "%Y%m%d")
+)
 
-for(year in 2004:2023){
+# Total days
+n_days_total <- sum(lengths(year_day_ls))
+# Initialize a vector to store all dates
+day_ls_all <- character(n_days_total)
+# Initialize a matrix to store output
+output_matrix <- matrix(NA,ncol=nrow(Site_info),nrow=n_days_total)
+
+# Initialize a index for storing output
+row_id <- 1
+
+for(i in seq_along(years)){
+  year <- years[i]
   year_folder <- paste0(PRISM_path,varname,"_daily/",year,"/")
   # Get all days in this year
-  day_ls <- format(seq(from = as.Date(paste0(year,"-01-01")),
-                       to = as.Date(paste0(year,"-12-31")),
-                       by = "day"),
-                   "%Y%m%d")
-  # Add this day list to all day list
-  day_ls_all <- c(day_ls_all,day_ls)
-  
+  day_ls <- year_day_ls[[i]]
+
   # Loop over each date
   for(date in day_ls){
     # Get zip file path
@@ -50,7 +60,9 @@ for(year in 2004:2023){
     # Clean up the tif file
     file.remove(tif_full_path)
     # Store in in the matrix
-    output_matrix <- rbind(output_matrix,values)
+    output_matrix[row_id,] <- values
+    day_ls_all[row_id] <- date
+    row_id <- row_id + 1
     print(date)
   }  
 }
