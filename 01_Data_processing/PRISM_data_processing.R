@@ -1,13 +1,12 @@
 # Author: Zhaozhe Chen
-# Date: 2025.8.6
+# Date: 2025.8.11
 
 # -------- Global -------------
 library(terra)
 library(here)
-library(readxl)
 
-# Site locations
-Site_info <- read_xlsx(here("00_Data/Metadata/DiscoveryFarms_SiteLocations.xlsx"))
+# Site locations, use the updated coordinates
+Site_info <- read.csv(here("00_Data/Processed_data/DF_site_info.csv"))
 # PRISM data path
 PRISM_path <- "G:/PRISM/"
 # Output_path
@@ -16,11 +15,11 @@ Output_path <- here("00_Data/Processed_data")
 # Source functions for data processing
 source(here("Functions","Data_processing_functions.R"))
 
-varname <- "tmean"
+varname <- "ppt"
 
 #  --------- Main --------
 # Get the coordinates of the sites
-Site_coor <- Site_info[,c("GPS Lon","GPS Lat")]
+Site_coor <- Site_info[,c("LONG_approx","LAT_approx")]
 names(Site_coor) <- c("lon","lat")
 
 # Initialize a vector to store all dates
