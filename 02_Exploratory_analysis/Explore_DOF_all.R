@@ -10,7 +10,9 @@ library(lubridate)
 
 # Data paths
 eof_df <- read.csv(here("00_Data/Processed_data/DF_EOF_All.csv"))
-site_indo <- read.csv(here("00_Data/Processed_data/DF_site_info.csv"))
+site_info <- read.csv(here("00_Data/Processed_data/DF_site_info.csv"))
+# Irrigation data
+irr_data <- read.csv(here("00_Data/DiscoveryFarms_IrrigationData.csv"))
 # Source plotting functions
 source(here("Functions/Plotting_functions.R"))
 Output_path <- here("Results/DF Exploratory/")

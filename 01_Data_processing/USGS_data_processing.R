@@ -39,10 +39,11 @@ usgs_eof <- usgs_eof %>%
   # Only keep DF sites
   filter(project == "DiscoveryFarms") %>%
   filter(Field_Name !="JF1", Field_Name !="JF3", Field_Name != "JF6", # Jersey Valley CRP and urban sites, site with basin delineation issues
-         Field_Name != "K1", Field_Name != "K2", Field_Name !="K3", # Saxon project sites with data quality concerns
-         Field_Name != "KP1", Field_Name != "KP2", Field_Name !="K4", # tile sites with data quality concerns
+         Field_Name != "K1", Field_Name != "K2", Field_Name !="K3",Field_Name != "K4", # Saxon project sites with data quality concerns
+         Field_Name != "KP1", Field_Name != "KP2", # tile sites with data quality concerns
          Field_Name != "RC1", Field_Name != "RC2", Field_Name != "RC3", Field_Name != "RC4", # USGS labels as "DiscoveryFarms", but I have no idea what these sites are, so excluding
-         Field_Name != "WF2", Field_Name != "WF3") # Dry run CRP site and site with abnormal soil hydrology
+        Field_Name != "WF3", # Dry run CRP site and site with abnormal soil hydrology
+        Field_Name != "AO2") # Basin size issue 
 
 # Revise some notations
 # estimated: 1=data are estimated and 0=concentrations were measured in the lab
