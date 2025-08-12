@@ -15,7 +15,7 @@ Output_path <- here("00_Data/Processed_data")
 # Source functions for data processing
 source(here("Functions","Data_processing_functions.R"))
 
-varname <- "ppt"
+varname <- "tmean"
 
 #  --------- Main --------
 # Get the coordinates of the sites
@@ -68,7 +68,7 @@ for(i in seq_along(years)){
 }
 
 # Add column names
-colnames(output_matrix) <- Site_info$`Site ID`
+colnames(output_matrix) <- Site_info$Field_Name
 # Convert this output_matrix to dataframe
 output_df <- as.data.frame(output_matrix)
 output_df$Date <- day_ls_all
