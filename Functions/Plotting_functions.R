@@ -9,6 +9,14 @@ library(RColorBrewer)
 library(ggrepel)
 library(gghalves)
 
+
+# County-level shape file for plotting
+US_bd <- st_read(here("00_Data","Msc","cb_2018_us_county_20m/cb_2018_us_county_20m.shp"))
+# Only keep WI county
+WI_bd <- US_bd[6][US_bd$STATEFP == 55,]
+# Get the outer boundary of WI
+WI_outer_bd <- st_union(WI_bd)
+
 # Theme for maps
 my_theme <- theme(
   #axis.line=element_line(color="black"),
@@ -41,15 +49,6 @@ my_theme2 <- theme(
   legend.title = element_text(size=18)
 )
   
-  
-  
-  my_theme+
-  theme(panel.border = element_rect(colour="black",fill=NA),
-        axis.text = element_text(size=18),
-        legend.position = "none",
-        axis.title = element_text(size=18),
-        axis.ticks.length = unit(30,"pt"))
-
 # This function is to print pdf and png figure
 # Input is the figure g,title,width, and height
 print_g <- function(g,title,w,h){
@@ -177,13 +176,6 @@ var_compare_group_all <- function(varname_ls,group_var,df,x_title,y_title_ls,w,h
   g_all <- plot_grid(plotlist = g_all,ncol=1)
   print_g(g_all,g_title,w,h)
   return(g_all)
-}
-
-# This function is to make plots for TS of variable
-var_TS <- function(df,varname){
-  
-  
-  
 }
 
 

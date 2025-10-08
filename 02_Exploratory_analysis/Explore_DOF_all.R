@@ -1,21 +1,19 @@
 # Author: Zhaozhe Chen
-# Update date: 2025.7.22
+# Update date: 2025.10.7
 
 # This code is to explore EOF dataset
 
 # -------- Global --------
 library(dplyr)
-library(here)
 library(lubridate)
 
 # Data paths
-eof_df <- read.csv(here("00_Data/Processed_data/DF_EOF_All.csv"))
-site_info <- read.csv(here("00_Data/Processed_data/DF_site_info.csv"))
+eof_df <- read.csv("00_Data/Processed_data/DF_EOF_All.csv")
 # Irrigation data
-irr_data <- read.csv(here("00_Data/DiscoveryFarms_IrrigationData.csv"))
+irr_data <- read.csv("00_Data/DiscoveryFarms_IrrigationData.csv") 
 # Source plotting functions
-source(here("Functions/Plotting_functions.R"))
-Output_path <- here("Results/DF Exploratory/")
+source("Functions/Plotting_functions.R")
+Output_path <- "Results/DF Exploratory/"
 
 # ------- Main ------
 # Explore the contribution of non-storm events to annual total at each site ----------

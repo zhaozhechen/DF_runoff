@@ -1,38 +1,29 @@
 # Author: Zhaozhe Chen
-# Update Date: 2025.10.7
+# Date: 2025.10.7
 
-# This code processes raw USGS EOF dataset, including 
-# Filter out sites that should not be included
-# Match the sites with the correct metadata
+# This code processes raw USGS EOF dataset
+# Filtering out sites that should not be included
+# Extract variables related to Q
 # This data processing code is adapted from Ellen Albright (personal communication)
 
 # -------- Global -----------
 library(dplyr)
 library(lfstat) # assign dates into USGS water years
-library(here)
 library(sf)
 library(lubridate)
 library(readxl)
 
 # Data paths ======
 # USGS raw EOF Storm event data
-usgs_eof <- read.csv(here("00_Data","USGS raw","All_EOF_StormEventLoadsFormatted.csv"))
-# USGS site info, all infomation in this data is included in DF site info, so not used
-# usgs_site_info <- read.csv(here("00_Data","USGS raw","EOF_Site_Table.csv"))
-# DF site info
-DF_site_info <- read.csv(here("00_Data","Metadata","DF EOF Site & Year Metadata (2004-2023)-Site_Update.csv"))
+usgs_eof <- read.csv("00_Data/USGS raw/All_EOF_StormEventLoadsFormatted.csv")
+# DF Site info
+DF_site_info <- read.csv("00_Data/Metadata/DF EOF Site & Year Metadata (2004-2023)-Site_Update.csv")
 # DF site updated coordinates
-DF_site_location <- read_xlsx(here("00_Data/Metadata/DiscoveryFarms_SiteLocations.xlsx"))
+DF_site_location <- read_xlsx('00_Data/Metadata/DiscoveryFarms_SiteLocations.xlsx')
 
 # Plotting related =========
 # Source functions for plotting
-source(here("Functions","Plotting_functions.R"))
-# County-level shape file for plotting
-US_bd <- st_read(here("00_Data","Msc","cb_2018_us_county_20m/cb_2018_us_county_20m.shp"))
-# Only keep WI county
-WI_bd <- US_bd[6][US_bd$STATEFP == 55,]
-# Get the outer boundary of WI
-WI_outer_bd <- st_union(WI_bd)
+source("Functions/Plotting_functions.R")
 # Colors for plotting
 my_color <- brewer.pal(n=8,name = "Set2")
 
@@ -57,7 +48,7 @@ usgs_eof[usgs_eof$estimated=="0" ,"estimated"]<-"Measured"
 usgs_eof[usgs_eof$frozen=="1" ,"frozen"]<-"Frozen"
 usgs_eof[usgs_eof$frozen=="0" ,"frozen"]<-"Non-Frozen"
 
-# Only keep Runoff and nitrogen related variables
+# Only keep Runoff (Q) related variables
 usgs_eof <- usgs_eof %>%
   select(
     USGS_Station_Number,
@@ -69,9 +60,7 @@ usgs_eof <- usgs_eof %>%
     storm_start,
     storm_end,
     runoff_volume,
-    peak_discharge,
-    matches("nitrogen|ammonia|nitrate|nitrite",ignore.case = TRUE),
-    -matches("remark",ignore.case = TRUE)
+    peak_discharge
   )
 
 # Get a summary of event # at each site
@@ -85,6 +74,11 @@ DF_site_info <- DF_site_info %>%
   filter(Field_Name %in% usgs_eof$Field_Name) %>%
   left_join(event_n,by="Field_Name") %>%
   mutate(MeanSlope_per = as.numeric(MeanSlope_per))
+
+# K6,P4,P5 are tile drainage
+DF_site_info$Monitoring[DF_site_info$Field_Name %in% c("K6","P4","P5")] <- "Tile"
+# Their paired sites are surface
+DF_site_info$Monitoring[DF_site_info$Field_Name %in% c("K5","P1","P3")] <- "Surface"
 
 # Extract required variables from the DF_site_location dataset
 # And match their names
@@ -104,7 +98,7 @@ DF_site_location <- DF_site_location %>%
          LONG_approx = `GPS Lon`) %>%
   mutate(MeanSlope_per = MeanSlope_per * 100)
 
-# Update DF site info if exist
+# Update DF site info if exist in DF_site_location
 # Add new columns from DF_site_location
 new_cols <- setdiff(names(DF_site_location),names(DF_site_info))
 DF_site_info <- DF_site_info %>%
@@ -155,17 +149,9 @@ eof_all <- eof_all %>%
   mutate(storm = ifelse(storm == 1,"Storm","Non-storm"))
 
 # Output the processed df
-write.csv(eof_all,here("00_Data","Processed_data/DF_EOF_All.csv"))
-write.csv(DF_site_info,here("00_Data","Processed_data/DF_site_info.csv"))
+write.csv(eof_all,"00_Data/Processed_data/Cleaned_data/DF_EOF_cleaned.csv")
+write.csv(DF_site_info,"00_Data/Processed_data/Cleaned_data/DF_site_info_cleaned.csv")
 
-# Total number of events
-n_total <- nrow(usgs_eof)
-# Number of events that are not classified as "storm": the flow is not associated with rainfall or snowmelt
-n_nonstorm <- sum(usgs_eof$storm==0)
-
-# Plot general information ===========
-Output_path <- here("Results","DF Exploratory")
-# Make a map of the DF sites after filtering
 g_map <- ggplot()+
   geom_sf(data=WI_bd,fill=my_color[3],alpha=0.3,color="grey")+
   geom_sf(data=WI_outer_bd,fill=NA,color="black")+
@@ -188,19 +174,4 @@ g_map <- ggplot()+
                    segment.color="black")+
   guides(fill = guide_legend(override.aes = list(size = 6,shape=21)),
          size=guide_legend(override.aes = list(shape=21)))
-print_g(g_map,"DF_Site_map",8,8)
-# Make a histogram of event number distribution
-g_hist <- ggplot(data=event_n,aes(x=event_n))+
-  geom_histogram(binwidth=20,color="black",fill="lightblue")+
-  theme(#axis.line=element_line(color="black"),
-    panel.background = element_blank(),
-    panel.border = element_rect(colour="black",fill=NA),
-    legend.key = element_blank(),
-    #legend.key.size = unit(6,"cm"),
-    #aspect.ratio = 1/1,
-    #legend.key.size = unit(0.3,'cm'),
-    legend.text = element_text(size=18),
-    plot.title = element_text(size=18))+
-  labs(x="Event number at each site")
-print_g(g_hist,"EOF_eventn_dist",6,6)
 
