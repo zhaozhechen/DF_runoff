@@ -9,7 +9,6 @@ library(RColorBrewer)
 library(ggrepel)
 library(gghalves)
 
-
 # County-level shape file for plotting
 US_bd <- st_read(here("00_Data","Msc","cb_2018_us_county_20m/cb_2018_us_county_20m.shp"))
 # Only keep WI county
@@ -65,22 +64,35 @@ print_g <- function(g,title,w,h){
 
 # This function is to make maps of DF sites
 # Input include:
-# varname: variable name to color
-DF_map <- function(varname){
-  g <- ggplot()+
-    geom_sf(data=WI_bd,fill=my_color[3],alpha=0.3,color="grey")+
+# df: the site info df
+# var_size: variable name for size
+# var_fill: variable name for fill
+# var_label: variable name for labeling
+# my_color: palette for coloring
+# size_name and fill_name are the titles for legends
+DF_map <- function(df,var_size,var_fill,var_label,my_color,
+                   size_name,fill_name){
+  # Turn the filled value to be factor
+  fill_factor <- factor(df[[var_fill]])
+  # Get # of levels
+  n_level <- length(levels(fill_factor))
+  # Choose the first n_level colors from my_color
+  pal <- my_color[1:n_level]
+  
+  g_map <- ggplot()+
+    geom_sf(data=WI_bd,fill="#aec8df",alpha=0.8,color="grey")+
     geom_sf(data=WI_outer_bd,fill=NA,color="black")+
-    geom_point(data=DF_meta_Site,
+    geom_point(data=df,
                aes(x=LONG_approx,y=LAT_approx,
-                   size = UseableYears,
-                   fill = .data[[varname]]),
+                   size = .data[[var_size]],
+                   fill = .data[[var_fill]]),
                shape = 21,
                color="black",
-               alpha=0.7)+
-    scale_fill_brewer(palette = "Set3")+
+               alpha=0.8)+
+    scale_fill_manual(values = pal)+
     my_theme+
-    geom_label_repel(data=DF_meta_Site,
-                     aes(x=LONG_approx,y=LAT_approx,label=SiteID),
+    geom_label_repel(data=df,
+                     aes(x=LONG_approx,y=LAT_approx,label=.data[[var_label]]),
                      point.padding = 0,
                      label.padding = 0.25,
                      box.padding = 0.25,
@@ -88,35 +100,56 @@ DF_map <- function(varname){
                      max.overlaps = 30,
                      segment.color="black")+
     guides(fill = guide_legend(override.aes = list(size = 6,shape=21)),
-           size=guide_legend(override.aes = list(shape=21)))
-  return(g)
+           size = guide_legend(override.aes = list(shape=21)))+
+    labs(fill=fill_name,size=size_name)
+  
+  return(g_map)
 }
 
-# This function makes bar plot of number of sites for each variable
+# This function makes bar plot of target variable
 # Input include:
-# varname: The target varname
-# df: The data frame
-DF_bar <- function(varname,df){
-  g <- ggplot(data=df,
-              aes(y=.data[[varname]],
-                  fill = .data[[varname]]))+
+# df: the site info df
+# var_fill: variable name for fill
+# fill_label: title for the legends
+DF_bar <- function(df,var_fill,my_color,fill_name){
+  # Turn the filled value to be factor
+  fill_factor <- factor(df[[var_fill]])
+  # Get # of levels
+  n_level <- length(levels(fill_factor))
+  # Choose the first n_level colors from my_color
+  pal <- my_color[1:n_level]
+  g_bar <- ggplot(data=df,
+                  aes(y=.data[[var_fill]],
+                      fill = .data[[var_fill]]))+
     geom_bar(color="black")+
-    scale_fill_brewer(palette = "Set3")+
+    scale_fill_manual(values = pal)+
     my_theme2+
-    ggtitle(varname)
-  return(g)
+    labs(x = "# of Sites",y = "")+
+    ggtitle(fill_name)
+  return(g_bar)  
 }
 
 # This function combines map of the target variable and distribution of the target variable
 # Input include:
-# varname: The target variable name in the DF_meta_Site df
-Site_plot <- function(varname){
-  g_map <- DF_map(varname)
-  g_bar <- DF_bar(varname,DF_meta_Site)  
-  g <- plot_grid(g_map,g_bar,nrow=1,
-                 rel_widths = c(1.8,1))
-  print_g(g,paste0("DF_Site_",varname),16,6)
+# df: the site info df
+# var_size: variable name for size
+# var_fill: variable name for fill
+# var_label: variable name for labeling
+# my_color: palette for coloring
+# size_name and fill_name are the titles for legends
+# w and h: width and height of output figure
+Site_plot <- function(df,var_size,var_fill,var_label,my_color,
+                      size_name,fill_name,w,h){
+  g_map <- DF_map(df,var_size,var_fill,var_label,my_color,
+                  size_name,fill_name)
+  g_bar <- DF_bar(df,var_fill,my_color,fill_name)  
+  g <- plot_grid(g_map,g_bar,nrow=2,
+                 rel_heights = c(1.5,1))
+  print_g(g,paste0("DF_Site_",var_fill),w,h)
 }
+
+
+
 
 # This function is to plot bar plots for field-year data
 Year_plot <- function(varname){
