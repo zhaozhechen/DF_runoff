@@ -20,3 +20,26 @@ read_tif <- function(zip_folder){
   r <- rast(tif_full_path)
   return(list(r,tif_full_path))
 }
+
+# This function is to extract subdaily P from USGS station
+# Input include arrayid, which indicates which site to process
+# And Site_ls, which includes Site_ID, USGS_ID, Start and End time
+USGS_ppt <- function(arrayid,Site_ls){
+  # Site to process
+  Site_ID <- Site_ls$Site_ID[arrayid]
+  # The corresponding USGS_ID
+  USGS_ID <- Site_ls$USGS_ID[arrayid]
+  start <- Site_ls$Start[arrayid]
+  end <- Site_ls$End[arrayid]
+  
+  # Extract subdaily P from USGS station
+  ppt <- readNWISuv(siteNumbers = USGS_ID,
+                    parameterCd = P_code,
+                    startDate = start,
+                    endDate = end,
+                    tz = "UTC") %>%
+    # Standardize variable name
+    renameNWISColumns()
+  
+  return(ppt)
+}
