@@ -8,6 +8,11 @@ library(cowplot)
 library(RColorBrewer)
 library(ggrepel)
 library(gghalves)
+library(sf)
+library(here)
+library(ggpubr)
+library(ggpointdensity)
+
 
 # County-level shape file for plotting
 US_bd <- st_read(here("00_Data","Msc","cb_2018_us_county_20m/cb_2018_us_county_20m.shp"))

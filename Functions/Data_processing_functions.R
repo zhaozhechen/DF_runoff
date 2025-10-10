@@ -24,14 +24,7 @@ read_tif <- function(zip_folder){
 # This function is to extract subdaily P from USGS station
 # Input include arrayid, which indicates which site to process
 # And Site_ls, which includes Site_ID, USGS_ID, Start and End time
-USGS_ppt <- function(arrayid,Site_ls){
-  # Site to process
-  Site_ID <- Site_ls$Site_ID[arrayid]
-  # The corresponding USGS_ID
-  USGS_ID <- Site_ls$USGS_ID[arrayid]
-  start <- Site_ls$Start[arrayid]
-  end <- Site_ls$End[arrayid]
-  
+USGS_ppt <- function(USGS_ID,start,end){
   # Extract subdaily P from USGS station
   ppt <- readNWISuv(siteNumbers = USGS_ID,
                     parameterCd = P_code,
@@ -39,7 +32,9 @@ USGS_ppt <- function(arrayid,Site_ls){
                     endDate = end,
                     tz = "UTC") %>%
     # Standardize variable name
-    renameNWISColumns()
+    renameNWISColumns() %>%
+    # Convert unit from in to mm
+    mutate(Precip_Inst_mm = Precip_Inst * 2.54*10)
   
   return(ppt)
 }
