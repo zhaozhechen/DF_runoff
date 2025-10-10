@@ -18,17 +18,20 @@ library(tidyr)
 # Cleaned EOF dataframe
 eof_df <- read.csv("00_Data/Processed_data/Cleaned_data/DF_EOF_cleaned.csv")
 # PRISM ppt
-ppt_df <- read.csv("00_Data/Processed_data/DF_PRISM_ppt.csv")
+PRISM_ppt_df <- read.csv("00_Data/Processed_data/DF_PRISM_ppt.csv")
 # Source functions
 source("Functions/Data_processing_functions.R")
 source("Functions/Plotting_functions.R")
 
 # Output path for subdaily USGS P
-P_output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/"
+P_output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/USGS_subdaily_P/"
+# Output path for plots
+Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/USGS_vs_PRISM_daily_P/"
 
 # Global parameters =======
 # Code for precipitation. Unit: in 
 P_code <- "00045"
+
 # ------------ Main ----------
 # Get Site info for USGS P extraction
 Site_ls <- eof_df %>%
@@ -45,9 +48,7 @@ Site_ls <- eof_df %>%
     End = paste0(WY_End,"-09-30")
   )
 
-# Initialize a list to store all plots
-g_all <- list()
-for(arrayid in 1:nrow(Site_ls)){
+for(arrayid in 6:nrow(Site_ls)){
   # Site info =====================
   # Site to process
   Site_ID <- Site_ls$Site_ID[arrayid]
@@ -59,7 +60,17 @@ for(arrayid in 1:nrow(Site_ls)){
   
   # USGS P processing =====================
   # Extract sub daily USGS P, Unit: mm
-  USGS_subd_P <- USGS_ppt(USGS_ID,start,end)
+  USGS_subd_P <- tryCatch(
+    {USGS_ppt(USGS_ID, start, end)},
+    error = function(e) {
+      message("Skipping ", Site_ID, " due to error: ", e$message)
+      return(NULL)
+    }
+  )
+  
+  # If extraction failed, skip to next site
+  if (is.null(USGS_subd_P)) next
+  
   # Output this sub daily USGS df
   write.csv(USGS_subd_P,paste0(P_output_path,"USGS_subdaily_P_",Site_ID,".csv"))
   
@@ -74,8 +85,8 @@ for(arrayid in 1:nrow(Site_ls)){
   
   # PRISM P processing =======================
   # Extract daily P from PRISM for the same site
-  PRISM_d_P <- data.frame(Date = ppt_df$Date,
-                          PRISM_P_mm = ppt_df[[Site_ID]])
+  PRISM_d_P <- data.frame(Date = PRISM_ppt_df$Date,
+                          PRISM_P_mm = PRISM_ppt_df[[Site_ID]])
   # Filter date to be the same as USGS P
   PRISM_d_P <- PRISM_d_P %>%
     mutate(Date = ymd(Date)) %>%
@@ -127,14 +138,16 @@ for(arrayid in 1:nrow(Site_ls)){
                  "USGS_P_mm" = "USGS")
     )+
     labs(x="",y="Daily P (mm)",color="")+
-    theme(legend.position = c(0.8,0.8))
+    theme(legend.position = c(0.8,0.8),
+          legend.background = element_blank())
   
   # Combine two plots
   g_Site <- plot_grid(g_scatter,g_TS,nrow=1,
                       align = "h",axis="tb",labels = "auto")
-  # Store this plot in g_all list
-  g_all[[arrayid]] <- g_Site  
-  
+
+  # Output this figure
+  print_g(g_Site,paste0("USGS_vs_PRISM_daily_P_",Site_ID),
+          10,4)
   message(arrayid)
 }
 
