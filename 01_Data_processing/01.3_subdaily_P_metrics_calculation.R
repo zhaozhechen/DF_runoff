@@ -40,20 +40,18 @@ file_name <- list.files(USGS_subdaily_P_path,full.names = FALSE)[arrayid]
 # Get the Site_ID
 Site_ID <- str_extract(file_name,"(?<=subdaily_P_).*(?=\\.csv)")
 # Read in the file
-subdaily_P <- read.csv(paste0(USGS_subdaily_P_path,file_name)) %>%
-  # Format Time
-  mutate(dateTime = if_else(
-    nchar(dateTime)==10,
-    paste0(dateTime,"00:00:00"),
-    dateTime
-  ),
-  dateTime = ymd_hms(dateTime,tz="UTC"))
+subdaily_P <- read.csv(paste0(USGS_subdaily_P_path,file_name))
+subdaily_P$dateTime <- correct_time(subdaily_P$dateTime)
 
 # Assign event ID to each unique rainfall event
 event_P <- Assign_P_event_ID(subdaily_P,P_th,MIT)
 
+# Keep EOF Q data at this site
+eof_site <- eof_df %>%
+  filter(Field_Name == Site_ID)
 
-
+# Match P with EOF Q ==================
+#event_df <- 
   
 
 

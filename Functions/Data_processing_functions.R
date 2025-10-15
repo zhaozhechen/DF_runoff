@@ -39,6 +39,16 @@ USGS_ppt <- function(USGS_ID,start,end){
   return(ppt)
 }
 
+# This function is to correct time format so that 00:00:00 is filled
+# And the output time is in the format of YYYY-MM-DD HH:MM:SS
+correct_time <- function(dateTime_vec){
+  time <- if_else(nchar(dateTime_vec) == 10,
+                  paste0(dateTime_vec,"00:00:00"),
+                  dateTime_vec)
+  time <- ymd_hms(time,tz="UTC")  
+  return(time)
+}
+
 # This function is to separate rainfall events, and give each individual event a event_ID
 # Only rainfall events separated by at least MIT (hours) are considered separate rainfall
 # P_event_ID is also assigned to dry periods within an event. i.e., between the first and last rain obs of each event
