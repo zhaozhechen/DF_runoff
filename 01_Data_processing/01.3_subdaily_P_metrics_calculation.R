@@ -29,7 +29,7 @@ source("Functions/Plotting_functions.R")
 # Initial test of 2 hours, align with EOF definition of runoff events
 MIT <- 2
 # This is threshold used to define rain or not
-P_th <- 0
+P_th <- 0.1
 
 # ------- Main ----------
 arrayid <- 1
@@ -50,8 +50,8 @@ event_P <- Assign_P_event_ID(subdaily_P,P_th,MIT)
 eof_site <- eof_df %>%
   filter(Field_Name == Site_ID) %>%
   # Correct time
-  mutate(runoff_start = correct_time(storm_start),
-         runoff_end = correct_time(storm_end))
+  mutate(storm_start = correct_time(storm_start),
+         storm_end = correct_time(storm_end))
 
 # Match P with EOF Q ==================
 

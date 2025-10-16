@@ -6,8 +6,6 @@
 # Extract variables related to P and Q
 # This data processing code is adapted from Ellen Albright (personal communication)
 
-# When using USGS All_EOF_StormEventLoadsRainCalculated.csv, skip 01.2 and 01.3. Directly run 01.4
-
 # -------- Global -----------
 library(dplyr)
 library(lfstat) # assign dates into USGS water years
@@ -17,7 +15,7 @@ library(readxl)
 
 # Data paths ======
 # USGS raw EOF Storm event data
-usgs_eof <- read.csv("00_Data/USGS raw/All_EOF_StormEventLoadsRainCalculated.csv")
+usgs_eof <- read.csv("00_Data/USGS raw/All_EOF_StormEventLoadsFormatted.csv")
 # DF Site info
 DF_site_info <- read.csv("00_Data/Metadata/DF EOF Site & Year Metadata (2004-2023)-Site_Update.csv")
 # DF site updated coordinates
@@ -65,12 +63,12 @@ usgs_eof <- usgs_eof %>%
     storm_start,
     storm_end,
     runoff_volume,
-    peak_discharge,
-    rain,
-    duration,
-    Ievent,
-    I5,I10,I15,I30,I60,
-    remark_rain
+    peak_discharge
+    #rain,
+    #duration,
+    #Ievent,
+    #I5,I10,I15,I30,I60,
+    #remark_rain
   )
 
 # Get a summary of event # at each site
