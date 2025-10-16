@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Date: 2025.10.9
+# Update Date: 2025.10.16
 
 # This code is to compare daily P from USGS sites vs PRISM
 # Note: USGS ppt date, PRISM data are all UTC time
@@ -44,11 +44,12 @@ Site_ls <- eof_df %>%
   mutate(
     WY_Start = as.integer(str_extract(StudyPeriod,"((?<=WY)\\d{4})")),
     WY_End = as.integer(str_extract(StudyPeriod,"((?<=-WY)\\d{4})")),
-    Start = paste0(WY_Start - 1,"-10-01"),
+    # To ensure the data captures all P before the runoff events in EOF dataset, set the starting date earlier
+    Start = paste0(WY_Start - 1,"-07-01"),
     End = paste0(WY_End,"-09-30")
   )
 
-for(arrayid in 6:nrow(Site_ls)){
+for(arrayid in 1:nrow(Site_ls)){
   # Site info =====================
   # Site to process
   Site_ID <- Site_ls$Site_ID[arrayid]
