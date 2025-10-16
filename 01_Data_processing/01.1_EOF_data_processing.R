@@ -20,6 +20,9 @@ usgs_eof <- read.csv("00_Data/USGS raw/All_EOF_StormEventLoadsFormatted.csv")
 DF_site_info <- read.csv("00_Data/Metadata/DF EOF Site & Year Metadata (2004-2023)-Site_Update.csv")
 # DF site updated coordinates
 DF_site_location <- read_xlsx('00_Data/Metadata/DiscoveryFarms_SiteLocations.xlsx')
+# Only keep Start data in this one
+DF_site_time <- read.csv("00_Data/USGS raw/EOF_Site_Table.csv") %>%
+  select(Field_Name,Approximate_Start_Date)
 
 # Plotting related =========
 # Source functions for plotting
@@ -70,6 +73,10 @@ usgs_eof <- usgs_eof %>%
     #I5,I10,I15,I30,I60,
     #remark_rain
   )
+
+# Combine unique storms
+
+
 
 # Get a summary of event # at each site
 event_n <- usgs_eof %>%
@@ -158,6 +165,9 @@ eof_all <- eof_all %>%
 
 # Output the processed df
 write.csv(eof_all,"00_Data/Processed_data/Cleaned_data/DF_EOF_cleaned.csv")
+
+DF_site_info <- DF_site_info %>%
+  left_join(DF_site_time,by="Field_Name")
 write.csv(DF_site_info,"00_Data/Processed_data/Cleaned_data/DF_site_info_cleaned.csv")
 
 # Plot metadata maps + distributions of categorical variables =====================
