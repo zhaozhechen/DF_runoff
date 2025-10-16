@@ -27,6 +27,7 @@ DF_site_time <- read.csv("00_Data/USGS raw/EOF_Site_Table.csv") %>%
 # Plotting related =========
 # Source functions for plotting
 source("Functions/Plotting_functions.R")
+source("Functions/Data_processing_functions.R")
 # Colors for plotting
 my_color <- brewer.pal(n=8,name = "Set2")
 
@@ -75,8 +76,16 @@ usgs_eof <- usgs_eof %>%
   )
 
 # Combine unique storms
-
-
+usgs_eof <- usgs_eof %>%
+  group_by(Field_Name,unique_storm_number) %>%
+  summarize(USGS_Station_Number = first(USGS_Station_Number),
+            frozen = first(frozen),
+            storm = first(storm),
+            storm_start = first(storm_start),
+            storm_end = last(storm_end),
+            runoff_volume = sum(runoff_volume,na.rm=TRUE),
+            peak_discharge = max(peak_discharge,na.rm=TRUE),
+            .groups = "drop")
 
 # Get a summary of event # at each site
 event_n <- usgs_eof %>%
@@ -161,7 +170,11 @@ eof_all$month <- month(eof_all$storm_start)
 
 # Rename storm
 eof_all <- eof_all %>%
-  mutate(storm = ifelse(storm == 1,"Storm","Non-storm"))
+  mutate(storm = ifelse(storm == 1,"Storm","Non-storm")) %>%
+  group_by(Field_Name) %>%
+  arrange(storm_start) %>%
+  ungroup() %>%
+  arrange(Field_Name)
 
 # Output the processed df
 write.csv(eof_all,"00_Data/Processed_data/Cleaned_data/DF_EOF_cleaned.csv")
