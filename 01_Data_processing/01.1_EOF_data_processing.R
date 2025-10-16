@@ -1,10 +1,12 @@
 # Author: Zhaozhe Chen
-# Date: 2025.10.7
+# Date: 2025.10.15
 
 # This code processes raw USGS EOF dataset
 # Filtering out sites that should not be included
-# Extract variables related to Q
+# Extract variables related to P and Q
 # This data processing code is adapted from Ellen Albright (personal communication)
+
+# When using USGS All_EOF_StormEventLoadsRainCalculated.csv, skip 01.2 and 01.3. Directly run 01.4
 
 # -------- Global -----------
 library(dplyr)
@@ -15,7 +17,7 @@ library(readxl)
 
 # Data paths ======
 # USGS raw EOF Storm event data
-usgs_eof <- read.csv("00_Data/USGS raw/All_EOF_StormEventLoadsFormatted.csv")
+usgs_eof <- read.csv("00_Data/USGS raw/All_EOF_StormEventLoadsRainCalculated.csv")
 # DF Site info
 DF_site_info <- read.csv("00_Data/Metadata/DF EOF Site & Year Metadata (2004-2023)-Site_Update.csv")
 # DF site updated coordinates
@@ -51,19 +53,24 @@ usgs_eof[usgs_eof$estimated=="0" ,"estimated"]<-"Measured"
 usgs_eof[usgs_eof$frozen=="1" ,"frozen"]<-"Frozen"
 usgs_eof[usgs_eof$frozen=="0" ,"frozen"]<-"Non-Frozen"
 
-# Only keep Runoff (Q) related variables
+# Only keep P and Runoff (Q) related variables
 usgs_eof <- usgs_eof %>%
   select(
     USGS_Station_Number,
     Field_Name,
-    estimated,
+    #estimated,
     frozen,
     storm,
     unique_storm_number,
     storm_start,
     storm_end,
     runoff_volume,
-    peak_discharge
+    peak_discharge,
+    rain,
+    duration,
+    Ievent,
+    I5,I10,I15,I30,I60,
+    remark_rain
   )
 
 # Get a summary of event # at each site
