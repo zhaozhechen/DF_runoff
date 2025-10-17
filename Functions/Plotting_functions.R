@@ -13,7 +13,6 @@ library(here)
 library(ggpubr)
 library(ggpointdensity)
 
-
 # County-level shape file for plotting
 US_bd <- st_read(here("00_Data","Msc","cb_2018_us_county_20m/cb_2018_us_county_20m.shp"))
 # Only keep WI county
@@ -153,9 +152,6 @@ Site_plot <- function(df,var_size,var_fill,var_label,my_color,
   print_g(g,paste0("DF_Site_",var_fill),w,h)
 }
 
-
-
-
 # This function is to plot bar plots for field-year data
 Year_plot <- function(varname){
   g_bar <- DF_bar(varname,DF_meta_Year)
@@ -216,4 +212,18 @@ var_compare_group_all <- function(varname_ls,group_var,df,x_title,y_title_ls,w,h
   return(g_all)
 }
 
+# This function plots distribution of target variable in eof_df
+# Input include
+# df: eof_df
+# varname: the target variable name
+# x_title: title on the x axis
+Hist_plot <- function(df,varname,x_title){
+  g <- ggplot(data=df,aes(x=.data[[varname]],fill=frozen))+
+    geom_histogram(position = "identity",color="black",alpha=0.8)+
+    scale_fill_manual(labels=c("Frozen","Non-Frozen"),
+                      values = my_color[c(1,4)])+
+    my_theme2+
+    labs(fill="",x=x_title)
+  return(g)
+}
 
