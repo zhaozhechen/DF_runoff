@@ -243,9 +243,11 @@ Hist_plot <- function(df,varname,x_title){
 # var_pre: predictor variable name
 BP_plot <- function(df,var_res,var_pre){
   # Fit linear model
-  lm_fit <- lm(formula = paste(var_res,"~",var_pre),data=df)
+  lm_formula <- as.formula(paste(var_res,"~",var_pre))
+  lm_fit <- lm(formula = lm_formula,data=df)
   # Fit segmented model, 1 breakpoint to be estimated
-  seg_fit <- segmented(lm_fit,seg.Z = ~P_total,npsi = 1)
+  seg_formula <- as.formula(paste("~",var_pre))
+  seg_fit <- segmented(lm_fit,seg.Z = seg_formula,npsi = 1)
   
   # Get breakpoint
   bp <- round(summary(seg_fit)$psi[1,"Est."],2)
@@ -255,12 +257,14 @@ BP_plot <- function(df,var_res,var_pre){
                max(df[[var_pre]],na.rm=TRUE),
                length.out = 200)
   
+  new_data <- setNames(data.frame(x_seq),var_pre)
+  
   # Predict fitted values for plotting, for both models
   pred_lm <- data.frame(x=x_seq,
-                        y=predict(lm_fit,newdata = data.frame(P_total = x_seq)),
+                        y=predict(lm_fit,newdata = new_data),
                         model = "Linear")
   pred_seg <- data.frame(x=x_seq,
-                         y=predict(seg_fit,newdata=data.frame(P_total = x_seq)),
+                         y=predict(seg_fit,newdata = new_data),
                          model = "Segmented")
   pred_df <- rbind(pred_lm,pred_seg)
   
