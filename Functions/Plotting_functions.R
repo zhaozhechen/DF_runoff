@@ -218,12 +218,82 @@ var_compare_group_all <- function(varname_ls,group_var,df,x_title,y_title_ls,w,h
 # varname: the target variable name
 # x_title: title on the x axis
 Hist_plot <- function(df,varname,x_title){
+  # Wilcoxon test between frozen vs non-frozen
+  p_value <- wilcox.test(df[[varname]]~df$frozen)$p.value
+  # Format p-value
+  p_label <- paste0("p = ",signif(p_value,3))
+  
   g <- ggplot(data=df,aes(x=.data[[varname]],fill=frozen))+
     geom_histogram(position = "identity",color="black",alpha=0.8)+
     scale_fill_manual(labels=c("Frozen","Non-Frozen"),
                       values = my_color[c(1,4)])+
+    annotate("text",
+             x=Inf,y=Inf,label=p_label,
+             hjust=1.1,vjust=1.5,size=6)+
     my_theme2+
-    labs(fill="",x=x_title)
+    labs(fill="",x=x_title,y="count")
   return(g)
+}
+
+# This function is to make scatter plots of response variable vs predictor
+# With pieacewise fitted model
+# Input include:
+# df: the eof_df
+# var_res: response variable name
+# var_pre: predictor variable name
+BP_plot <- function(df,var_res,var_pre){
+  # Fit linear model
+  lm_fit <- lm(formula = paste(var_res,"~",var_pre),data=df)
+  # Fit segmented model, 1 breakpoint to be estimated
+  seg_fit <- segmented(lm_fit,seg.Z = ~P_total,npsi = 1)
+  
+  # Get breakpoint
+  bp <- round(summary(seg_fit)$psi[1,"Est."],2)
+  
+  # Make a df for plotting
+  x_seq <- seq(min(df[[var_pre]],na.rm=TRUE),
+               max(df[[var_pre]],na.rm=TRUE),
+               length.out = 200)
+  
+  # Predict fitted values for plotting, for both models
+  pred_lm <- data.frame(x=x_seq,
+                        y=predict(lm_fit,newdata = data.frame(P_total = x_seq)),
+                        model = "Linear")
+  pred_seg <- data.frame(x=x_seq,
+                         y=predict(seg_fit,newdata=data.frame(P_total = x_seq)),
+                         model = "Segmented")
+  pred_df <- rbind(pred_lm,pred_seg)
+  
+  # Get R2 for the two models
+  r2_lm <- round(summary(lm_fit)$r.squared,2)
+  r2_seg <- round(summary(seg_fit)$r.squared,2)
+  
+  g <- ggplot(data = df,aes(x = .data[[var_pre]],
+                            y = .data[[var_res]]))+
+    geom_point(size=2)+
+    # Add LM fitted line
+    geom_line(data=pred_df %>% filter(model == "Linear"),
+              aes(x=x,y=y),
+              color=my_color[1],size=1)+
+    # Add Seg fitted line
+    geom_line(data=pred_df %>% filter(model == "Segmented"),
+              aes(x=x,y=y),
+              color=my_color[2],size=1)+
+    geom_vline(xintercept = bp,color=my_color[2],linetype="dashed",size=1)+
+    # R2 labels
+    annotate("text",x=-Inf,y=Inf,hjust=-0.1,vjust=2,
+             label = paste0("R2(LM) = ",r2_lm),
+             size=5,color=my_color[1])+
+    annotate("text",x=-Inf,y=Inf,hjust=-0.1,vjust=3.5,
+             label = paste0("R2(Seg) = ",r2_seg),
+             size=5,color=my_color[2])+
+    # BP label
+    annotate("text",x=Inf,y=-Inf,hjust=1.1,vjust=-0.5,
+             label = paste0("BP = ",bp),
+             color=my_color[2],size=6)+
+    my_theme2
+  
+  out <- list(g,bp)
+  return(out)
 }
 
