@@ -31,9 +31,9 @@ Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Gene
 MIT <-2
 
 # ---- Main ------------
-arrayid <- 1
+arrayid <- 2
 
-for(arrayid in 1:16){
+#for(arrayid in 1:16){
   Site_ID <- site_ls[arrayid]
   
   # Read in eof at this site
@@ -75,7 +75,7 @@ for(arrayid in 1:16){
   # Output these figures at each site
   print_g(g_all,paste0(Site_ID,"_MIT"),9,12)
   message(arrayid)
-}
+#}
 
 
 

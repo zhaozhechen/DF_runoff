@@ -101,6 +101,3 @@ g <- ggplot(data=site_df)+
 
 
 
-
-
-

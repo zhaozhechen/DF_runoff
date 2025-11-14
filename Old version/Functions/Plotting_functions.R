@@ -118,18 +118,23 @@ DF_map <- function(df,var_size,var_fill,var_label,my_color,
 DF_bar <- function(df,var_fill,my_color,fill_name){
   # Turn the filled value to be factor
   fill_factor <- factor(df[[var_fill]])
+  fill_factor <- factor(fill_factor, levels = rev(levels(fill_factor)))
+  df[[var_fill]] <- fill_factor
   # Get # of levels
   n_level <- length(levels(fill_factor))
   # Choose the first n_level colors from my_color
-  pal <- my_color[1:n_level]
+  #pal <- my_color[1:n_level]
+  pal <- rev(my_color[1:n_level])
   g_bar <- ggplot(data=df,
-                  aes(y=.data[[var_fill]],
+                  aes(x=.data[[var_fill]],
                       fill = .data[[var_fill]]))+
     geom_bar(color="black")+
     scale_fill_manual(values = pal)+
     my_theme2+
-    labs(x = "# of Sites",y = "")+
-    ggtitle(fill_name)
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 4)) +
+    labs(y = "# of Sites",x = "")+
+    #ggtitle(fill_name)+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
   return(g_bar)  
 }
 
@@ -146,10 +151,12 @@ Site_plot <- function(df,var_size,var_fill,var_label,my_color,
                       size_name,fill_name,w,h){
   g_map <- DF_map(df,var_size,var_fill,var_label,my_color,
                   size_name,fill_name)
+  print_g(g_map,paste0("DF_Site_map_",var_fill),w,h)
+  
   g_bar <- DF_bar(df,var_fill,my_color,fill_name)  
-  g <- plot_grid(g_map,g_bar,nrow=2,
-                 rel_heights = c(1.5,1))
-  print_g(g,paste0("DF_Site_",var_fill),w,h)
+  #g <- plot_grid(g_map,g_bar,nrow=2,
+  #               rel_heights = c(1.5,1))
+  print_g(g_bar,paste0("DF_Site_bar_",var_fill),w/5,h/2)
 }
 
 # This function is to plot bar plots for field-year data

@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Date: 2025.10.15
+# Date: 2025.11.6
 
 # This code processes raw USGS EOF dataset
 # Filtering out sites that should not be included
@@ -174,31 +174,33 @@ eof_all <- eof_all %>%
   group_by(Field_Name) %>%
   arrange(storm_start) %>%
   ungroup() %>%
-  arrange(Field_Name)
+  arrange(Field_Name)%>%
+  mutate(DrainageClass = if_else(DrainageClass == "Well Drained","Well drained",DrainageClass))
 
 # Output the processed df
 write.csv(eof_all,"00_Data/Processed_data/Cleaned_data/DF_EOF_cleaned.csv")
 
 DF_site_info <- DF_site_info %>%
-  left_join(DF_site_time,by="Field_Name")
+  left_join(DF_site_time,by="Field_Name")%>%
+  mutate(DrainageClass = if_else(DrainageClass == "Well Drained","Well drained",DrainageClass))
 write.csv(DF_site_info,"00_Data/Processed_data/Cleaned_data/DF_site_info_cleaned.csv")
 
 # Plot metadata maps + distributions of categorical variables =====================
 # For monitoring type (Surface vs Tile)
 Site_plot(DF_site_info,var_size = "event_n",var_fill = "Monitoring",var_label = "Field_Name",
-          my_color,size_name = "# of Events",fill_name = "Monitoring",6,8)
+          my_color,size_name = "# of Events",fill_name = "Monitoring",8,5)
 # For LandCover
 Site_plot(DF_site_info,var_size = "event_n",var_fill = "LandCover",var_label = "Field_Name",
-          my_color,size_name = "# of Events",fill_name = "Land Cover",8,8)
+          my_color,size_name = "# of Events",fill_name = "Land Cover",8,5)
 # For Tillage
 Site_plot(DF_site_info,var_size = "event_n",var_fill = "Tillage",var_label = "Field_Name",
-          my_color,size_name = "# of Events",fill_name = "Tillage",6,8)
+          my_color,size_name = "# of Events",fill_name = "Tillage",8,5)
 # For Manure
 Site_plot(DF_site_info,var_size = "event_n",var_fill = "Manure",var_label = "Field_Name",
-          my_color,size_name = "# of Events",fill_name = "Manure",6,8)
+          my_color,size_name = "# of Events",fill_name = "Manure",8,5)
 # For SoilType
 Site_plot(DF_site_info,var_size = "event_n",var_fill = "DrainageClass",var_label = "Field_Name",
-          my_color,size_name = "# of Events",fill_name = "Drainage Class",8,8)
+          my_color,size_name = "# of Events",fill_name = "Drainage Class",8,5)
 
 
 
