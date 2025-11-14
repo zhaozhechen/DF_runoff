@@ -12,6 +12,7 @@ library(lfstat) # assign dates into USGS water years
 library(sf)
 library(lubridate)
 library(readxl)
+library(tidyr)
 
 # Data paths ======
 # USGS raw EOF Storm event data
@@ -116,7 +117,9 @@ DF_site_info <- DF_site_info %>%
   mutate(LAT_approx = coalesce(LAT_approx_New,LAT_approx),
          LONG_approx = coalesce(LONG_approx_New,LONG_approx)) %>%
   select(-LAT_approx_New,-LONG_approx_New) %>%
-  left_join(DF_site_time,by="Field_Name")
+  left_join(DF_site_time,by="Field_Name") %>%
+  mutate(Approximate_Start_Date = mdy(Approximate_Start_Date),
+         Approximate_End_Date = mdy(Approximate_End_Date))
 
 # Output this DF site info
 write.csv(DF_site_info,paste0(Output_path,"DF_site_info.csv"))
@@ -136,43 +139,59 @@ usgs_eof <- usgs_eof %>%
 write.csv(usgs_eof,paste0(Output_path,"eof_P_Q_df.csv"))
 
 # Process USGS P data ===============
+# Preprocessing of usgs_p
+usgs_p <- usgs_p %>%
+  # Only keep sites in EOF sites
+  filter(project == "DiscoveryFarms") %>%
+  # Filter out P <= 0.01 inch
+  filter(rain > 0.01) %>%
+  select(-project) %>%
+  rename(USGS_Station_Number = USGS_Station_Number_for_Precipitation,
+         P_start = StartDate,
+         P_end = EndDate) %>%
+  # Split All_Field_Names into multiple rows, into long data
+  separate_rows(All_Field_Names,sep="\\|") %>%
+  # Reformat time
+  mutate(P_start = mdy_hm(ifelse(grepl("^\\d{1,2}/\\d{1,2}/\\d{4}$", P_start),
+                           paste(P_start,"00:00"),
+                           P_start)),
+         P_end = mdy_hm(ifelse(grepl("^\\d{1,2}/\\d{1,2}/\\d{4}$", P_end),
+                                 paste(P_end,"00:00"),
+                                 P_end)))
+
 # Process P data for each site individually  
 arrayid <- 1
 Site_ID <- DF_site_info$Field_Name[arrayid]
-# Match using Site ID because some sites share the same USGS Station gauge
+# Only keep precipitation for this target site
+# Match using Site ID not USGS Station Number because some sites share the same USGS Station gauge
+usgs_p_site <- usgs_p %>%
+  filter(All_Field_Names == Site_ID)
 
-# Keep the corresponding P data for this site
-p_site_df <- usgs_p %>%
-  filter(USGS_Station_Number == USGS_ID)
+# Get this site's study period
+site_dates <- DF_site_info %>%
+  filter(Field_Name == Site_ID) %>%
+  select(Approximate_Start_Date, Approximate_End_Date)
 
-
-
-
-# This is P data from all relevant USGS P gauges, but because each gauge may be related to more than 1 DF field, 
-# with different Q events, and different monitoring periods
-# So, P events at each field should be delineated separately
-
-
-
-
-usgs_p <- usgs_p %>%
-  # Only keep sites in EOF sites
-  filter(USGS_Station_Number_for_Precipitation %in% usgs_eof$USGS_Station_Number) %>%
-  # Filter out P <= 0.01 inch
-  filter(rain > 0.01) %>%
-  select(-project,-All_Field_Names) %>%
-  rename(USGS_Station_Number = USGS_Station_Number_for_Precipitation,
-         P_start = StartDate,
-         P_end = EndDate)
-
-
-
-
-
-
-
+site_start <- site_dates$Approximate_Start_Date
+site_end <- site_dates$Approximate_End_Date
 
 # For each site, Only keep the P events during the monitoring period
+# Filter P records to the study period
+if (is.na(site_end)) {
+  # No end date: keep everything from start onward
+  usgs_p_site <- usgs_p_site %>%
+    filter(P_start >= site_start)
+} else {
+  # Both start and end defined → keep only within window
+  usgs_p_site <- usgs_p_site %>%
+    filter(P_start >= site_start,
+           P_start <= site_end)
+}
+
+
+
+
+
 
 # If a P event is associated with a Q event, Associated_Q is Yes, otherwise no
 
