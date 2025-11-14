@@ -80,7 +80,14 @@ usgs_eof <- usgs_eof %>%
          ARFdays1,
          ARFdays2,
          ARFdays7,
-         ARFdays14)
+         ARFdays14) %>%
+  # Reformat time
+  mutate(Q_start = mdy_hm(ifelse(grepl("^\\d{1,2}/\\d{1,2}/\\d{4}$", Q_start),
+                                 paste(Q_start,"00:00"),
+                                 Q_start)),
+         Q_end = mdy_hm(ifelse(grepl("^\\d{1,2}/\\d{1,2}/\\d{4}$", Q_end),
+                               paste(Q_end,"00:00"),
+                               Q_end)))
 
   # Combine unique storms (these Q events are associated with the same P event)
   #group_by(Field_Name,unique_storm_number) %>%
@@ -188,13 +195,17 @@ if (is.na(site_end)) {
            P_start <= site_end)
 }
 
+# If a P event is associated with a Q event, Associated_Q is TRUE, otherwise FALSE
+# Get Q for this site fist
+eof_site <- usgs_eof %>%
+  filter(Field_Name == Site_ID)
 
-
-
-
-
-# If a P event is associated with a Q event, Associated_Q is Yes, otherwise no
-
+usgs_p_site$Associated_Q <- sapply(seq_len(nrow(usgs_p_site)), function(i) {
+  any(
+    eof_site$Q_end   >= usgs_p_site$P_start[i] &
+      eof_site$Q_start <= usgs_p_site$P_end[i]
+  )
+})
 
 # Frozen or not.
 
