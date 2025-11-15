@@ -6,6 +6,8 @@
 # Extract variables related to P and Q
 # This data processing code is adapted from Ellen Albright (personal communication)
 
+# For EOF Q events, only Q associated with storm events are kept
+
 # This code also processes USGS P data
 # For each site, only P events happened during the monitoring period of that site is kept
 # P <= 0.01 in are filtered out
@@ -91,7 +93,10 @@ usgs_eof <- usgs_eof %>%
                                  Q_start)),
          Q_end = mdy_hm(ifelse(grepl("^\\d{1,2}/\\d{1,2}/\\d{4}$", Q_end),
                                paste(Q_end,"00:00"),
-                               Q_end)))
+                               Q_end))) %>%
+  mutate(storm = ifelse(storm == 1,"Storm","Non-storm")) %>%
+  # Filter out Q events that are not associated with storm
+  filter(storm == "Storm")
 
   # Combine unique storms (these Q events are associated with the same P event)
   #group_by(Field_Name,unique_storm_number) %>%
@@ -237,8 +242,7 @@ usgs_eof <- usgs_eof %>%
   # convert area from acre to sqrt ft
   mutate(area_ft2 = BasinArea_ac*43560) %>%
   # runoff volume unit: cubit ft to in
-  mutate(runoff_in = runoff_volume/area_ft2 * 12) %>%
-  mutate(storm = ifelse(storm == 1,"Storm","Non-storm")) 
+  mutate(runoff_in = runoff_volume/area_ft2 * 12)
 
 # Calculate duration from P_start to Q_start
 usgs_eof <- usgs_eof %>%
