@@ -1,10 +1,14 @@
 # Author: Zhaozhe Chen
-# Date: 2025.11.13
+# Update Date: 2025.11.15
 
 # This code processes raw USGS EOF dataset
-# Filtering out sites that should not be included
+# Filter out sites that should not be included
 # Extract variables related to P and Q
 # This data processing code is adapted from Ellen Albright (personal communication)
+
+# This code also processes USGS P data
+# For each site, only P events happened during the monitoring period of that site is kept
+# P <= 0.01 in are filtered out
 
 # -------- Global -----------
 library(dplyr)
@@ -35,7 +39,7 @@ PRISM_T <- read.csv("00_Data/Processed_data/DF_PRISM_tmean.csv")
 Output_path <- "00_Data/Processed_data_v2/"
 
 # ------- Main ---------
-# USGS EOF storm event data processing =================
+# Step 1. USGS EOF storm event data processing =================
 # Filter out sites that should not be included
 usgs_eof <- usgs_eof %>%
   # Only keep required DF sites
@@ -101,7 +105,7 @@ usgs_eof <- usgs_eof %>%
   #          .groups = "drop") %>%
   #select(-unique_storm_number)
 
-# DF site info processing =====================
+# Step 2. DF site info processing =====================
 # Only keep sites after filtering
 DF_site_info <- DF_site_info %>%
   filter(Field_Name %in% usgs_eof$Field_Name) %>%
@@ -131,21 +135,7 @@ DF_site_info <- DF_site_info %>%
 # Output this DF site info
 write.csv(DF_site_info,paste0(Output_path,"DF_site_info.csv"))
 
-# Additional calculation for EOF =======================
-usgs_eof <- usgs_eof %>%
-  left_join(DF_site_info %>%
-              select(Field_Name,BasinArea_ac),
-            by="Field_Name") %>%
-  # convert area from acre to sqrt ft
-  mutate(area_ft2 = BasinArea_ac*43560) %>%
-  # runoff volume unit: cubit ft to in
-  mutate(runoff_in = runoff_volume/area_ft2 * 12) %>%
-  mutate(storm = ifelse(storm == 1,"Storm","Non-storm")) 
-
-# Output this eof_df
-write.csv(usgs_eof,paste0(Output_path,"eof_P_Q_df.csv"))
-
-# Process USGS P data ===============
+# Step 3. Process USGS P data ===============
 # Preprocessing of usgs_p
 usgs_p <- usgs_p %>%
   # Only keep sites in EOF sites
@@ -166,60 +156,115 @@ usgs_p <- usgs_p %>%
                                  paste(P_end,"00:00"),
                                  P_end)))
 
-# Process P data for each site individually  
-arrayid <- 1
-Site_ID <- DF_site_info$Field_Name[arrayid]
-# Only keep precipitation for this target site
-# Match using Site ID not USGS Station Number because some sites share the same USGS Station gauge
-usgs_p_site <- usgs_p %>%
-  filter(All_Field_Names == Site_ID)
+# Process P data for each site individually 
 
-# Get this site's study period
-site_dates <- DF_site_info %>%
-  filter(Field_Name == Site_ID) %>%
-  select(Approximate_Start_Date, Approximate_End_Date)
-
-site_start <- site_dates$Approximate_Start_Date
-site_end <- site_dates$Approximate_End_Date
-
-# For each site, Only keep the P events during the monitoring period
-# Filter P records to the study period
-if (is.na(site_end)) {
-  # No end date: keep everything from start onward
+# This is wrapper function to process P at each site
+# Including keeping only P events during the monitoring period of site
+# Label whether a P event is associated with a P event or not
+# Label whether a P event is frozen or not
+process_site_P <- function(Site_ID){
+  # Extract P events for this target site
+  # Match using Site ID not USGS Station Number because some sites share the same USGS Station gauge
+  usgs_p_site <- usgs_p %>%
+    filter(All_Field_Names == Site_ID)
+  
+  # Get this site's monitoring period
+  site_dates <- DF_site_info %>%
+    filter(Field_Name == Site_ID) %>%
+    select(Approximate_Start_Date, Approximate_End_Date)
+  
+  site_start <- site_dates$Approximate_Start_Date
+  site_end <- site_dates$Approximate_End_Date
+  
+  # For each site, Only keep the P events during the monitoring period
+  # Filter P records to the study period
+  if (is.na(site_end)) {
+    # No end date: keep everything from start onward
+    usgs_p_site <- usgs_p_site %>%
+      filter(P_start >= site_start)
+  } else {
+    # Both start and end defined → keep only within window
+    usgs_p_site <- usgs_p_site %>%
+      filter(P_start >= site_start,
+             P_start <= site_end)
+  }
+  
+  # If a P event is associated with a Q event, Associated_Q is TRUE, otherwise FALSE
+  # Get Q for this site fist
+  eof_site <- usgs_eof %>%
+    filter(Field_Name == Site_ID)
+  
+  usgs_p_site$Associated_Q <- sapply(seq_len(nrow(usgs_p_site)), function(i) {
+    any(
+      eof_site$Q_end   >= usgs_p_site$P_start[i] &
+        eof_site$Q_start <= usgs_p_site$P_end[i]
+    )
+  })
+  
+  # Get the PRISM T for this site
+  T_site <- data.frame(
+    Date = PRISM_T$Date,
+    Tmp = PRISM_T[[Site_ID]]) %>%
+    # Convert character to Date
+    mutate(Date = ymd(Date))
+  
+  # Label if the P event is frozen or not
   usgs_p_site <- usgs_p_site %>%
-    filter(P_start >= site_start)
-} else {
-  # Both start and end defined → keep only within window
-  usgs_p_site <- usgs_p_site %>%
-    filter(P_start >= site_start,
-           P_start <= site_end)
+    # Use the calendar day for P_start
+    mutate(Date = as.Date(P_start)) %>%
+    # Join in daily temperature for this site
+    left_join(T_site,by="Date") %>%
+    # Label frozen vs non-frozen
+    mutate(P_frozen = ifelse(Tmp <=0,TRUE,FALSE))
+  
+  return(usgs_p_site)
 }
 
-# If a P event is associated with a Q event, Associated_Q is TRUE, otherwise FALSE
-# Get Q for this site fist
-eof_site <- usgs_eof %>%
-  filter(Field_Name == Site_ID)
+# Combine processed P for all sites
+Site_ID_ls <- DF_site_info$Field_Name
+usgs_p_all_sites <- lapply(Site_ID_ls,process_site_P) %>%
+  bind_rows() %>%
+  rename(Field_Name = All_Field_Names)
 
-usgs_p_site$Associated_Q <- sapply(seq_len(nrow(usgs_p_site)), function(i) {
-  any(
-    eof_site$Q_end   >= usgs_p_site$P_start[i] &
-      eof_site$Q_start <= usgs_p_site$P_end[i]
+# Output this P data frame
+write.csv(usgs_p_all_sites,paste0(Output_path,"All_P_events_df.csv"))
+
+# Step 4. Additional calculation for EOF =======================
+usgs_eof <- usgs_eof %>%
+  left_join(DF_site_info %>%
+              select(Field_Name,BasinArea_ac),
+            by="Field_Name") %>%
+  # convert area from acre to sqrt ft
+  mutate(area_ft2 = BasinArea_ac*43560) %>%
+  # runoff volume unit: cubit ft to in
+  mutate(runoff_in = runoff_volume/area_ft2 * 12) %>%
+  mutate(storm = ifelse(storm == 1,"Storm","Non-storm")) 
+
+# Calculate duration from P_start to Q_start
+usgs_eof <- usgs_eof %>%
+  rowwise() %>%
+  mutate(
+    first_P_start = {
+      # P event at this site that overlap this Q event
+      site_p <- usgs_p_all_sites %>%
+        filter(Field_Name == Field_Name,
+               P_end >= Q_start,
+               P_start <= Q_start)
+      
+      if(nrow(site_p) ==0){
+        as.POSIXct(NA)
+      }else{
+        min(site_p$P_start,na.rm=TRUE)  
+      }
+    }
+  ) %>%
+  ungroup() %>%
+  mutate(
+    Q_response_time_hr = as.numeric(difftime(Q_start,first_P_start,units = "hours"))
   )
-})
 
-# Frozen or not.
-
-
-
-
-
-
-# Plotting =================
-# Map of sites
-
-# Number of Q and P events at each site, as well as # of available years
-
-
+# Output this eof_df
+write.csv(usgs_eof,paste0(Output_path,"All_Q_events_df.csv"))
 
 
 
