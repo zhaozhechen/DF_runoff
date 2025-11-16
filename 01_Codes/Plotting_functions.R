@@ -129,3 +129,48 @@ plot_bar <- function(df,x_varname,y_varname,fill_name = NULL,
   }
   return(g)
 }
+
+# This function is to make maps of DF sites
+# Input include:
+# df: the site info df
+# var_size: variable name for size
+# var_fill: variable name for fill
+# var_label: variable name for labeling
+# my_color: palette for coloring
+# size_name and fill_name are the titles for legends
+DF_map <- function(df,var_size,var_fill,var_label,my_color,
+                   size_name,fill_name){
+  # Turn the filled value to be factor
+  fill_factor <- factor(df[[var_fill]])
+  # Get # of levels
+  n_level <- length(levels(fill_factor))
+  # Choose the first n_level colors from my_color
+  pal <- my_color[1:n_level]
+  
+  g_map <- ggplot()+
+    geom_sf(data=WI_bd,fill="#aec8df",alpha=0.8,color="grey")+
+    geom_sf(data=WI_outer_bd,fill=NA,color="black")+
+    geom_point(data=df,
+               aes(x=LONG_approx,y=LAT_approx,
+                   size = .data[[var_size]],
+                   fill = .data[[var_fill]]),
+               shape = 21,
+               color="black",
+               alpha=0.8)+
+    scale_fill_manual(values = pal)+
+    my_theme+
+    geom_label_repel(data=df,
+                     aes(x=LONG_approx,y=LAT_approx,label=.data[[var_label]]),
+                     point.padding = 0,
+                     label.padding = 0.25,
+                     box.padding = 0.25,
+                     min.segment.length = 0,
+                     max.overlaps = 30,
+                     segment.color="black")+
+    guides(fill = guide_legend(override.aes = list(size = 6,shape=21)),
+           size = guide_legend(override.aes = list(shape=21)))+
+    labs(fill=fill_name,size=size_name)
+  
+  return(g_map)
+}
+
