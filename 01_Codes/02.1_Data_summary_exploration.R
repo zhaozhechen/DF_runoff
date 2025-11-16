@@ -212,29 +212,78 @@ g_bars_V <- plot_grid(g_VQ,g_pfrozen_V,g_VQ_month,g_VQ_p_month,ncol=1,
                       align = "hv")
 print_g(g_bars_V,"Q_V_bars",10,14)
 
+# Summarize Q depth =================
+# Annual Q depth across sites Unit: in
+Q_d_site <- Q_df %>%
+  group_by(Field_Name,frozen) %>%
+  summarise(total_Q_in = sum(runoff_in,na.rm=TRUE)) %>%
+  left_join(monitoring_time %>% select(Field_Name,monitoring_years),
+            by="Field_Name") %>%
+  mutate(mean_Q_per_year = total_Q_in/monitoring_years)
 
+# Monthly Q depth across all sites
+Q_d_month <- Q_df %>%
+  mutate(Month = month(Q_start),
+         Year = year(Q_start)) %>%
+  group_by(Year,Month,frozen) %>%
+  summarise(Monthly_Q = sum(runoff_in,na.rm=TRUE)) %>% 
+  # Mean and sd of monthly total Q acorss years
+  group_by(Month,frozen) %>%
+  summarise(mean_monthly_Q = mean(Monthly_Q,na.rm=TRUE),
+            sd_monthly_Q = sd(Monthly_Q,na.rm=TRUE)) %>%
+  mutate(Month = factor(month.abb[Month],levels=month.abb))
 
+# Total frozen and non-frozen depth, across sites, acorss years
+Q_df %>%
+  group_by(frozen) %>%
+  summarize(total_Q = sum(runoff_in,na.rm=TRUE))
 
-# Make boxplots of Q volume during each event
-df <- Q_df
-x_varname <- "Field_Name"
-y_varname <- "runoff_volume"
-fill_varname <- "frozen"
+Q_d_month %>%
+  select(-sd_monthly_Q) %>%
+  pivot_wider(values_from = mean_monthly_Q,
+              names_from = frozen) %>%
+  mutate(p = `Non-Frozen`/(`Non-Frozen` + Frozen)*100)
 
-ggplot(data=df,aes(x=.data[[x_varname]],y=log10(.data[[y_varname]]),fill=.data[[fill_varname]]))+
-  geom_half_violin(alpha = 0.5, color=NA)+
-  geom_boxplot(width = 0.5,color="black",outlier.color = NA)+
-  geom_jitter(aes(x=as.numeric(.data[[x_varname]])+0.2),
-              position = position_jitter(width=0.1))
+# Bar plots of Annual mean Q volume during frozen vs non-frozen across sites
+g_dQ <- plot_bar(df = Q_d_site,x_varname = "Field_Name",y_varname = "mean_Q_per_year",fill_name = "frozen",
+                 x_title = "",y_title = "Annual Q (in)",fill_title = "",
+                 label_x = 0.8,label_y = 0.9,
+                 my_cols = c("Frozen" = my_color[3],"Non-Frozen" = my_color[2]))
 
+# Bar plots of Monthly total Q depth across months
+g_dQ_month <- plot_bar(df = Q_d_month,x_varname = "Month",y_varname = "mean_monthly_Q",fill_name = "frozen",
+                       x_title = "",y_title = "Monthly Q (in)",fill_title = "",
+                       my_cols = c("Frozen" = my_color[3],"Non-Frozen" = my_color[2]),
+                       label_x = 0.8)
 
+# Combine these plots
+g_bars_V <- plot_grid(g_dQ,g_dQ_month,ncol=1,
+                      align = "hv")
+print_g(g_bars_V,"Q_d_bars",10,7)
 
+# Non-frozen Q volume and depth during each event ========================
+# Pre-processing of non-frozen Q
+Q_non_frozen <- Q_df %>%
+  filter(frozen == "Non-Frozen") %>%
+  mutate(Field_Name = factor(Field_Name,levels = site_order)) %>%
+  left_join(DF_site_info, by = "Field_Name") %>%
+  mutate(Month = month(Q_start)) %>%
+  mutate(Month = factor(month.abb[Month],levels=month.abb))
 
-g <- ggplot(data=eof_summary,aes(x=storm,y=contribution,color=storm,fill=storm))+
-  geom_half_violin(alpha = 0.5, color=NA)+
-  geom_boxplot(width = 0.1,color="black",outlier.color = NA)+
-  geom_jitter(aes(x=as.numeric(as.factor(storm))+0.2),
-              position = position_jitter(width=0.1))+
+# Make boxplots of non-frozen Q depth during each event
+g_box_nonfrozen_Q_in <- plot_box(df = Q_non_frozen,x_varname = "Field_Name",y_varname = "runoff_in",fill_name = "Monitoring",
+         x_title = "",y_title = "Non-Frozen Q (in)",fill_title = "",box_width = 0.4,jitter_offset = 0.4,label_y = 0.8,
+         my_cols = c("Surface" = my_color[1],"Tile" = my_color[4]))
+
+# Make boxplots of non-frozen Q depth across Months
+g_box_nonfrozen_Q_in_Month <- plot_box(df = Q_non_frozen,x_varname = "Month",y_varname = "runoff_in",fill_name = "storm",
+                                 x_title = "",y_title = "Non-Frozen Q (in)",fill_title = "",
+                                 box_width = 0.1,jitter_offset = 0.2,white_box = TRUE,
+                                 my_cols = c("Storm" = my_color[2]))+
+  theme(legend.position = "none")
+
+g_box_Q_in <- plot_grid(g_box_nonfrozen_Q_in,g_box_nonfrozen_Q_in_Month,ncol = 1,align="hv")
+print_g(g_box_Q_in,"Q_d_box",10,7)
 
 
 

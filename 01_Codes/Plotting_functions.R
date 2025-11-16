@@ -174,3 +174,47 @@ DF_map <- function(df,var_size,var_fill,var_label,my_color,
   return(g_map)
 }
 
+# This function is to make box plots
+plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
+                     x_title,y_title,fill_title = NULL,
+                     label_x = 0.1,label_y = 0.9,
+                     jitter_offset = 0.2,jitter_width = 0.1,box_width = 0.1,y_limits = NULL,my_cols=NULL,white_box = NULL){
+  
+  g <- ggplot(data = df,
+              aes(x = .data[[x_varname]],y = .data[[y_varname]],fill = .data[[fill_name]])) +
+    geom_half_violin(alpha = 0.5, color=NA)+
+    # Jittered points, nudged a bit to the right
+    geom_jitter(
+      aes(x = as.numeric(.data[[x_varname]]) + jitter_offset,
+          color=.data[[fill_name]]),
+      position = position_jitter(width = jitter_width),
+      size = 2,
+      alpha = 0.7
+    ) +
+    labs(x = x_title, y = y_title, fill = fill_name,color=fill_name) +
+    my_theme2+
+    theme(
+      axis.text.x = element_text(angle = 45, vjust = 0.5),
+      legend.position = c(label_x, label_y)
+    )+
+    guides(color="none")
+  
+  if(is.null(white_box)){
+    # Boxplot
+    g <- g + geom_boxplot(width = box_width,color = "black",outlier.color = NA)
+  }else{
+    g <- g + geom_boxplot(width = box_width,color = "black",fill="white",outlier.color = NA)
+  }
+  
+  if(!is.null(y_limits)){
+    g <- g + ylim(y_limits)
+  }
+  
+  if(!is.null(my_cols)){
+    g <- g+ 
+      scale_fill_manual(values = my_cols)+
+      scale_color_manual(values = my_cols)
+  }
+  
+  return(g)
+}
