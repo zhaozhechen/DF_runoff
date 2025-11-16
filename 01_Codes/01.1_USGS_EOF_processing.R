@@ -231,9 +231,6 @@ usgs_p_all_sites <- lapply(Site_ID_ls,process_site_P) %>%
   bind_rows() %>%
   rename(Field_Name = All_Field_Names)
 
-# Output this P data frame
-write.csv(usgs_p_all_sites,paste0(Output_path,"All_P_events_df.csv"))
-
 # Step 4. Additional calculation for EOF =======================
 usgs_eof <- usgs_eof %>%
   left_join(DF_site_info %>%
@@ -265,13 +262,24 @@ usgs_eof <- usgs_eof %>%
   ungroup() %>%
   mutate(
     Q_response_time_hr = as.numeric(difftime(Q_start,first_P_start,units = "hours"))
+  ) %>%
+  # Force time output to keep 00:00:00
+  mutate(
+    Q_start = format(Q_start,"%Y-%m-%d %H:%M:%S"),
+    Q_end = format(Q_end,"%Y-%m-%d %H:%M:%S")
   )
 
 # Output this eof_df
 write.csv(usgs_eof,paste0(Output_path,"All_Q_events_df.csv"))
 
-
-
+# Convert time to character of usgs_p_all_sites for easier processing later
+usgs_p_all_sites <- usgs_p_all_sites %>%
+  mutate(
+    P_start = format(P_start,"%Y-%m-%d %H:%M:%S"),
+    P_end = format(P_end,"%Y-%m-%d %H:%M:%S")
+)
+# Output this P data frame
+write.csv(usgs_p_all_sites,paste0(Output_path,"All_P_events_df.csv"))
 
 
 
