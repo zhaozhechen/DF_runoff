@@ -185,7 +185,7 @@ plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
     geom_half_violin(alpha = 0.5, color=NA)+
     # Jittered points, nudged a bit to the right
     geom_jitter(
-      aes(x = as.numeric(.data[[x_varname]]) + jitter_offset,
+      aes(x = as.numeric(as.factor(.data[[x_varname]])) + jitter_offset,
           color=.data[[fill_name]]),
       position = position_jitter(width = jitter_width),
       size = 2,

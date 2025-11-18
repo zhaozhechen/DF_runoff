@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2025.11.15
+# Update Date: 2025.11.17
 
 # This code is to explore and summarize the dataset
 
@@ -38,7 +38,10 @@ P_df <- P_df %>%
   mutate(
     P_start = ymd_hms(P_start),
     P_end = ymd_hms(P_end)
-  )
+  ) %>%
+  rename(frozen = P_frozen) %>%
+  mutate(frozen = ifelse(frozen == TRUE,"Frozen","Non-Frozen"))
+  
 DF_site_info <- DF_site_info %>%
   mutate(Approximate_Start_Date = ymd(Approximate_Start_Date),
          Approximate_End_Date = ymd(Approximate_End_Date))
@@ -285,19 +288,193 @@ g_box_nonfrozen_Q_in_Month <- plot_box(df = Q_non_frozen,x_varname = "Month",y_v
 g_box_Q_in <- plot_grid(g_box_nonfrozen_Q_in,g_box_nonfrozen_Q_in_Month,ncol = 1,align="hv")
 print_g(g_box_Q_in,"Q_d_box",10,7)
 
+# Box plots of Q in grouped by other practices
+# By monitoring
+g_box_nonfrozen_Q_in_Monitoring <- plot_box(df = Q_non_frozen,x_varname = "Monitoring",y_varname = "runoff_in",fill_name = "Monitoring",
+         x_title = "",y_title = "Non-Frozen Q (in)",fill_title = "",box_width = 0.05,jitter_offset = 0.15,
+         label_x = 0.8,label_y = 0.8, white_box=TRUE,
+         my_cols = c("Surface" = my_color[1],"Tile" = my_color[4]))+
+  theme(legend.position = "none")
+# By tillage
+g_box_nonfrozen_Q_in_Tillage <- plot_box(df = Q_non_frozen,x_varname = "Tillage",y_varname = "runoff_in",fill_name = "Tillage",
+                                            x_title = "",y_title = "Non-Frozen Q (in)",fill_title = "",box_width = 0.05,jitter_offset = 0.15,
+                                            label_x = 0.8,label_y = 0.8, white_box=TRUE,
+                                            my_cols = c("Yes" = my_color[1],"No" = my_color[4]))+
+  theme(legend.position = "none")
+# By Drainage class
+g_box_nonfrozen_Q_in_Drainage <- plot_box(df = Q_non_frozen,x_varname = "DrainageClass",y_varname = "runoff_in",fill_name = "DrainageClass",
+                                          x_title = "",y_title = "Non-Frozen Q (in)",fill_title = "",box_width = 0.05,jitter_offset = 0.15,
+                                          label_x = 0.8,label_y = 0.8, white_box=TRUE,
+                                          my_cols = c("Well drained" = my_color[1],"Moderately well drained" = my_color[4],
+                                                      "Poorly drained" = my_color[5]))+
+  theme(legend.position = "none")
+# By tillage
+g_box_nonfrozen_Q_in_Crop <- plot_box(df = Q_non_frozen,x_varname = "LandCover",y_varname = "runoff_in",fill_name = "LandCover",
+                                         x_title = "",y_title = "Non-Frozen Q (in)",fill_title = "",box_width = 0.05,jitter_offset = 0.15,
+                                         label_x = 0.8,label_y = 0.8, white_box=TRUE,
+                                         my_cols = c("Cultivated Crops" = my_color[1],"Pasture/Hay" = my_color[4]))+
+  theme(legend.position = "none")
+
+g_box_Q_in_practice <- plot_grid(g_box_nonfrozen_Q_in_Monitoring,g_box_nonfrozen_Q_in_Crop,
+                                 g_box_nonfrozen_Q_in_Tillage,g_box_nonfrozen_Q_in_Drainage,
+                                 ncol = 4,align = "hv")
+print_g(g_box_Q_in_practice,"Q_d_box_practice",12,5)
+
+# # of frozen vs non-frozen P =====================
+# Group by sites
+P_n_site <- P_df %>%
+  group_by(Field_Name,frozen) %>%
+  summarise(n_P_events = n()) %>%
+  mutate(Field_Name = factor(Field_Name,levels = site_order))
+
+# Across all sites
+P_n_all <- P_df %>%
+  group_by(frozen) %>%
+  summarise(n_P_events = n()) %>%
+  mutate(Field_Name = "Total") %>%
+  select(Field_Name,frozen,n_P_events) %>%
+  bind_rows(P_n_site)
+
+# Calculate proportion of non-frozen vs total events, at each site
+P_p_all <- P_n_all %>%
+  pivot_wider(names_from = frozen,
+              values_from = n_P_events) %>%
+  # Calculate proportion: Non-Frozen/Total
+  mutate(p_nonfrozen = `Non-Frozen`/(`Non-Frozen` + Frozen) * 100,
+         Field_Name = factor(Field_Name,levels = c(site_order,"Total")))
+
+# P numbers grouped by month across all sites
+P_n_month <- P_df %>%
+  #filter(frozen == "Non-Frozen") %>%
+  #mutate(Month = month(P_start)) %>%
+  mutate(Month = ifelse(!is.na(P_start),month(P_start),month(P_end))) %>%
+  group_by(Month,frozen) %>%
+  summarise(n_P = n()) %>%
+  mutate(Month = factor(month.abb[Month],levels=month.abb))
+
+test <- P_n_month %>%
+  pivot_wider(names_from = frozen,
+              values_from = n_P)
+
+# Make bar plots of P# across sites
+g_nP <- plot_bar(df = P_n_site,x_varname = "Field_Name",y_varname = "n_P_events",fill_name = "frozen",
+                 x_title = "",y_title = "# of P Events",fill_title = "",
+                 label_x = 0.1,label_y = 0.9,
+                 my_cols = c("Frozen" = my_color[3],"Non-Frozen" = my_color[2]))
+
+# Make bar plots of proportion of non-frozen/total across all sites
+g_pfrozen <- plot_bar(df = P_p_all,x_varname = "Field_Name",y_varname = "p_nonfrozen",
+                      x_title = "",y_title = "% of Non-Frozen P",total_color = my_color[1])
+
+# Bar plots of # of non-frozen P events during each month
+g_nP_month <- plot_bar(df=P_n_month,x_varname = "Month",y_varname = "n_P",fill_name = "frozen",
+                       x_title = "",y_title = "# of P",
+                       my_cols = c("Frozen" = my_color[3],"Non-Frozen" = my_color[2]),
+                       label_x = 0.1,label_y = 0.8)
+# Output above plots
+g_bars <- plot_grid(g_nP,g_pfrozen,g_nP_month,
+                    ncol=1,
+                    align = "hv")
+print_g(g_bars,"P_n_bars",10,10)
+
+
+# Summarize P depth =================
+# Annual P depth across sites Unit: in
+P_d_site <- P_df %>%
+  group_by(Field_Name,frozen) %>%
+  summarise(total_P_in = sum(rain,na.rm=TRUE)) %>%
+  left_join(monitoring_time %>% select(Field_Name,monitoring_years),
+            by="Field_Name") %>%
+  mutate(mean_P_per_year = total_P_in/monitoring_years)
+
+test <- P_d_site %>%
+  filter(frozen == "Non-Frozen")
+
+# Monthly P depth across all sites
+P_d_month <- P_df %>%
+  mutate(Month = month(P_start),
+         Year = year(P_start)) %>%
+  group_by(Year,Month,frozen) %>%
+  summarise(Monthly_P = sum(rain,na.rm=TRUE)) %>% 
+  # Mean and sd of monthly total P acorss years
+  group_by(Month,frozen) %>%
+  summarise(mean_monthly_P = mean(Monthly_P,na.rm=TRUE),
+            sd_monthly_P = sd(Monthly_P,na.rm=TRUE)) %>%
+  mutate(Month = factor(month.abb[Month],levels=month.abb))
+
+# Total frozen and non-frozen depth, across sites, acorss years
+P_df %>%
+  group_by(frozen) %>%
+  summarize(total_P = sum(rain,na.rm=TRUE))
+
+P_d_month %>%
+  select(-sd_monthly_P) %>%
+  pivot_wider(values_from = mean_monthly_P,
+              names_from = frozen) %>%
+  mutate(p = `Non-Frozen`/(`Non-Frozen` + Frozen)*100)
+
+# Bar plots of Annual mean P volume during frozen vs non-frozen across sites
+g_dP <- plot_bar(df = P_d_site,x_varname = "Field_Name",y_varname = "mean_P_per_year",fill_name = "frozen",
+                 x_title = "",y_title = "Annual P (in)",fill_title = "",
+                 label_x = 0.8,label_y = 0.9,
+                 my_cols = c("Frozen" = my_color[3],"Non-Frozen" = my_color[2]))
+
+# Bar plots of Monthly total P depth across months
+g_dP_month <- plot_bar(df = P_d_month,x_varname = "Month",y_varname = "mean_monthly_P",fill_name = "frozen",
+                       x_title = "",y_title = "Monthly P (in)",fill_title = "",
+                       my_cols = c("Frozen" = my_color[3],"Non-Frozen" = my_color[2]),
+                       label_x = 0.8)
+
+# Combine these plots
+g_bars_V <- plot_grid(g_dP,g_dP_month,ncol=1,
+                      align = "hv")
+print_g(g_bars_V,"P_d_bars",10,7)
+
+# # of NON_FROZEN P produced Q ========================
+nonfrozen_P_df <- P_df %>%
+  filter(frozen == "Non-Frozen") %>%
+  mutate(Field_Name = factor(Field_Name,levels = c(site_order,"Total")))
+
+# Total number of P produced Q
+sum(nonfrozen_P_df$Associated_Q)
+
+# Summarize number of P that produced Q across sites
+P_Q_site_df <- nonfrozen_P_df %>%
+  group_by(Field_Name,Associated_Q) %>%
+  summarize(n_Q_produced = n())
+
+# Proportion of P that produced Q across sites
+P_Q_p_all <- P_Q_site_df %>%
+  pivot_wider(names_from = Associated_Q,
+              values_from = n_Q_produced) %>%
+  mutate(p_Q_produced = `TRUE`/(`TRUE` + `FALSE`) * 100) %>%
+  left_join(DF_site_info %>% 
+              select(Field_Name,Monitoring,LandCover,Tillage,DrainageClass,MeanSlope_per),
+            by="Field_Name")
+
+# Bar plots of # of non-frozen P that produced Q across sites
+g_n_P_Q <- plot_bar(df = P_Q_site_df,x_varname = "Field_Name",y_varname = "n_Q_produced",fill_name = "Associated_Q",
+                    x_title = "",y_title = "# of P that produced Q",fill_title = "Produced Q?",
+                    my_cols = c("TRUE" = my_color[1],"FALSE" = my_color[7]))+
+  theme(legend.position = "top")
+
+# Bar plots of percentage of P that generated Q across sites
+g_p_P_Q <- plot_bar(df = P_Q_p_all,x_varname = "Field_Name",y_varname = "p_Q_produced",fill_name = "Monitoring",
+                    x_title = "",y_title = "% of non-frozen P that produced Q",fill_title = "Monitoring",
+                    my_cols = c("Surface" = my_color[1],"Tile" = my_color[4]),
+                    label_x = 0.85,label_y = 0.7)
+
+g_P_Q <- plot_grid(g_n_P_Q,g_p_P_Q,nrow=2,align="hv")
+print_g(g_P_Q,"P_Q_bars",10,8)
+
+# Box plots across different practices
 
 
 
-
-# # of frozen vs non-frozen P
-
-
-# Proportion of non-frozen P
-
-
-# # of P produced Q
-
-# proportion of P produced Q
+# Scatter plots of percentage vs practices
+ggplot(P_Q_p_all,aes(x = MeanSlope_per,y = p_Q_produced,color = Monitoring))+
+  geom_point()+
+  my_theme2
 
 
 
