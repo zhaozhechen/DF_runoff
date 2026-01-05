@@ -1,9 +1,9 @@
 # Author: Zhaozhe Chen
-# Update Date: 2025.11.15
+# Update Date: 2026.1.5
 
 # This code processes raw USGS EOF dataset
-# Filter out sites that should not be included
-# Extract variables related to P and Q
+# Filters out sites that should not be included
+# Extracts variables related to P and Q
 # This data processing code is adapted from Ellen Albright (personal communication)
 
 # For EOF Q events, only Q associated with storm events are kept
@@ -137,6 +137,9 @@ DF_site_info <- DF_site_info %>%
   mutate(Approximate_Start_Date = mdy(Approximate_Start_Date),
          Approximate_End_Date = mdy(Approximate_End_Date))
 
+# Include slope for Site AR2, ref: https://uwdiscoveryfarms.org/wp-content/uploads/sites/1255/2024/02/Rock-Co-Report-2024-2.pdf
+DF_site_info$MeanSlope_per[DF_site_info$Field_Name == "AR2"] <- 3.4
+
 # Output this DF site info
 write.csv(DF_site_info,paste0(Output_path,"DF_site_info.csv"))
 
@@ -165,7 +168,7 @@ usgs_p <- usgs_p %>%
 
 # This is wrapper function to process P at each site
 # Including keeping only P events during the monitoring period of site
-# Label whether a P event is associated with a P event or not
+# Label whether a P event is associated with a Q event or not
 # Label whether a P event is frozen or not
 process_site_P <- function(Site_ID){
   # Extract P events for this target site
