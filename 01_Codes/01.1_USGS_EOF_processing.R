@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.5
+# Update Date: 2026.1.6
 
 # This code processes raw USGS EOF dataset
 # Filters out sites that should not be included
@@ -30,6 +30,9 @@ DF_site_info <- read.csv("00_Data/Metadata/DF EOF Site & Year Metadata (2004-202
 DF_site_location <- read_xlsx('00_Data/Metadata/DiscoveryFarms_SiteLocations.xlsx')
 # USGS raw P data
 usgs_p <- read.csv("00_Data/USGS raw/All_EOF_RainEvents.csv")
+# Soil Texture lookup table
+soil_tb <- read.csv("00_Data/Metadata/Soil_Texture_Lookup_table.csv")
+
 # Only keep Start and End time in this one
 DF_site_time <- read.csv("00_Data/USGS raw/EOF_Site_Table.csv") %>%
   select(Field_Name,Approximate_Start_Date,Approximate_End_Date)
@@ -139,6 +142,12 @@ DF_site_info <- DF_site_info %>%
 
 # Include slope for Site AR2, ref: https://uwdiscoveryfarms.org/wp-content/uploads/sites/1255/2024/02/Rock-Co-Report-2024-2.pdf
 DF_site_info$MeanSlope_per[DF_site_info$Field_Name == "AR2"] <- 3.4
+
+# Get clay fraction based on soil type
+DF_site_info <- DF_site_info %>%
+  left_join(soil_tb %>%
+              select(Soil_Type,Clay_Fraction),
+            by = c("SoilType" = "Soil_Type"))
 
 # Output this DF site info
 write.csv(DF_site_info,paste0(Output_path,"DF_site_info.csv"))
