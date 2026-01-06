@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2025.11.15
+# Update Date: 2026.1.6
 
 # This code is to make plots for the DF projects
 
@@ -12,6 +12,7 @@ library(sf)
 library(here)
 library(ggpubr)
 library(ggpointdensity)
+library(scales)
 
 # County-level shape file for plotting
 US_bd <- st_read(here("00_Data","Msc","cb_2018_us_county_20m/cb_2018_us_county_20m.shp"))
@@ -180,6 +181,12 @@ plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
                      label_x = 0.1,label_y = 0.9,
                      jitter_offset = 0.2,jitter_width = 0.1,box_width = 0.1,y_limits = NULL,my_cols=NULL,white_box = NULL){
   
+  # Trunk values to fit in y_limits
+  if(!is.null(y_limits)){
+    df[[y_varname]][df[[y_varname]] > y_limits[2]] <- y_limits[2]
+    df[[y_varname]][df[[y_varname]] < y_limits[1]] <- y_limits[1]
+  }
+  
   g <- ggplot(data = df,
               aes(x = .data[[x_varname]],y = .data[[y_varname]],fill = .data[[fill_name]])) +
     geom_half_violin(alpha = 0.5, color=NA)+
@@ -191,7 +198,7 @@ plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
       size = 2,
       alpha = 0.7
     ) +
-    labs(x = x_title, y = y_title, fill = fill_name,color=fill_name) +
+    labs(x = x_title, y = y_title, fill = fill_title,color=fill_title) +
     my_theme2+
     theme(
       axis.text.x = element_text(angle = 45, vjust = 0.5),
@@ -206,8 +213,18 @@ plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
     g <- g + geom_boxplot(width = box_width,color = "black",fill="white",outlier.color = NA)
   }
   
+  # Change labels if y_limits are provided
   if(!is.null(y_limits)){
-    g <- g + ylim(y_limits)
+    g <- g + coord_cartesian(ylim = y_limits) +
+      scale_y_continuous(
+        breaks = scales::pretty_breaks(),
+        labels = function(brks) {
+          labs <- as.character(brks)
+          i_max <- which.max(brks)
+          labs[i_max] <- paste0("\u2265 ", y_limits[2])  # "≥ upper_lim"
+          labs
+        }
+      )
   }
   
   if(!is.null(my_cols)){
