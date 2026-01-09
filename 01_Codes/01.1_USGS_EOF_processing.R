@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.6
+# Update Date: 2026.1.9
 
 # This code processes raw USGS EOF dataset
 # Filters out sites that should not be included

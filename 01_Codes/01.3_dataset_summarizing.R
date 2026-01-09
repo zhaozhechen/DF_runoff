@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.6
+# Update Date: 2026.1.9
 
 # This code is to synthesize all data to get final dataset for RF
 # Only keep non-frozen P and non-frozen Q
@@ -22,6 +22,8 @@ Crop_df <- read.csv("00_Data/Processed_data_v2/Crop_df.csv") %>%
 # Updated site info
 DF_site_info <- read.csv("00_Data/Processed_data_v2/DF_site_info.csv") %>%
   select(-X)
+# Tillage for each site at each site
+DF_Tillage <- read.csv("00_Data/Metadata/DF_EOF_Tillage.csv")
 
 # Output path
 Output_path <- "00_Data/Processed_data_v2/"
@@ -33,13 +35,18 @@ DF_site_df <- DF_site_info %>%
          Monitoring,
          FarmEnterprise,
          CropRotation,
-         Tillage,
+         #Tillage,
          Tile,
          SoilType,
          HydrologicGroup,
          DrainageClass,
          MeanSlope_per,
          Clay_Fraction)
+
+# Process Tillage Data
+DF_Tillage <- DF_Tillage %>%
+  mutate(Tillage = ifelse(Tillage == "Pasture Renovation","Pasture",Tillage),
+         Tillage = ifelse(Tillage == "None","No-Till",Tillage))
 
 # Join P df ==============
 P_joint_df <- P_all_df %>%
@@ -50,6 +57,10 @@ P_joint_df <- P_all_df %>%
   left_join(Crop_df,by=c("Field_Name","Field_Year")) %>%
   # Calculate Days since planting (DSP)
   mutate(DSP = date(P_start) - as.Date(Start_Date_wt)) %>%
+  # Include Tillage for each year
+  left_join(DF_Tillage,
+            by = c("Field_Name" = "SiteID",
+                   "Field_Year" = "Year")) %>%
   # Only keep non-frozen events
   filter(P_frozen == "FALSE")
 
@@ -65,6 +76,10 @@ Q_joint_df <- Q_all_df %>%
   left_join(Crop_df,by=c("Field_Name","Field_Year")) %>%
   # Calculate Days since planting (DSP)
   mutate(DSP = date(Q_start) - as.Date(Start_Date_wt)) %>%
+  # Include Tillage for each year
+  left_join(DF_Tillage,
+            by = c("Field_Name" = "SiteID",
+                   "Field_Year" = "Year")) %>%
   # Only keep non-frozen events
   filter(frozen == "Non-Frozen")
 
