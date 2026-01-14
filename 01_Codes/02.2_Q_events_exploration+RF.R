@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.9
+# Update Date: 2026.1.13
 
 # This code is to explore non-frozen Q events
 
@@ -20,16 +20,20 @@ source("01_Codes/Plotting_functions.R")
 my_color <- RColorBrewer::brewer.pal(7,"Set2")
 
 # Set random seed
-seed <- 1
+seed <- 111
 
+# Variables to be included in RF =====
 # Response variable
-var_re <- "RC"
-# var_re <- "Q_response_time_hr
+var_re <- "Q_response_time_hr"
+
 # Predictors to be included
-var_pr <- c("duration","I30","ARFdays1","ARFdays14","Field_Name",
-            #"Monitoring","FarmEnterprise","Tillage","Tile","SoilType","MeanSlope_per","Clay_Fraction",
+var_pr <- c("duration","I30","ARFdays7","rain_in",
+            "Tillage","Tile","MeanSlope_per","SoilType",
             "PerennialFrac","DSP")
 var_ls_all <- c(var_re,var_pr)
+
+# Output path
+Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/RF_results/"
 
 # ------- Main ---------
 # Processing Q event df =========
@@ -45,7 +49,9 @@ Q_df <- Q_df %>%
          Tillage = as.factor(Tillage),
          Tile = as.factor(Tile),
          SoilType = as.factor(SoilType),
-         Field_Name = as.factor(Field_Name)) %>%
+         Field_Name = as.factor(Field_Name),
+         Crop = as.factor(Crop),
+         PreviousCrop = as.factor(PreviousCrop)) %>%
   # Filter out tile monitoring sites
   filter(Monitoring == "Surface")
 
@@ -70,30 +76,74 @@ system.time(rf <- randomForest(f,
                                data = df_train,
                                importance=TRUE,
                                type = "regression",
-                               ntree=500))
+                               ntree=100))
 print("Complete RF model")
 
 # Record r for testing and training set
-r_train <- cor(rf$predicted,df_train[var_re],use="pairwise.complete.obs")
-rf.test.pred <- predict(rf,df_test)
-r_test  <- cor(rf.test.pred,df_test[var_re],use="pairwise.complete.obs")
+pred_train <- predict(rf,df_train)
+pred_test <- predict(rf,df_test)
+r_train <- cor(pred_train,df_train[var_re],use="pairwise.complete.obs")
+r_test  <- cor(pred_test,df_test[var_re],use="pairwise.complete.obs")
+
 rf_importance <- as.data.frame(importance(rf))
 rf_importance$Feature <- rownames(rf_importance)
-rf_importance <- rf_importance %>% rename("Importance" = "%IncMSE")
+rf_importance <- rf_importance %>% 
+  rename("Importance" = "%IncMSE") %>%
+  # Add groups for coloring
+  mutate(
+    Group = case_when(
+      Feature %in% c("rain_in","I30","duration","ARFdays7","ARFdays1","ARFdays14") ~ "Rainfall",
+      Feature %in% c("MeanSlope_per","SoilType") ~ "Landscape",
+      TRUE ~ "Management"
+    )
+  )
+
+# Define colors for the three types
+my_fill <- c(
+  "Rainfall" = my_color[3],
+  "Landscape" = my_color[1],
+  "Management" = my_color[2]
+)
+  
 # Rescale importance to sum = 1
 rf_importance$Importance <- rf_importance$Importance/sum(rf_importance$Importance)
 # Plot of relative importance
-g_imp <- ggplot(data=rf_importance,aes(x=Importance,y=reorder(Feature,Importance)))+
-  geom_bar(stat="identity",fill="skyblue",color="black")+
+g_imp <- ggplot(data=rf_importance,aes(x=Importance,y=reorder(Feature,Importance),fill=Group))+
+  geom_bar(stat="identity",color="black")+
   annotate("text",x=0.8*max(rf_importance$Importance),y=3,label=paste("R2_train =",round(r_train^2,2)))+
   annotate("text",x=0.8*max(rf_importance$Importance),y=2,label=paste("R2_test =",round(r_test^2,2)))+
-  labs(y="")
+  scale_fill_manual(values = my_fill)+
+  labs(y="")+
+  my_theme2
+
+# Make PDP
+# Initialize a list to store pdp plots
+pdp_ls <- list()
+IP_var_ls <- rownames(rf_importance[order(rf_importance$Importance,decreasing = TRUE),])
+# Remove some categorical variables
+IP_var_ls <- setdiff(IP_var_ls,
+                     c("SoilType","Tillage","Tile"))
+
+for(i in 1:length(IP_var_ls)){
+  g <- make_pdp_plot(rf,df_train,var_re,IP_var_ls,i)
+  pdp_ls[[i]] <- g
+  print(i)
+}
+
+# Combine all plots
+g_pdp_all <- plot_grid(plotlist = pdp_ls)
+g_all <- plot_grid(g_imp,g_pdp_all,
+                   nrow = 1,rel_widths = c(0.6,1))
+
+# Output this figure
+print_g(g_all,paste0("RF_",var_re),16,8)
+
+
 
 
 # Explore RC across groups ==========
 if(FALSE){
   
-
 # Across Sites
 RC_Site <- plot_box(df = Q_df,x_varname = "Field_Name",y_varname = "RC",fill_name = "Monitoring",
          x_title = "",y_title = "Runoff Coefficient",fill_title = "",box_width = 0.4,
@@ -111,6 +161,12 @@ RC_Drainage <- plot_box(df = Q_df,x_varname = "DrainageClass",y_varname = "RC",f
 RC_Monitoring <- plot_box(df = Q_df,x_varname = "Monitoring",y_varname = "RC",fill_name = "storm",
                         x_title = "",y_title = "Runoff Coefficient",box_width = 0.4,fill_title = NULL,
                         jitter_offset = 0.4,label_y = 0.8,y_limits = c(0,2))
+# Across Tillage
+# Should also check Current Crop type perennial or annual for cover crop with No-Till!!!!!!!!!!!!
+
+RC_Tillage <- plot_box(df = Q_df,x_varname = "Tillage",y_varname = "RC",fill_name = "storm",
+                          x_title = "",y_title = "Runoff Coefficient",box_width = 0.4,fill_title = NULL,
+                          jitter_offset = 0.4,label_y = 0.8,y_limits = c(0,2))
 
 }
 

@@ -235,3 +235,52 @@ plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
   
   return(g)
 }
+
+
+# This function is to make pdp plot
+# rf is the RF model
+# df_train is training dataset
+# var_re is the variable name for response variable
+# IP_var_ls is the list of response variables
+# i is the idx for response variable to be plotted against
+make_pdp_plot <- function(rf,df_train,var_re,IP_var_ls,i){
+  # Get pdp using package function
+  pp <- partialPlot(rf, pred.data = df_train, x.var = IP_var_ls[i], plot = FALSE)
+  # Make it a df
+  test <- data.frame(x=pp$x,y=pp$y)
+  # Get predictor data
+  var_name <- IP_var_ls[i]
+  xcol <- df_train[[var_name]]
+  
+  # For numerical data
+  if(is.numeric(xcol)){
+    # Get density of the data
+    test$density <- density(xcol,n=nrow(test))$y
+    
+    g <- ggplot(test,aes(x,y))+
+      geom_line(aes(color=density),size=2)+
+      my_theme2+
+      labs(x=var_name,y=var_re)+
+      theme(aspect.ratio = 1/1.5,
+            legend.position = "none")+
+      scale_color_distiller(palette = "YlGnBu",direction = "1")
+  }
+  
+  # For categorical data
+  if(is.character(xcol) | is.factor(xcol)){
+    test$x <- factor(test$x,levels = levels(xcol))
+    # Get frequency table
+    freq_df <- as.data.frame(table(xcol))
+    freq_df$x <- factor(freq_df$x,levels=levels(xcol))
+    test <- dplyr::left_join(test, freq_df, by = "x")
+    
+    g <- ggplot(test, aes(x = y, y = x)) +
+      geom_col(aes(fill = Freq), color = "black", width = 0.75) +
+      my_theme2 +
+      labs(x = var_re, y = var_name) +
+      theme(aspect.ratio = 1/1.5, legend.position = "none") +
+      scale_fill_distiller(palette = "YlGnBu",direction = "1")
+  }
+  return(g)
+}
+
