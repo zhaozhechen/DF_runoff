@@ -284,3 +284,69 @@ make_pdp_plot <- function(rf,df_train,var_re,IP_var_ls,i){
   return(g)
 }
 
+# This function is to make scatter plot, color coded by variable of interest
+# var_re is response variable name
+# var_name1 is the predictor name
+# var_group is the variable name to be color coded with
+plot_scatter <- function(df,var_name1,var_re,var_group,
+                         y_limits=NULL,x_limits=NULL,mycolor){
+  # Only keep the target variables
+  df_tmp <- data.frame(x=df[[var_name1]],
+                       y=df[[var_re]],
+                       group = df[[var_group]])
+  df_tmp <- na.omit(df_tmp)
+  
+  # Trunk values to fit in y_limits
+  if(!is.null(y_limits)){
+    df_tmp$y[df_tmp$y > y_limits[2]] <- y_limits[2]
+    df_tmp$y[df_tmp$y < y_limits[1]] <- y_limits[1]
+  }
+  
+  # Trunk values to fit in x_limits
+  if(!is.null(x_limits)){
+    df_tmp$x[df_tmp$x > x_limits[2]] <- x_limits[2]
+    df_tmp$x[df_tmp$x < x_limits[1]] <- x_limits[1]
+  }
+  
+  g <- ggplot(df_tmp,aes(x= x,y = y,color=group)) +
+    geom_point(size=2,alpha=0.8)+
+    my_theme2+
+    theme(legend.position = "right")+
+    labs(x = var_name1,y=var_re,color=var_group)+
+    scale_color_manual(values = mycolor)
+  
+  g <- g + coord_cartesian(
+    xlim = x_limits,
+    ylim = y_limits
+  )
+  
+  # Revise truncated labels
+  if (!is.null(y_limits)) {
+    g <- g + scale_y_continuous(
+      breaks = scales::pretty_breaks(),
+      labels = function(brks) {
+        labs <- as.character(brks)
+        i_min <- which.min(brks)
+        i_max <- which.max(brks)
+        #labs[i_min] <- paste0("\u2264 ", y_limits[1])  # "≤ lower"
+        labs[i_max] <- paste0("\u2265 ", y_limits[2])  # "≥ upper"
+        labs
+      }
+    )
+  }
+  
+  if (!is.null(x_limits)) {
+    g <- g + scale_x_continuous(
+      breaks = scales::pretty_breaks(),
+      labels = function(brks) {
+        labs <- as.character(brks)
+        i_min <- which.min(brks)
+        i_max <- which.max(brks)
+        #abs[i_min] <- paste0("\u2264 ", x_limits[1])  # "≤ lower"
+        labs[i_max] <- paste0("\u2265 ", x_limits[2])  # "≥ upper"
+        labs
+      }
+    )
+  }
+  return(g)
+}

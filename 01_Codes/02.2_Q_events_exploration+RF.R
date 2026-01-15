@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.13
+# Update Date: 2026.1.15
 
 # This code is to explore non-frozen Q events
 
@@ -32,6 +32,9 @@ var_pr <- c("duration","I30","ARFdays7","rain_in",
             "PerennialFrac","DSP")
 var_ls_all <- c(var_re,var_pr)
 
+# Threshold for low P events
+P_in_th <- 0.2
+
 # Output path
 Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/RF_results/"
 
@@ -60,6 +63,10 @@ Q_df <- Q_df %>%
 df_all <- Q_df[,var_ls_all]
 # Only keep complete observations
 df_all <- na.omit(df_all)
+
+# Filter out low P events
+df_all <- df_all %>%
+  filter(rain_in > P_in_th)
 
 # Split dataset into Training set 70% and Testing set 30%
 set.seed(seed)
@@ -136,7 +143,27 @@ g_all <- plot_grid(g_imp,g_pdp_all,
                    nrow = 1,rel_widths = c(0.6,1))
 
 # Output this figure
-print_g(g_all,paste0("RF_",var_re),16,8)
+print_g(g_all,paste0("RF_",var_re,"_Pth",P_in_th),16,8)
+
+# Explore Response variable vs most important variables scatter plots ============================
+# Plot against rain_in, color coded by Tillage
+g_scatter1 <- plot_scatter(Q_df,var_name1 = "rain_in",var_re=var_re,var_group = "Tillage",y_limits = c(0,24),mycolor=my_color[c(1,2,3,4)])
+g_scatter2 <- plot_scatter(Q_df,var_name1 = "duration",var_re=var_re,var_group = "Tillage",
+                           y_limits = c(0,24),x_limits = c(0,24),mycolor=my_color[c(1,2,3,4)])
+g_scatter3 <- plot_scatter(Q_df,var_name1 = "MeanSlope_per",var_re=var_re,var_group = "Tillage",
+                           y_limits = c(0,24),mycolor=my_color[c(1,2,3,4)])
+g_scatter4 <- plot_scatter(Q_df,var_name1 = "DSP",var_re=var_re,var_group = "Tillage",
+                           y_limits = c(0,24),mycolor=my_color[c(1,2,3,4)])
+g_scatter5 <- plot_scatter(Q_df,var_name1 = "I30",var_re=var_re,var_group = "Tillage",
+                           y_limits = c(0,24),mycolor=my_color[c(1,2,3,4)])
+g_scatter6 <- plot_scatter(Q_df,var_name1 = "ARFdays7",var_re=var_re,var_group = "Tillage",
+                           y_limits = c(0,24),mycolor=my_color[c(1,2,3,4)])
+# Combine these
+g_scatter <- plot_grid(g_scatter1,g_scatter2,g_scatter3,g_scatter4,g_scatter5,g_scatter6,nrow=2)
+# Output this figure
+print_g(g_scatter,paste0("Scatter_",var_re,"_Tillage"),16,8)
+
+
 
 
 
