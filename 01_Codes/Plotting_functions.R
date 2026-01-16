@@ -175,7 +175,7 @@ DF_map <- function(df,var_size,var_fill,var_label,my_color,
   return(g_map)
 }
 
-# This function is to make box plots
+# This function is to make box plots, violin plots, and jittered points
 plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
                      x_title,y_title,fill_title = NULL,
                      label_x = 0.1,label_y = 0.9,
@@ -350,3 +350,37 @@ plot_scatter <- function(df,var_name1,var_re,var_group,
   }
   return(g)
 }
+
+# This function is to plot mean and sd of target var across groups, color coded by var_group
+# Error bar represents bootstrapped 95% CI
+# df is the input df
+# varname1 is the variable name on the x axis
+# varname2 is the variable name on the y axis
+# var_group is the variable name to be grouped by
+# ytitle
+# xtitle
+# grouptitle
+# mycolor is the colors
+plot_Qprob <- function(df,varname1,varname2,vargroup,xtitle,ytitle,grouptitle,mycolor){
+  # Get a df of only target variables
+  df_tmp <- df[,c(varname1,varname2,vargroup)]
+  # Only keep complete obs
+  df_tmp <- na.omit(df_tmp)
+  names(df_tmp) <- c("x","y","group")
+  
+  # Make plot
+  g <- ggplot(data=df_tmp,aes(x=x,y=y,color=group,fill=group))+
+    stat_summary(fun.data=mean_cl_boot,geom="errorbar",width=0.2,
+                 position = position_dodge(width=0.4))+
+    stat_summary(fun=mean,geom="point",shape=21,size=2.5,color="black",
+                 position = position_dodge(width=0.4))+
+    scale_color_manual(values = mycolor)+
+    scale_fill_manual(values = mycolor)+
+    my_theme2+
+    theme(legend.position = "right")+
+    labs(x = xtitle,y=ytitle,color=grouptitle,fill=grouptitle)
+  return(g)
+}
+
+
+
