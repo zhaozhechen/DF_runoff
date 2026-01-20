@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.9
+# Update Date: 2026.1.20
 
 # This code processes raw USGS EOF dataset
 # Filters out sites that should not be included
@@ -218,6 +218,19 @@ process_site_P <- function(Site_ID){
     )
   })
   
+  # Also get the total Q volume for each P event
+  usgs_p_site$Q_total_volume <- sapply(seq_len(nrow(usgs_p_site)),function(i){
+    idx <- which(
+      eof_site$Q_end   >= usgs_p_site$P_start[i] &
+        eof_site$Q_start <= usgs_p_site$P_end[i]
+    )
+    if(length(idx) == 0){
+      0
+    } else{
+      sum(eof_site$runoff_volume[idx],na.rm=TRUE)
+    }
+  })
+  
   # Get the PRISM T for this site
   T_site <- data.frame(
     Date = PRISM_T$Date,
@@ -242,6 +255,18 @@ Site_ID_ls <- DF_site_info$Field_Name
 usgs_p_all_sites <- lapply(Site_ID_ls,process_site_P) %>%
   bind_rows() %>%
   rename(Field_Name = All_Field_Names)
+
+# Note!!! Because there could be multiple P that are associated with the same Q
+# Remove the repeating ones
+usgs_p_all_sites <- usgs_p_all_sites %>%
+  mutate(
+    # The current and the previous P event have the same total Q, and both have Associated_Q being TRUE
+    dup_Q = Associated_Q & 
+      lag(Associated_Q) & 
+      (Q_total_volume == lag(Q_total_volume)) & 
+      (Q_total_volume > 0),
+    Q_total_volume = ifelse(dup_Q,0,Q_total_volume)
+  )
 
 # Step 4. Additional calculation for EOF =======================
 usgs_eof <- usgs_eof %>%
@@ -286,6 +311,13 @@ write.csv(usgs_eof,paste0(Output_path,"All_Q_events_df.csv"))
 
 # Convert time to character of usgs_p_all_sites for easier processing later
 usgs_p_all_sites <- usgs_p_all_sites %>%
+  left_join(DF_site_info %>%
+              select(Field_Name,BasinArea_ac),
+            by="Field_Name") %>%
+  # convert area from acre to sqrt ft
+  mutate(area_ft2 = BasinArea_ac*43560) %>%
+  # runoff volume unit: cubit ft to in
+  mutate(Q_total_in = Q_total_volume/area_ft2 * 12) %>%
   mutate(
     P_start = format(P_start,"%Y-%m-%d %H:%M:%S"),
     P_end = format(P_end,"%Y-%m-%d %H:%M:%S")
