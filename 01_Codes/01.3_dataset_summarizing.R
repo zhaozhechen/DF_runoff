@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.9
+# Update Date: 2026.1.20
 
 # This code is to synthesize all data to get final dataset for RF
 # Only keep non-frozen P and non-frozen Q
@@ -35,7 +35,7 @@ DF_site_df <- DF_site_info %>%
          Monitoring,
          FarmEnterprise,
          CropRotation,
-         #Tillage,
+         Tillage,
          Tile,
          SoilType,
          HydrologicGroup,
@@ -43,10 +43,11 @@ DF_site_df <- DF_site_info %>%
          MeanSlope_per,
          Clay_Fraction)
 
-# Process Tillage Data
+# Process Annual Tillage Data
 DF_Tillage <- DF_Tillage %>%
-  mutate(Tillage = ifelse(Tillage == "Pasture Renovation","Pasture",Tillage),
-         Tillage = ifelse(Tillage == "None","No-Till",Tillage))
+  mutate(Annual_Tillage = ifelse(Tillage == "Pasture Renovation","Pasture",Tillage),
+         Annual_Tillage = ifelse(Tillage == "None","No-Till",Tillage)) %>%
+  select(-Tillage)
 
 # Join P df ==============
 P_joint_df <- P_all_df %>%

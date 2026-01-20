@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen (zhaozhe.chen@wisc.edu)
-# Date: 2025.1.16
+# Date: 2025.1.20
 
 # This code is to model Q occurrence (when P produced Q or not, focusing on non-frozen events only)
 # Question to answer: What controls whether a precipitation event produces runoff across Wisconsin farms?
@@ -34,7 +34,7 @@ quantile_bin <- function(x, n = 4) {
 }
 
 # ------- Main -------
-# Preprocessing
+# Preprocessing P dataset ====================================
 P_df <- P_df %>%
   # Q occurrence or not is the response
   mutate(Q_Occurred = as.integer(Associated_Q == TRUE)) %>%
@@ -65,9 +65,9 @@ vars_to_scale <- c("log_P","log_Dur","log_I30",
                    "ARFdays7","MeanSlope_per","DSP","PerennialFrac")
 P_df_stand[vars_to_scale] <- scale(P_df_stand[vars_to_scale])
 
-# Explore the dataset =============
+# Explore the dataset ==============================
+# Distributions of continuous explanatory variables -----------------------------
 
-# Distributions of continuous explanatory variables -------
 
 
 
@@ -88,7 +88,9 @@ g_pQ_Tillage3 <- plot_Qprob(P_df,varname1 = "Dur_bin",varname2 = "Q_Occurred",va
 # Q occurrence across P ARFdays7
 g_pQ_Tillage4 <- plot_Qprob(P_df,varname1 = "ARFdays7_bin",varname2 = "Q_Occurred",vargroup = "Tillage",
                             xtitle = "Antecendent P Level",ytitle = "P(Q generated)",grouptitle = "",mycolor = my_color[c(1,2,3,4)])
-
+# Combine these plots
+g_Tillage <- plot_grid(g_pQ_Tillage1,g_pQ_Tillage2,g_pQ_Tillage3,g_pQ_Tillage4,
+                       ncol=2,align = "hv")
 
 # Revise below!!!!!!!!!!!!!!!!!!!!!
 
