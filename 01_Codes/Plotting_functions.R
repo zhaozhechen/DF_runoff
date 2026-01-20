@@ -351,6 +351,15 @@ plot_scatter <- function(df,var_name1,var_re,var_group,
   return(g)
 }
 
+# This function is to plot distributions of the continuous data
+Dist_bar <- function(df,varname,xtitle){
+  g <- ggplot(data = df,aes(x=.data[[varname]]))+
+    geom_histogram(fill="grey",color="black")+
+    labs(x=xtitle)+
+    my_theme2
+  return(g)
+}
+
 # This function is to plot mean and sd of target var across groups, color coded by var_group
 # Error bar represents bootstrapped 95% CI
 # df is the input df
@@ -382,5 +391,43 @@ plot_Qprob <- function(df,varname1,varname2,vargroup,xtitle,ytitle,grouptitle,my
   return(g)
 }
 
+# This function is to plot # of P events per bin
+plot_Pcount_by_bin <- function(df, bin_var, xtitle = bin_var) {
+  
+  df_cnt <- df %>%
+    filter(!is.na(.data[[bin_var]])) %>%
+    count(.data[[bin_var]], name = "n_P")
+  
+  g <- ggplot(df_cnt, aes(x = .data[[bin_var]], y = n_P)) +
+    geom_col(fill = "grey70", color = "black") +
+    geom_text(aes(label = n_P), vjust = -0.4, size = 3) +
+    labs(x = xtitle, y = "Number of P events") +
+    my_theme2
+  
+  return(g)
+}
 
+# This function is to plot # of Q events per bin
+plot_Qcount_by_bin <- function(df,bin_var,y_var = "Q_Occurred",xtitle = bin_var){
+  df_cnt <- df %>%
+    filter(!is.na(.data[[bin_var]]),!is.na(.data[[y_var]])) %>%
+    group_by(.data[[bin_var]]) %>%
+    summarize(n_Q = sum(.data[[y_var]]==1),.groups = "drop")
+  
+  g <- ggplot(df_cnt, aes(x = .data[[bin_var]], y = n_Q)) +
+    geom_col(fill = "grey70", color = "black") +
+    geom_text(aes(label = n_Q), vjust = -0.4, size = 3) +
+    labs(x = xtitle, y = "Number of Q Occurred") +
+    my_theme2
+  
+  return(g)
+}
+
+# This function is to plot total Q depth per bin
+plot_Qdepth_by_bin <- function(df,bin_var,xtitle = bin_var){
+  df_sum <- df %>%
+    filter(!is.na(.data[[bin_var]]),!is.na(.data[[]]))
+  
+  
+}
 
