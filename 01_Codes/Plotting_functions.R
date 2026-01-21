@@ -309,7 +309,7 @@ plot_scatter <- function(df,var_name1,var_re,var_group,
   }
   
   g <- ggplot(df_tmp,aes(x= x,y = y,color=group)) +
-    geom_point(size=2,alpha=0.8)+
+    geom_point(size=2,alpha=0.6)+
     my_theme2+
     theme(legend.position = "right")+
     labs(x = var_name1,y=var_re,color=var_group)+
@@ -386,7 +386,7 @@ plot_Qprob <- function(df,varname1,varname2,vargroup,xtitle,ytitle,grouptitle,my
     scale_color_manual(values = mycolor)+
     scale_fill_manual(values = mycolor)+
     my_theme2+
-    theme(legend.position = "right")+
+    theme(legend.position = c(0.2,0.8))+
     labs(x = xtitle,y=ytitle,color=grouptitle,fill=grouptitle)
   return(g)
 }
@@ -400,8 +400,9 @@ plot_Pcount_by_bin <- function(df, bin_var, xtitle = bin_var) {
   
   g <- ggplot(df_cnt, aes(x = .data[[bin_var]], y = n_P)) +
     geom_col(fill = "grey70", color = "black") +
-    geom_text(aes(label = n_P), vjust = -0.4, size = 3) +
-    labs(x = xtitle, y = "Number of P events") +
+    geom_text(aes(label = n_P), vjust = -0.4, size = 5) +
+    labs(x = xtitle, y = "n(P events)") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
     my_theme2
   
   return(g)
@@ -416,8 +417,9 @@ plot_Qcount_by_bin <- function(df,bin_var,y_var = "Q_Occurred",xtitle = bin_var)
   
   g <- ggplot(df_cnt, aes(x = .data[[bin_var]], y = n_Q)) +
     geom_col(fill = "grey70", color = "black") +
-    geom_text(aes(label = n_Q), vjust = -0.4, size = 3) +
-    labs(x = xtitle, y = "Number of Q Occurred") +
+    geom_text(aes(label = n_Q), vjust = -0.4, size = 5) +
+    labs(x = xtitle, y = "n(Q Occurrence)") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
     my_theme2
   
   return(g)
@@ -426,8 +428,95 @@ plot_Qcount_by_bin <- function(df,bin_var,y_var = "Q_Occurred",xtitle = bin_var)
 # This function is to plot total Q depth per bin
 plot_Qdepth_by_bin <- function(df,bin_var,xtitle = bin_var){
   df_sum <- df %>%
-    filter(!is.na(.data[[bin_var]]),!is.na(.data[[]]))
+    filter(!is.na(.data[[bin_var]]),!is.na(Q_total_in),!is.na(Associated_Q)) %>%
+    # Sum Q depth only for events where Q occurred
+    filter(Associated_Q == 1) %>%
+    group_by(.data[[bin_var]]) %>%
+    summarise(total_Q_in = sum(Q_total_in))
   
+  # Total Q
+  Q_total <- sum(df_sum$total_Q_in)
   
+  g <- ggplot(df_sum, aes(x = .data[[bin_var]], y = total_Q_in)) +
+    geom_col(fill = "grey70", color = "black") +
+    geom_text(aes(label = round(total_Q_in, 2)), vjust = -0.4, size = 5) +
+    geom_text(aes(y = total_Q_in/2, label = paste0(round(total_Q_in/Q_total,2)*100," %")),size=5) +
+    labs(x = xtitle, y = "Total Q (in)") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+    my_theme2
+  
+  return(g)
 }
+
+# This function is to plot Q occurrence across continuous x variable
+plot_Qoccurence_x <- function(df,x_varname,xtitle,linecolor){
+  g <- ggplot(df,aes(x = .data[[x_varname]],y=Q_Occurred))+
+    geom_point(alpha=0.08)+
+    stat_summary_bin(fun = mean, bins = 25, geom = "line",color = linecolor,linewidth = 1) +
+    labs(y = "P(Q Occurrence)", x = xtitle)+
+    my_theme2
+  
+  return(g)
+}
+
+# This function is to plot Q occurrence response surface to two P characteristics
+# Plot No Q first, then Q occured, for visualization
+scatter_Q_occurence <- function(df,x_varname,y_varname,mycolor,x_title,y_title){
+  g <- ggplot()+
+    geom_point(data = df %>%
+                 filter(Associated_Q == FALSE),
+               aes(x=.data[[x_varname]],y=.data[[y_varname]],color=Associated_Q),
+               size=2,alpha=0.6)+
+    geom_point(data = df %>%
+                 filter(Associated_Q == TRUE),
+               aes(x=.data[[x_varname]],y=.data[[y_varname]],color=Associated_Q),
+               size=2,alpha=0.6)+
+    my_theme2+
+    scale_color_manual(values = mycolor)+
+    labs(x = x_title,y=y_title,color="Q Occurred?")
+  
+  return(g)
+}
+
+# This function is to visualize the marginal effect of each variable in the mixed-effect logistic regression model
+# varname is the variable name to be plotted against (which should be in the model)
+# var_res is the variable name for the response
+marginal_plot <- function(df,model,varname,var_res,x_title,y_title){
+  # predict marginal changes with respect to this predictor
+  pred_tmp <- ggeffect(model,terms = varname)
+  g <- ggplot()+
+    # raw observations (jittered)
+    geom_jitter(data = df,aes(x = .data[[varname]], y = .data[[var_res]]),
+                height = 0.05,width = 0,alpha = 0.2) +
+    # Plot model prediction
+    geom_line(data=pred_tmp,aes(x=x,y=predicted),
+              linewidth = 1.2,color="black")+
+    # Ribbon
+    geom_ribbon(data=pred_tmp,aes(x=x,ymin=conf.low,ymax=conf.high),alpha=0.25)+
+    labs(x = x_title,y=y_title)+
+    my_theme2
+  return(g)
+}
+
+# This function is to compare model performance vs observations
+compare_model <- function(df,model,var_res){
+  df$pred_prob <- predict(model,type= "response")
+  df_cal <- df %>%
+    mutate(bin = ntile(pred_prob,20)) %>%
+    group_by(bin) %>%
+    summarize(obs = mean(.data[[var_res]]),
+              pred = mean(pred_prob))
+  # Get R2
+  R2 <- cor(df_cal$pred,df_cal$obs)^2
+  g <- ggplot(df_cal,aes(x=pred,y=obs))+
+    geom_point(size=3) +
+    geom_abline(slope=1,intercept=0,linetype = "dashed")+
+    labs(x = "Modeled P(Q Occurrence)",y="Observed P(Q Occurrence)")+
+    annotate("text",x=Inf,y=-Inf,
+             label = paste0("R2=",round(R2,3)),
+             hjust=1.1,vjust=-0.5,size=5)+
+    my_theme2
+  return(g)
+}
+
 
