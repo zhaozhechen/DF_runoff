@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.5
+# Update Date: 2026.1.22
 
 # This code is to model crop cover based on crop type and plant timing
 
@@ -65,6 +65,12 @@ Crop_raw_df <- Crop_raw_df %>%
 # Ref: https://mrcc.purdue.edu/mw_climate/climateSummaries/climSummOut_grow?stnId=USW00014837
 Crop_raw_df <- Crop_raw_df %>%
   mutate(Planting_Date = mdy(Planting_Date)) %>%
+  # When year of Planting Date does not match that of Field_Year, overwrite the year
+  mutate(Planting_Date = make_date(
+    year = Field_Year,
+    month = month(Planting_Date),
+    day = day(Planting_Date)
+  )) %>%
   mutate(
     # If perennial and no planting date, use May 2 of the Field_Year
     Planting_Date = if_else(

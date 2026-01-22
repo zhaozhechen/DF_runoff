@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.20
+# Update Date: 2026.1.22
 
 # This code is to synthesize all data to get final dataset for RF
 # Only keep non-frozen P and non-frozen Q
@@ -58,6 +58,8 @@ P_joint_df <- P_all_df %>%
   left_join(Crop_df,by=c("Field_Name","Field_Year")) %>%
   # Calculate Days since planting (DSP)
   mutate(DSP = date(P_start) - as.Date(Start_Date_wt)) %>%
+  # If DSP < 0 (planting not started), change DSP to 0
+  mutate(DSP = ifelse(DSP<0,0,DSP)) %>%
   # Include Tillage for each year
   left_join(DF_Tillage,
             by = c("Field_Name" = "SiteID",
