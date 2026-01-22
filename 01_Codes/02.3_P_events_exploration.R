@@ -22,7 +22,7 @@ library(performance)
 
 # Data path =======
 # Joint non-frozen P events
-P_df <- read.csv("00_Data/Processed_data_v2/Non-Frozen_P_joint_df.csv")
+P_df_all <- read.csv("00_Data/Processed_data_v2/Non-Frozen_P_joint_df.csv")
 
 # Source functions
 source("01_Codes/Plotting_functions.R")
@@ -34,9 +34,6 @@ my_color <- RColorBrewer::brewer.pal(7,"Set2")
 # Decide if only focus on Surface monitoring sites and filter out Tile sites
 Tile_Y <- "NOTile"
 
-# Seasons to consider
-season_ls <- c("All","SS","GS","FS")
-
 Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/Q_occurrence2/"
 
 # ------- Main -------
@@ -46,12 +43,13 @@ g_ls <- list()
 AIC_ls <- list()
 
 # Loop over seasons
-for(i in 1:length(season_ls)){
-  season <- season_ls[i]
+for(season in c("SS","GS","FS")){
   # Figure main name
   g_name <- paste0(Tile_Y,"_",season)
   
   # Preprocessing P dataset ====================================
+  P_df <- P_df_all
+  
   # If Tile_Y is TRUE, keep Tile sites, otherwise, filter them out
   if(Tile_Y == "NOTile"){
     P_df <- P_df %>%
@@ -94,51 +92,13 @@ for(i in 1:length(season_ls)){
   # Plots are directly printed to the output folder
   explore_plots_wrapper(P_df,g_name)
   
-  # Fit Mixed-effects logistic regression model ==========================
-  # Use a common dataset to ensure all models have the same sample size
-  vars_all <- c("Q_Occurred","Field_Name","log_I30","log_Dur","log_ARFdays7",
-                "Annual_Tillage","Tile","DSP","PerennialFrac")
-  P_df_common <- P_df %>%
-    select(all_of(vars_all)) %>%
-    na.omit()
-  
-  # Rainfall-only baseline model --------------------------
-  # logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site)
-  # How much variance rainfall alone explains
-  MELR_result0 <- MELR(P_df_common,vars_to_scale = c("log_I30","log_Dur","log_ARFdays7"),main_varls = c("log_I30","log_Dur","log_ARFdays7"),
-                       random_varls = "Field_Name",res_varname = "Q_Occurred",model_title = "I30+Dur+ARF7")
-  
-  # Add agricultural management as main effects -----------------
-  # logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site) + b4Tillage + b5 PerennialFrac + b6DSP
-  MELR_result_ag <- MELR(P_df_common,vars_to_scale = c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac"),
-                         main_varls = c("log_I30","log_Dur","log_ARFdays7","Annual_Tillage","DSP","PerennialFrac"),
-                         random_varls = "Field_Name",res_varname = "Q_Occurred",
-                         model_title = "I30+Dur+ARF7+Annual_Tillage+DSP+Perenfrac")
-  
-  # Calculate AIC
-  AIC0 <- AIC(MELR_result0$model)
-  AIC_ag <- AIC(MELR_result_ag$model)
-  AIC_df <- data.frame(Season = season,
-                       AIC0 = AIC0,
-                       AIC_ag = AIC_ag)  
-  
-  
-  
-  message("Complete ",season)
 }
-
-
-
-
-
 
 
 # Garbage below =============
 
 if(FALSE){
-  # Compare modeled response vs observations
-  g_m0 <- compare_model(P_df_base,model0,var_res="Q_Occurred")+
-    ggtitle("I30+Dur+ARF7")
+  
   # Check marginal effect of each variable
   # Names for x axis
   x_title_ls <- c("Log I30 (standardized)","Log Duration (standardized)","Log ARF7 (standardized)")
@@ -310,8 +270,3 @@ if(FALSE){
   )
   
 }
-
-
-
-  
-
