@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen (zhaozhe.chen@wisc.edu)
-# Date: 2025.1.20
+# Date: 2025.1.22
 
 # This code is to model Q occurrence (when P produced Q or not, focusing on non-frozen events only)
 # Question to answer: What controls whether a precipitation event produces runoff across Wisconsin farms?
@@ -19,69 +19,48 @@ P_df <- read.csv("00_Data/Processed_data_v2/Non-Frozen_P_joint_df.csv")
 
 # Source functions
 source("01_Codes/Plotting_functions.R")
+source("01_Codes/Analyses_functions.R")
 
 # Colors for plotting 
 my_color <- RColorBrewer::brewer.pal(7,"Set2")
 
 # Decide if only focus on Surface monitoring sites and filter out Tile sites
-Tile_Y <- FALSE
+Tile_Y <- "NOTile"
 
-# Figure name (for Tile_Y is TRUE)
-g_name <- "Both"
+# Determine the time period to analyze
+# Options include 
+# All
+# Growing season (GS): May - Sep 
+# Spring shoulder (SS): Jan - April 
+# Fall shoulder (FS): Oct - Dec
+season <- "GS"
 
-# Decide if only focus on true growing season so tillage has already happened
-GS <- "GS"
+# Figure main name
+g_name <- paste0(Tile_Y,"_",season)
 
 Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/Q_occurrence/"
-
-# ------- Functions ---------
-# Function to create 4 quantile bins
-add_quantile_bin <- function(df, var, new_var = NULL, probs = c(0, 0.25, 0.5, 0.75, 1)) {
-  if (is.null(new_var)) new_var <- paste0(var, "_bin")
-  
-  x <- df[[var]]
-  qs <- stats::quantile(x, probs = probs, na.rm = TRUE, type = 7)
-  
-  # If quantile breakpoints repeat, cut() can't form the requested bins
-  if (length(unique(qs)) < length(qs)) {
-    stop(
-      paste0(
-        "Cannot create quantile bins for '", var, "': quantile breakpoints are not unique.\n",
-        "This usually happens when the variable has many identical values.\n",
-        "Quantiles: ", paste(names(qs), round(qs, 6), sep = "=", collapse = ", ")
-      )
-    )
-  }
-  
-  # Labels like Q1-Q4 (based on number of intervals)
-  n_bins <- length(probs) - 1
-  labs <- paste0("Q", seq_len(n_bins))
-  
-  df[[new_var]] <- cut(
-    x,
-    breaks = qs,
-    include.lowest = TRUE,
-    right = TRUE,
-    labels = labs
-  )
-  
-  df[[new_var]] <- factor(df[[new_var]], levels = labs)
-  return(df)
-}
 
 # ------- Main -------
 # Preprocessing P dataset ====================================
 # If Tile_Y is TRUE, keep Tile sites, otherwise, filter them out
-if(Tile_Y == FALSE){
+if(Tile_Y == "NOTile"){
   P_df <- P_df %>%
     filter(Monitoring == "Surface")
-  # Get file name
-  g_name <- "Monitoring"
 }
 
-if(GS == "GS"){
+# Trunk to the target season
+if(season == "GS"){
+  # Growing season: May - Sep
   P_df <- P_df %>%
-    filter(month(P_df$P_start) < 11 & month(P_df$P_start) > 4)
+    filter(month(P_df$P_start) < 10 & month(P_df$P_start) > 4)
+}else if(season == "SS"){
+  # Spring shoulder season: Jan - April
+  P_df <- P_df %>%
+    filter(month(P_df$P_start) <  5)
+}else if(season == "FS"){
+  # Fall shoulder season: Oct - Dec
+  P_df <- P_df %>%
+    filter(month(P_df$P_start) > 9)
 }
 
 P_df <- P_df %>%
@@ -104,12 +83,11 @@ P_df <- P_df %>%
 # Explore the dataset ==============================
 # List of target explanatory variables
 x_varname_ls <- c("I30","rain","duration","ARFdays7")
-x_title_ls <- c("I30","P_depth","P_duration","ARFdays7")
+x_title_ls <- c("I30","P depth","P duration","ARFdays7")
 for(i in 1:length(x_varname_ls)){
   x_varname <- x_varname_ls[i]
   x_title <- x_title_ls[i]
   P_df_tmp <- P_df
-  
   # Distributions of continuous explanatory variables
   g_hist <- Dist_bar(P_df_tmp,x_varname,x_title)
   # Convert the continuous data into quantiles
@@ -145,15 +123,129 @@ for(i in 1:length(x_varname_ls)){
                      g_PQ_continuous,g_PQ_tile,g_PQ_Monitoring,g_PQ_tillage,g_PQ_annual_tillage,align="hv")
   
   # Output this figure
-  print_g(g_all,paste0("Q_occurence_",x_varname,"_",g_name,"_",GS),15,10)
+  print_g(g_all,paste0("Q_occurence_",x_varname,"_",g_name),15,10)
 }
 
 # Correlations, and scatter plots among continuous explanatory variables, to see if there is any obvious relationship ----
-df_tmp <- P_df %>%
+df_CM <- P_df %>%
   select(log_I30,log_Dur,log_P,log_ARFdays7,DSP)
-ggpairs(df_tmp)
+g_CM <- ggpairs(df_CM)
 
-# Response surface of Q occurrence vs two P characteristics ---------------
+# Fit Mixed-effects logistic regression model ==========================
+# Rainfall-only baseline model --------------------------
+# logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site)
+# How much variance rainfall alone explains
+# Standardize continuous predictors
+P_df_base <- P_df
+vars_to_scale <- c("log_I30","log_Dur","log_ARFdays7")
+P_df_base[vars_to_scale] <- scale(P_df_base[vars_to_scale])
+P_df_base <- P_df_base %>%
+  select(Field_Name,Q_Occurred,log_I30,log_Dur,log_ARFdays7) %>%
+  na.omit()
+# Fit the baseline model
+model0 <- glmer(Q_Occurred ~ log_I30 + log_Dur + log_ARFdays7 + (1|Field_Name),
+                data = P_df_base,
+                family = binomial(link = "logit"),
+                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5)))
+
+# Compare modeled response vs observations
+g_m0 <- compare_model(P_df_base,model0,var_res="Q_Occurred")
+# Check marginal effect of each variable
+# Names for x axis
+x_title_ls <- c("Log I30 (standardized)","Log Duration (standardized)","Log ARF7 (standardized)")
+# Initialize a list to store figures
+g_ls <- list()
+for(i in 1:length(vars_to_scale)){
+  varname <- vars_to_scale[i]
+  x_title <- x_title_ls[i]
+  g <- marginal_plot(P_df_base,model0,varname,"Q_Occurred",x_title = x_title,y_title = "P(Q Occurrence)")
+  g_ls[[i]] <- g
+}
+# Combine all plots
+g0_all <- plot_grid(g_m0,g_ls[[1]],g_ls[[2]],g_ls[[3]],nrow=1,align="hv")
+# Output this figure
+print_g(g0_all,paste0("MELR0_",g_name,"_",GS),16,4)
+
+# Add agricultural management as main effects -----------------
+# logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site) + b4Tillage + b5 PerennialFrac + b6Tile + b7DSP
+P_df_ag <- P_df
+vars_to_scale <- c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac")
+P_df_ag[vars_to_scale] <- scale(P_df_ag[vars_to_scale])
+P_df_ag <- P_df_ag %>%
+  select(Field_Name,Q_Occurred,log_I30,log_Dur,log_ARFdays7,
+         Annual_Tillage,Tile,DSP,PerennialFrac) %>%
+  na.omit()
+# Fit the baseline model
+model_ag <- glmer(Q_Occurred ~ log_I30 + log_Dur + log_ARFdays7 + 
+                    Annual_Tillage + Tile + DSP + PerennialFrac+(1|Field_Name),
+                  data = P_df_ag,
+                  family = binomial(link = "logit"),
+                  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5)))
+
+# Compare modeled response vs observations
+g_m_ag <- compare_model(P_df_ag,model_ag,var_res="Q_Occurred")
+
+# Check marginal effect of each variable
+var_ls <- c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac")
+# Names for x axis
+x_title_ls <- c("Log I30 (standardized)","Log Duration (standardized)","Log ARF7 (standardized)","Date since planting","Perennial Fraction")
+# Initialize a list to store figures
+g_ls <- list()
+for(i in 1:length(var_ls)){
+  varname <- var_ls[i]
+  x_title <- x_title_ls[i]
+  g <- marginal_plot(P_df_ag,model_ag,varname,"Q_Occurred",x_title = x_title,y_title = "P(Q Occurrence)")
+  g_ls[[i]] <- g
+}
+# Combine all plots
+g_ag_all <- plot_grid(plotlist = g_ls,align="hv")
+# Output this figure
+#print_g(g0_all,paste0("MELR0_",g_name,"_",GS),16,4)
+
+# Add interactions
+# Add log(I30) x Tillage
+# logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site) + b4Tillage + b5 PerennialFrac + b6Tile + b7DSP
+
+
+
+# Site properties ----------------
+P_df_ag <- P_df
+vars_to_scale <- c("log_I30","log_Dur","log_ARFdays7","Clay_Fraction","MeanSlope_per")
+P_df_ag[vars_to_scale] <- scale(P_df_ag[vars_to_scale])
+P_df_ag <- P_df_ag %>%
+  select(Field_Name,Q_Occurred,log_I30,log_Dur,log_ARFdays7,
+         Clay_Fraction,MeanSlope_per) %>%
+  na.omit()
+# Fit the baseline model
+model_ag <- glmer(Q_Occurred ~ log_I30 + log_Dur + log_ARFdays7 + 
+                    Clay_Fraction+MeanSlope_per+(1|Field_Name),
+                  data = P_df_ag,
+                  family = binomial(link = "logit"),
+                  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5)))
+
+# Compare modeled response vs observations
+g_m_ag <- compare_model(P_df_ag,model_ag,var_res="Q_Occurred")
+
+# Check marginal effect of each variable
+var_ls <- c("log_I30","log_Dur","log_ARFdays7","Clay_Fraction","MeanSlope_per")
+# Names for x axis
+x_title_ls <- c("Log I30 (standardized)","Log Duration (standardized)","Log ARF7 (standardized)","Clay Fraction","Slope")
+# Initialize a list to store figures
+g_ls <- list()
+for(i in 1:length(var_ls)){
+  varname <- var_ls[i]
+  x_title <- x_title_ls[i]
+  g <- marginal_plot(P_df_ag,model_ag,varname,"Q_Occurred",x_title = x_title,y_title = "P(Q Occurrence)")
+  g_ls[[i]] <- g
+}
+# Combine all plots
+g_ag_all <- plot_grid(plotlist = g_ls,align="hv")
+
+
+
+
+
+# Response surface of Q occurrence vs two P characteristics ==================
 # Loop over different tillage
 # Full dataset
 df_tmp <- P_df
@@ -230,84 +322,6 @@ g_all <- plot_grid(
   ncol = 1,
   align = "v"
 )
-
-
-# Fit Mixed-effects logistic regression model ==========================
-# Rainfall-only baseline model --------------------------
-# logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site)
-# How much variance rainfall alone explains
-# Standardize continuous predictors
-P_df_base <- P_df
-vars_to_scale <- c("log_I30","log_Dur","log_ARFdays7")
-P_df_base[vars_to_scale] <- scale(P_df_base[vars_to_scale])
-P_df_base <- P_df_base %>%
-  select(Field_Name,Q_Occurred,log_I30,log_Dur,log_ARFdays7) %>%
-  na.omit()
-# Fit the baseline model
-model0 <- glmer(Q_Occurred ~ log_I30 + log_Dur + log_ARFdays7 + (1|Field_Name),
-                data = P_df_base,
-                family = binomial(link = "logit"),
-                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5)))
-
-# Compare modeled response vs observations
-g_m0 <- compare_model(P_df_base,model0,var_res="Q_Occurred")
-# Check marginal effect of each variable
-# Names for x axis
-x_title_ls <- c("Log I30 (standardized)","Log Duration (standardized)","Log ARF7 (standardized)")
-# Initialize a list to store figures
-g_ls <- list()
-for(i in 1:length(vars_to_scale)){
-  varname <- vars_to_scale[i]
-  x_title <- x_title_ls[i]
-  g <- marginal_plot(P_df_base,model0,varname,"Q_Occurred",x_title = x_title,y_title = "P(Q Occurrence)")
-  g_ls[[i]] <- g
-}
-# Combine all plots
-g0_all <- plot_grid(g_m0,g_ls[[1]],g_ls[[2]],g_ls[[3]],nrow=1,align="hv")
-# Output this figure
-print_g(g0_all,paste0("MELR0_",g_name,"_",GS),16,4)
-
-# Add agricultural management as main effects -----------------
-# logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site) + b4Tillage + b5 PerennialFrac + b6Tile + b7DSP
-P_df_ag <- P_df
-vars_to_scale <- c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac")
-P_df_ag[vars_to_scale] <- scale(P_df_ag[vars_to_scale])
-P_df_ag <- P_df_ag %>%
-  select(Field_Name,Q_Occurred,log_I30,log_Dur,log_ARFdays7,
-         Annual_Tillage,Tile,DSP,PerennialFrac) %>%
-  na.omit()
-# Fit the baseline model
-model_ag <- glmer(Q_Occurred ~ log_I30 + log_Dur + log_ARFdays7 + 
-                    Annual_Tillage + Tile + DSP + PerennialFrac+(1|Field_Name),
-                data = P_df_ag,
-                family = binomial(link = "logit"),
-                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5)))
-
-# Compare modeled response vs observations
-g_m_ag <- compare_model(P_df_ag,model_ag,var_res="Q_Occurred")
-
-# Check marginal effect of each variable
-var_ls <- c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac")
-# Names for x axis
-x_title_ls <- c("Log I30 (standardized)","Log Duration (standardized)","Log ARF7 (standardized)","Date since planting","Perennial Fraction")
-# Initialize a list to store figures
-g_ls <- list()
-for(i in 1:length(var_ls)){
-  varname <- var_ls[i]
-  x_title <- x_title_ls[i]
-  g <- marginal_plot(P_df_ag,model_ag,varname,"Q_Occurred",x_title = x_title,y_title = "P(Q Occurrence)")
-  g_ls[[i]] <- g
-}
-# Combine all plots
-g_ag_all <- plot_grid(plotlist = g_ls,align="hv")
-# Output this figure
-#print_g(g0_all,paste0("MELR0_",g_name,"_",GS),16,4)
-
-# Add interactions
-# Add log(I30) x Tillage
-# logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site) + b4Tillage + b5 PerennialFrac + b6Tile + b7DSP
-
-
 
 
   

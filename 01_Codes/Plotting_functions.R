@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.1.6
+# Update Date: 2026.1.22
 
 # This code is to make plots for the DF projects
 
@@ -430,7 +430,7 @@ plot_Qdepth_by_bin <- function(df,bin_var,xtitle = bin_var){
   df_sum <- df %>%
     filter(!is.na(.data[[bin_var]]),!is.na(Q_total_in),!is.na(Associated_Q)) %>%
     # Sum Q depth only for events where Q occurred
-    filter(Associated_Q == 1) %>%
+    filter(Associated_Q == TRUE) %>%
     group_by(.data[[bin_var]]) %>%
     summarise(total_Q_in = sum(Q_total_in))
   
