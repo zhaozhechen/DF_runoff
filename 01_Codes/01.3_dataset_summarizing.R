@@ -79,6 +79,8 @@ Q_joint_df <- Q_all_df %>%
   left_join(Crop_df,by=c("Field_Name","Field_Year")) %>%
   # Calculate Days since planting (DSP)
   mutate(DSP = date(Q_start) - as.Date(Start_Date_wt)) %>%
+  # If DSP < 0 (planting not started), change DSP to 0
+  mutate(DSP = ifelse(DSP<0,0,DSP)) %>%
   # Include Tillage for each year
   left_join(DF_Tillage,
             by = c("Field_Name" = "SiteID",
