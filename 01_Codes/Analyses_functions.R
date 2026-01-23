@@ -67,12 +67,12 @@ MELR <- function(df,vars_to_scale = NULL,main_varls,random_varls,res_varname,mod
                  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5)))
   
   # Make plots to compare modeled response vs observations
-  g_compare <- compare_model(df,model,var_res = res_varname)+
-    ggtitle(model_title)
+  #g_compare <- compare_model(df,model,var_res = res_varname)+
+  #  ggtitle(model_title)
   
   # Output the model and the plot
-  out <- list(model = model,g = g_compare)
-  return(out)
+  #out <- list(model = model,g = g_compare)
+  return(model)
 }
 
 # This is a wrapper function to output exploratory figures of P_df dataset
@@ -131,3 +131,12 @@ explore_plots_wrapper <- function(P_df,g_name){
   # Output this correlation matrix
   print_g(g_CM,paste0("CM_",g_name),8,8)  
 }
+
+# Compute AUC for a glmer model on a dataset (same columns used to fit)
+get_auc_glmer <- function(model, df, res_var = "Q_Occurred"){
+  p <- predict(model, newdata = df, type = "response", allow.new.levels = FALSE)
+  roc_obj <- pROC::roc(response = df[[res_var]], predictor = p, quiet = TRUE)
+  as.numeric(pROC::auc(roc_obj))
+}
+
+

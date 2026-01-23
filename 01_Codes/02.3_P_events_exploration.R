@@ -1,7 +1,7 @@
 # Author: Zhaozhe Chen (zhaozhe.chen@wisc.edu)
 # Date: 2025.1.22
 
-# This code is to model Q occurrence (when P produced Q or not, focusing on non-frozen events only)
+# This code is to explore Q occurrence (when P produced Q or not, focusing on non-frozen events only)
 # Question to answer: What controls whether a precipitation event produces runoff across Wisconsin farms?
 
 # Seasons to consider
