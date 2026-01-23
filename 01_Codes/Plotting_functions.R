@@ -520,3 +520,30 @@ compare_model <- function(df,model,var_res){
 }
 
 
+
+
+plot_marginal_gge <- function(model, term, x_title = term, y_title = "P(Q Occurrence)", color = "black") {
+  df_eff <- as.data.frame(ggeffects::ggeffect(model, terms = term))
+  # ggeffect returns columns: x, predicted, conf.low, conf.high (and group if interaction)
+  
+  g <- ggplot(df_eff, aes(x = x, y = predicted)) +
+    geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +
+    geom_line(linewidth = 1) +
+    labs(x = x_title, y = y_title) +
+    my_theme2
+  
+  return(g)
+}
+
+plot_marginal_factor_gge <- function(model, term, x_title = term, y_title = "P(Q Occurrence)") {
+  df_eff <- as.data.frame(ggeffects::ggeffect(model, terms = term))
+  
+  g <- ggplot(df_eff, aes(x = x, y = predicted)) +
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.15) +
+    labs(x = x_title, y = y_title) +
+    my_theme2
+  
+  return(g)
+}
+

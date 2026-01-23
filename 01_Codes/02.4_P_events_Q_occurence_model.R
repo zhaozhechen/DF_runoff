@@ -105,14 +105,14 @@ for(season in c("SS","GS","FS")){
     # logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site)
     # How much variance rainfall alone explains
     m0 <- MELR(P_df_common,vars_to_scale = c("log_I30","log_Dur","log_ARFdays7"),main_varls = c("log_I30","log_Dur","log_ARFdays7"),
-               random_varls = "Field_Name",res_varname = "Q_Occurred",model_title = paste(season,"Rainfall-only"))
+               random_varls = "Field_Name",res_varname = "Q_Occurred",model_title = paste(season,"Rainfall-only"))$model
     
     # Add agricultural management as main effects
     # logit(P(Q=1)) = b0 + b1log(I30) + b2log(Duration) + b3log(ARF7) + (1|Site) + b4Tillage + b5 PerennialFrac + b6DSP
     m_ag <- MELR(P_df_common,vars_to_scale = c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac"),
                  main_varls = c("log_I30","log_Dur","log_ARFdays7","Annual_Tillage","DSP","PerennialFrac"),
                  random_varls = "Field_Name",res_varname = "Q_Occurred",
-                 model_title = paste(season,"Rainfall+Agricultural"))
+                 model_title = paste(season,"Rainfall+Agricultural"))$model
     
     # Calculate AIC
     AIC0 <- AIC(m0)
@@ -154,7 +154,7 @@ for(season in c("SS","GS","FS")){
                      main_varls = main_drop,
                      random_varls = "Field_Name",
                      res_varname = "Q_Occurred",
-                     model_title = paste(season, "Drop", v_drop))
+                     model_title = paste(season, "Drop", v_drop))$model
       # Compare drop model vs full agriculture model (nested)
       LRT_drop <- anova(m_drop, m_ag, test = "Chisq")
       chisq_drop <- LRT_drop$Chisq[2]
@@ -269,3 +269,46 @@ g_model <- plot_grid(g_dAIC,g_chi,align="hv")
 g_ag_drop <- plot_grid(g_drop_dAIC,g_drop_chi,align="hv")  
 print_g(g_model,"Model_comparison",10,6)
 print_g(g_ag_drop,"Ag_drop_comparison",18,6)
+
+# Make marginal effect plots ===============
+marginal_g_ls <- list()
+
+# Only fit one model for one season
+for(season in c("SS","GS","FS")){
+  P_df_season <- P_df %>%
+    filter(Season == season) %>%
+    select(all_of(vars_all)) %>%
+    na.omit()
+  
+  # Fit one "final" model for marginal effects (no resampling)
+  m_ag_fit <- MELR(P_df_season,
+                      vars_to_scale = c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac"),
+                      main_varls = c("log_I30","log_Dur","log_ARFdays7","Annual_Tillage","DSP","PerennialFrac"),
+                      random_varls = "Field_Name",
+                      res_varname = "Q_Occurred",
+                      model_title = paste0(season," Final"))
+  m_ag <- m_ag_fit$model
+  df_fit <- m_ag_fit$data
+  
+  # Marginal effects
+  g_I30 <- plot(ggpredict(m_ag,terms="log_I30",data=df_fit))
+  g_Dur <- plot(ggpredict(m_ag,terms="log_Dur",data=df_fit))
+  g_ARF <- plot(ggpredict(m_ag,terms="log_ARFdays7",data=df_fit))
+  g_DSP <- plot(ggpredict(m_ag,terms="DSP",data=df_fit))
+  g_PerennialF <- plot(ggpredict(m_ag,terms="PerennialFrac",data=df_fit))
+  g_Tillage <- plot(ggpredict(m_ag,terms="Annual_Tillage",data=df_fit))
+
+  
+  
+  # Add season title
+  g_row <- plot_grid(
+    ggdraw() + draw_label(season, fontface = "bold", x = 0, hjust = 0),
+    plot_grid(g_I30,g_Dur,g_ARF,g_DSP, g_PerennialF, g_Tillage, nrow = 1, align = "hv"),
+    ncol = 1, rel_heights = c(0.15, 1)
+  )
+  
+  marginal_g_ls[[season]] <- g_row
+}
+# Combine these plots
+g_ag <- plot_grid(plotlist = marginal_g_ls,nrow=3)
+print_g(g_ag,"Marginal_effect_ag",12,12)

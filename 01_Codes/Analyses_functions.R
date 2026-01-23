@@ -72,7 +72,7 @@ MELR <- function(df,vars_to_scale = NULL,main_varls,random_varls,res_varname,mod
   
   # Output the model and the plot
   #out <- list(model = model,g = g_compare)
-  return(model)
+  return(list(model=model,data=df))
 }
 
 # This is a wrapper function to output exploratory figures of P_df dataset
