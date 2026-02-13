@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen (zhaozhe.chen@wisc.edu)
-# Date: 2025.1.22
+# Date: 2026.1.22
 
 # This code is to model Q occurrence (when P produced Q or not, focusing on non-frozen events only)
 # Question to answer: What controls whether a precipitation event produces runoff across Wisconsin farms?
@@ -311,4 +311,4 @@ for(season in c("SS","GS","FS")){
 }
 # Combine these plots
 g_ag <- plot_grid(plotlist = marginal_g_ls,nrow=3)
-print_g(g_ag,"Marginal_effect_ag",12,12)
+print_g(g_ag,"Marginal_effect_ag",24,12)

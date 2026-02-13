@@ -547,3 +547,85 @@ plot_marginal_factor_gge <- function(model, term, x_title = term, y_title = "P(Q
   return(g)
 }
 
+# This function is to make scatter plots with annotated linear regression lines
+plot_scatter_lm <- function(df, x, y, group = NULL,
+                            point_alpha = 0.8, point_size = 2,
+                            line_size = 0.9, se = FALSE,
+                            p_digits = 3, r2_digits = 2,
+                            label_x = 0.02, label_y = 0.98,
+                            my_colors = my_colors) {
+  
+  # keep only needed cols + drop NA
+  cols <- c(x, y, group)
+  d <- df %>%
+    dplyr::select(dplyr::all_of(cols)) %>%
+    tidyr::drop_na()
+  
+  # helper to compute lm stats (p for slope, R2)
+  lm_stats <- function(dat) {
+    fit <- lm(dat[[y]] ~ dat[[x]], data = dat)
+    sm  <- summary(fit)
+    p   <- sm$coefficients[2, 4]
+    r2  <- sm$r.squared
+    tibble::tibble(
+      p = p,
+      r2 = r2,
+      label = paste0(
+        "p=", formatC(p, format = "g", digits = p_digits),
+        ", R²=", formatC(r2, format = "f", digits = r2_digits)
+      )
+    )
+  }
+  
+  if (is.null(group)) {
+    stats <- lm_stats(d) %>%
+      dplyr::mutate(.grp = "All")
+    
+    p <- ggplot(d, aes(x = .data[[x]], y = .data[[y]])) +
+      geom_point(alpha = point_alpha, size = point_size,color=my_colors) +
+      geom_smooth(method = "lm", se = se, linewidth = line_size)
+    
+    # one label, placed in plot corner
+    p <- p +
+      annotate(
+        "text",
+        x = -Inf, y = Inf,
+        hjust = label_x, vjust = label_y,
+        label = stats$label[1]
+      )+
+      my_theme2
+  } else {
+    
+    # per-group stats
+    stats <- d %>%
+      dplyr::group_by(.data[[group]]) %>%
+      dplyr::group_modify(~ lm_stats(.x)) %>%
+      dplyr::ungroup()
+    
+    # compute dynamic spacing in data units
+    y_range <- range(d[[y]], na.rm = TRUE)
+    y_span  <- diff(y_range)
+    
+    stats <- stats %>%
+      dplyr::mutate(
+        .row = dplyr::row_number(),
+        x_pos = min(d[[x]], na.rm = TRUE),
+        y_pos = max(d[[y]], na.rm = TRUE) - (.row - 1) * 0.08 * y_span
+      )
+    
+    p <- ggplot(d, aes(x = .data[[x]], y = .data[[y]], color = .data[[group]])) +
+      geom_point(alpha = point_alpha, size = point_size) +
+      geom_smooth(method = "lm", se = se, linewidth = line_size) +
+      geom_text(
+        data = stats,
+        aes(x = x_pos, y = y_pos, label = label, color = .data[[group]]),
+        hjust = 0,
+        show.legend = FALSE
+      )+
+      scale_color_manual(values = my_colors)+
+      guides(color=guide_legend(nrow=4))+
+      my_theme2+
+      theme(legend.position = "bottom")
+  }
+  return(p)
+}
