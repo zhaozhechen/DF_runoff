@@ -519,7 +519,7 @@ marginal_plot <- function(df,model,varname,var_res,x_title,y_title){
   return(g)
 }
 
-# This function is to compare model performance vs observations
+# This function is to compare model performance vs observations for logistic regression model
 compare_model <- function(df,model,var_res){
   df$pred_prob <- predict(model,type= "response")
   df_cal <- df %>%
@@ -539,8 +539,6 @@ compare_model <- function(df,model,var_res){
     my_theme2
   return(g)
 }
-
-
 
 
 plot_marginal_gge <- function(model, term, x_title = term, y_title = "P(Q Occurrence)", color = "black") {

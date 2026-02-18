@@ -139,4 +139,53 @@ get_auc_glmer <- function(model, df, res_var = "Q_Occurred"){
   as.numeric(pROC::auc(roc_obj))
 }
 
+# This function is to conduct mixed-effect linear regression model
+MER <- function(df,
+                vars_to_scale = NULL,
+                main_varls,
+                random_varls,
+                res_varname = "log_RC",
+                model_title = NULL,
+                REML = FALSE) {
+  
+  # ---- Keep only target variables and drop NA ----
+  vars_to_keep <- unique(c(res_varname, main_varls, random_varls))
+  df2 <- df %>%
+    dplyr::select(dplyr::all_of(vars_to_keep)) %>%
+    tidyr::drop_na()
+  
+  # ---- Scale numeric predictors if requested ----
+  if (!is.null(vars_to_scale) && length(vars_to_scale) > 0) {
+    # only scale columns that exist
+    vars_to_scale <- intersect(vars_to_scale, names(df2))
+    
+    # scale numeric only (avoid accidental scaling of factors)
+    num_vars <- vars_to_scale[sapply(df2[vars_to_scale], is.numeric)]
+    if (length(num_vars) > 0) {
+      df2[num_vars] <- scale(df2[num_vars])
+    }
+  }
+  
+  # ---- Build formula ----
+  fixed_effect  <- paste(main_varls, collapse = " + ")
+  random_effect <- paste0("(1|", random_varls, ")", collapse = " + ")
+  
+  # allow intercept-only fixed part if main_varls is empty
+  if (length(main_varls) == 0) fixed_effect <- "1"
+  
+  form <- as.formula(paste0(res_varname, " ~ ", fixed_effect, " + ", random_effect))
+  
+  # ---- Fit model ----
+  model <- lme4::lmer(
+    form,
+    data = df2,
+    REML = REML,
+    control = lme4::lmerControl(
+      optimizer = "bobyqa",
+      optCtrl = list(maxfun = 2e5)
+    )
+  )
+  
+  return(list(model = model, data = df2, formula = form, title = model_title))
+}
 
