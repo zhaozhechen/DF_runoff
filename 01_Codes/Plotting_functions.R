@@ -181,11 +181,30 @@ plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
                      label_x = 0.1,label_y = 0.9,
                      jitter_offset = 0.2,jitter_width = 0.1,box_width = 0.1,y_limits = NULL,my_cols=NULL,white_box = NULL){
   
+  # This is a function to compare across groups
+  get_group_p_label <- function(df, x_varname, y_varname) {
+    d2 <- df %>% dplyr::select(dplyr::all_of(c(x_varname, y_varname))) %>% tidyr::drop_na()
+    x <- as.factor(d2[[x_varname]])
+    
+    # If 2 groups -> Wilcoxon; if >2 -> Kruskal-Wallis (robust default)
+    if (nlevels(x) == 2) {
+      p <- wilcox.test(d2[[y_varname]] ~ x)$p.value
+      test_name <- "Wilcoxon"
+    } else {
+      p <- kruskal.test(d2[[y_varname]] ~ x)$p.value
+      test_name <- "Kruskal"
+    }
+    
+    paste0(test_name, " p=", format.pval(p, digits = 3, eps = 1e-3))
+  }
+  
   # Trunk values to fit in y_limits
   if(!is.null(y_limits)){
     df[[y_varname]][df[[y_varname]] > y_limits[2]] <- y_limits[2]
     df[[y_varname]][df[[y_varname]] < y_limits[1]] <- y_limits[1]
   }
+  
+  p_lab <- get_group_p_label(df,x_varname,y_varname)
   
   g <- ggplot(data = df,
               aes(x = .data[[x_varname]],y = .data[[y_varname]],fill = .data[[fill_name]])) +
@@ -204,7 +223,9 @@ plot_box <- function(df,x_varname,y_varname,fill_name=NULL,
       axis.text.x = element_text(angle = 45, vjust = 0.5),
       legend.position = c(label_x, label_y)
     )+
-    guides(color="none")
+    guides(color="none")+
+    annotate("text",x=Inf,y=-Inf,label=p_lab,
+             hjust=1.05,vjust=-0.6,size=5)
   
   if(is.null(white_box)){
     # Boxplot
@@ -615,7 +636,7 @@ plot_scatter_lm <- function(df, x, y, group = NULL,
     
     p <- ggplot(d, aes(x = .data[[x]], y = .data[[y]], color = .data[[group]])) +
       geom_point(alpha = point_alpha, size = point_size) +
-      geom_smooth(method = "lm", se = se, linewidth = line_size) +
+      geom_smooth(aes(fill=.data[[group]]),method = "lm", se = se, linewidth = line_size) +
       geom_text(
         data = stats,
         aes(x = x_pos, y = y_pos, label = label, color = .data[[group]]),
@@ -623,9 +644,25 @@ plot_scatter_lm <- function(df, x, y, group = NULL,
         show.legend = FALSE
       )+
       scale_color_manual(values = my_colors)+
+      scale_fill_manual(values = my_colors)+
       guides(color=guide_legend(nrow=4))+
       my_theme2+
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom",
+            legend.title.position = "top")
   }
   return(p)
+}
+
+# This function plots density of variable across groups
+Density_group <- function(df,varname,group,xtitle,my_colors){
+  g <- ggplot(data=df,aes(x=.data[[varname]],color=.data[[group]],fill=.data[[group]]))+
+    geom_density(alpha=0.3)+
+    labs(x=xtitle)+
+    scale_color_manual(values = my_colors)+
+    scale_fill_manual(values = my_colors)+
+    guides(color=guide_legend(nrow=4))+
+    my_theme2+
+    theme(legend.position = "bottom",
+          legend.title.position = "top")
+  return(g)
 }
