@@ -664,3 +664,48 @@ Density_group <- function(df,varname,group,xtitle,my_colors){
           legend.title.position = "top")
   return(g)
 }
+
+# This function is to plot dAIC across seasons
+plot_dAIC <- function(df,small_model,big_model){
+  # Get AIC variable name
+  AIC_name <- paste0("dAIC_",small_model,"_",big_model)
+  mean_AIC <- paste0("mean_",AIC_name)
+  sd_AIC <- paste0("sd_",AIC_name)
+  g <- ggplot(df,aes(x=Season,y=.data[[mean_AIC]]))+
+    geom_col(fill = "grey70", color = "black") +
+    geom_errorbar(aes(ymin = .data[[mean_AIC]] - .data[[sd_AIC]],
+                      ymax = .data[[mean_AIC]] + .data[[sd_AIC]]),
+                  width = 0.2) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(x = "", y = expression(Delta*AIC)) +
+    ggtitle(paste(small_model,"vs",big_model))+
+    my_theme2 +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.15)))
+  return(g)
+}
+
+# This function is to plot chisq across seasons
+plot_chisq <- function(df,small_model,big_model){
+  # Get chisq variable name
+  chisq_name <- paste0("chisq_",small_model,"_",big_model)
+  mean_chisq <- paste0("mean_",chisq_name)
+  sd_chisq <- paste0("sd_",chisq_name)
+  # significant p proportion variable name
+  p_prop_name <- paste0("prop_sig_",small_model,"_",big_model)
+  g <- ggplot(df, aes(x = Season, y = .data[[mean_chisq]])) +
+    geom_col(fill = "grey70", color = "black") +
+    geom_errorbar(aes(ymin = .data[[mean_chisq]] - .data[[sd_chisq]],
+                      ymax = .data[[mean_chisq]] + .data[[sd_chisq]]),
+                  width = 0.2) +
+    geom_text(aes(label = paste0("p<0.05: ", round(.data[[p_prop_name]]*100), "%")),
+              vjust = -0.4, size = 5) +
+    labs(x = "", y = expression(chi^2)) +
+    ggtitle(paste(small_model,"vs",big_model))+
+    my_theme2 +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.18)))
+  return(g)
+}
+
+
+
+

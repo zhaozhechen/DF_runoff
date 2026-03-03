@@ -20,6 +20,7 @@ library(ggeffects)
 library(performance)
 library(pROC)
 library(tibble)
+library(forcats)
 
 # Data path =======
 # Joint non-frozen Q events
@@ -333,6 +334,11 @@ summary_df <- res_df %>%
     mean_dAIC_ag_full = mean(dAIC_ag_full), sd_dAIC_ag_full = sd(dAIC_ag_full),
     mean_dAIC_site_full = mean(dAIC_site_full), sd_dAIC_site_full = sd(dAIC_site_full),
     
+    mean_chisq_storm_ag = mean(chisq_storm_ag),sd_chisq_storm_ag = sd(chisq_storm_ag),
+    mean_chisq_storm_site = mean(chisq_storm_site),sd_chisq_storm_site = sd(chisq_storm_site),
+    mean_chisq_ag_full = mean(chisq_ag_full),sd_chisq_ag_full = sd(chisq_ag_full),
+    mean_chisq_site_full = mean(chisq_site_full),sd_chisq_site_full = sd(chisq_site_full),
+    
     prop_sig_storm_ag = mean(p_storm_ag < 0.05, na.rm=TRUE),
     prop_sig_storm_site = mean(p_storm_site < 0.05, na.rm=TRUE),
     prop_sig_ag_full = mean(p_ag_full < 0.05, na.rm=TRUE),
@@ -368,6 +374,10 @@ drop_summary <- drop_df %>%
   summarize(
     mean_dAIC_drop = mean(dAIC_drop),
     sd_dAIC_drop = sd(dAIC_drop),
+    
+    mean_chisq_drop = mean(chisq_drop, na.rm = TRUE), 
+    sd_chisq_drop   = sd(chisq_drop, na.rm = TRUE),  
+    
     prop_sig_drop = mean(p_drop < 0.05, na.rm=TRUE),
     .groups = "drop"
   ) %>%
@@ -377,6 +387,129 @@ drop_summary <- drop_df %>%
   )
 
 write.csv(drop_summary, paste0(Output_path, "RC_drop1_summary.csv"), row.names = FALSE)
+
+# Visualize model comparisons =============
+# AIC Threshold ref: https://stats.libretexts.org/Bookshelves/Advanced_Statistics/Intermediate_Statistics_with_R_(Greenwood)/08%3A_Multiple_linear_regression/8.13%3A_AICs_for_model_selection
+summary_df <- summary_df %>%
+  mutate(
+    # ΔAIC definition: AIC_small - AIC_big.
+    # Positive => big model is better (lower AIC)
+    interp_dAIC_storm_ag = case_when(
+      mean_dAIC_storm_ag > 4 ~ "Strong support for adding Ag",
+      mean_dAIC_storm_ag > 2  ~ "Moderate support for adding Ag",
+      mean_dAIC_storm_ag > 0  ~ "Weak support for adding Ag",
+      TRUE                    ~ "No support / worse with Ag"
+    ),
+    interp_dAIC_storm_site = case_when(
+      mean_dAIC_storm_site > 4 ~ "Strong support for adding Site physics",
+      mean_dAIC_storm_site > 2  ~ "Moderate support for adding Site physics",
+      mean_dAIC_storm_site > 0  ~ "Weak support for adding Site physics",
+      TRUE                      ~ "No support / worse with Site physics"
+    )
+  )
+
+# Compare models =================
+# ΔAIC = AIC_small - AIC_big
+# Positive means big model improves AIC
+# Storm vs Agricultural -----------
+g_dAIC_storm_ag <- plot_dAIC(summary_df,"storm","ag")
+# Chisq for Storm vs Agricultural
+g_chisq_storm_ag <- plot_chisq(summary_df,"storm","ag")
+  
+# Storm vs Site ------------
+g_dAIC_storm_site <- plot_dAIC(summary_df,"storm","site")
+g_chisq_storm_site <- plot_chisq(summary_df,"storm","site")
+
+# ag vs Full ----------
+g_dAIC_ag_full <- plot_dAIC(summary_df,"ag","full")
+g_chisq_ag_full <- plot_chisq(summary_df,"ag","full")
+
+# site vs Full ------
+g_dAIC_site_full <- plot_dAIC(summary_df,"site","full")
+g_chisq_site_full <- plot_chisq(summary_df,"site","full")
+
+# Combine these plots
+g_model_compare <- plot_grid(g_dAIC_storm_ag,g_dAIC_storm_site,g_dAIC_ag_full,g_dAIC_site_full,
+                   g_chisq_storm_ag,g_chisq_storm_site,g_chisq_ag_full,g_chisq_site_full,
+                   nrow=2,align="hv")
+print_g(g_model_compare,"Model_comparison",14,8)
+
+
+# Drop 1 variable ==========================
+# ΔAIC_drop = AIC_drop - AIC_full
+# Positive => dropping the variable makes AIC worse => variable is important
+drop_summary2 <- drop_summary %>%
+  mutate(
+    Dropped_group = case_when(
+      Dropped %in% ag_vars ~ "Agricultural",
+      Dropped %in% c("MeanSlope_per","HG") ~ "Site physics",
+      TRUE ~ "Other"
+    ),
+    Dropped_group = factor(Dropped_group, levels = c("Agricultural","Site physics","Other"))
+  )
+# Rank the order of these variables
+rank_df <- drop_summary2 %>%
+  group_by(Dropped) %>%
+  summarize(rank_score = mean(mean_dAIC_drop, na.rm = TRUE), .groups = "drop") %>%
+  arrange(desc(rank_score))
+
+drop_plot_df <- drop_summary2 %>%
+  mutate(Dropped = factor(Dropped, levels = rank_df$Dropped))
+# Plot delta AIC for each dropped variable
+g_drop_dAIC_h <- ggplot(drop_plot_df,
+                        aes(x = Dropped, y = mean_dAIC_drop, fill = Dropped_group)) +
+  geom_col(color = "black") +
+  geom_errorbar(aes(ymin = mean_dAIC_drop - sd_dAIC_drop,
+                    ymax = mean_dAIC_drop + sd_dAIC_drop),
+                width = 0.2) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  facet_wrap(~Season, nrow = 1) +
+  coord_flip() +
+  labs(
+    x = "",
+    y = expression(Delta*AIC~"(Drop - Full)"),
+    fill = "Variable type"
+  ) +
+  my_theme2 +
+  scale_fill_manual(values = my_color[c(2,1)]) +
+  # show Dropped names only on the left facet (SS)
+  theme(
+    axis.text.y = element_text(),
+    axis.title.y = element_blank(),
+    strip.background = element_blank()
+  ) +
+  geom_blank()
+
+# Plot chisq for each dropped variable
+g_drop_chi_h <- ggplot(drop_plot_df,
+                       aes(x = Dropped, y = mean_chisq_drop, fill = Dropped_group)) +
+  geom_col(color = "black") +
+  geom_errorbar(aes(ymin = mean_chisq_drop - sd_chisq_drop,
+                    ymax = mean_chisq_drop + sd_chisq_drop),
+                width = 0.2) +
+  facet_wrap(~Season, nrow = 1) +
+  # annotation: with coord_flip, adjust hjust (not vjust) to move text above the bar
+  geom_text(aes(label = paste0("p<0.05: ", round(prop_sig_drop*100), "%")),
+            hjust = -0.1, size = 4) +
+  coord_flip() +
+  labs(
+    x = "",
+    y = expression(chi^2~"(Drop vs Full)"),
+    fill = "Variable type"
+  ) +
+  my_theme2 +
+  scale_fill_manual(values = my_color[c(2,1)]) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.25))) +
+  theme(
+    axis.text.y = element_text(),
+    axis.title.y = element_blank(),
+    strip.background = element_blank()
+  ) +
+  geom_blank()
+
+# Combine these two plots
+g_drop1 <- plot_grid(g_drop_dAIC_h,g_drop_chi_h,nrow=2)
+print_g(g_drop1,"Model_drop1",12,8)
 
 # Marginal effects ====================
 # initiliaze a list to store plots
