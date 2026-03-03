@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Date: 2026.2.17
+# Date: 2026.3.2
 
 # This code is to model Q event runoff coefficient (RC)
 
@@ -19,6 +19,7 @@ library(GGally)
 library(ggeffects)
 library(performance)
 library(pROC)
+library(tibble)
 
 # Data path =======
 # Joint non-frozen Q events
@@ -97,6 +98,7 @@ for(season in c("SS","GS","FS")){
             res_varname = "log_RC",
             model_title = paste0("RC model - ", season),
             REML = FALSE)$model
+  
   # Compare model performance
   df_tmp <- data.frame(obs = Q_df_season$log_RC,
                        fit = predict(m0))
@@ -109,7 +111,8 @@ for(season in c("SS","GS","FS")){
   # Add agricultural management as main effects ===========
   m_ag <- MER(Q_df_season,
               vars_to_scale = c("log_I30", "log_Dur", "log_ARFdays7","DSP","PerennialFrac"),
-              main_varls = c("log_I30", "log_Dur", "log_ARFdays7","Annual_Tillage","DSP","PerennialFrac"),
+              main_varls = c("log_I30", "log_Dur", "log_ARFdays7",
+                             "Annual_Tillage","DSP","PerennialFrac"),
               random_varls = c("Field_Name"),
               res_varname = "log_RC",
               model_title = paste0("RC model - ", season),
@@ -123,6 +126,82 @@ for(season in c("SS","GS","FS")){
     ggtitle(paste(season,"P + Ag MER","RMSE:",RMSE_ag))  
   g_model_ls[[length(g_model_ls)+1]] <- g_mag
   
+  # Add interactions in the model ===================
+  m_ag_int <- MER(Q_df_season,
+                  vars_to_scale = c("log_I30","log_Dur","log_ARFdays7","DSP","PerennialFrac"),
+                  main_varls = c("log_I30","log_Dur","log_ARFdays7",
+                                 "Annual_Tillage","DSP","PerennialFrac"),
+                  interaction_varls = c(                         
+                    "Annual_Tillage:log_I30",
+                    "Annual_Tillage:log_ARFdays7",
+                    "PerennialFrac:log_ARFdays7",
+                    "DSP:log_ARFdays7"
+                  ),
+                  random_varls = c("Field_Name"),
+                  res_varname = "log_RC",
+                  model_title = paste0("RC model - ", season),
+                  REML = FALSE)$model
+  # Compare model performance
+  df_tmp <- data.frame(obs = Q_df_season$log_RC,
+                       fit = predict(m_ag_int))
+  RMSE_ag <- round(sqrt(mean((df_tmp$obs - df_tmp$fit)^2)),2)
+  g_mag_int <- plot_scatter_lm(df_tmp,x="obs",y="fit",my_colors = my_color[1],label_x = -0.2,label_y=1.5)+
+    labs(x = "Observed RC",y="Fitted RC")+
+    ggtitle(paste(season,"P + Ag +interactions MER","RMSE:",RMSE_ag))  
+  
+  # Random slopes by field ======================
+  m0_rs <- MER(Q_df_season,
+               vars_to_scale = c("log_I30","log_Dur","log_ARFdays7"),
+               main_varls = c("log_I30","log_Dur","log_ARFdays7"),
+               random_varls = c("Field_Name"),
+               random_slope_varls = c("log_I30","log_ARFdays7","log_Dur"),
+               res_varname = "log_RC",
+               model_title = paste0("RC model - ", season),
+               REML = FALSE)$model
+  # Compare model performance
+  df_tmp <- data.frame(obs = Q_df_season$log_RC,
+                       fit = predict(m0_rs))
+  RMSE_ag <- round(sqrt(mean((df_tmp$obs - df_tmp$fit)^2)),2)
+  g_m0_rs <- plot_scatter_lm(df_tmp,x="obs",y="fit",my_colors = my_color[1],label_x = -0.2,label_y=1.5)+
+    labs(x = "Observed RC",y="Fitted RC")+
+    ggtitle(paste(season,"P + Ag +interactions MER","RMSE:",RMSE_ag))  
+  
+  # Compare model_performance
+  performance::r2_nakagawa(m0)
+  performance::r2_nakagawa(m_ag)
+  performance::r2_nakagawa(m_ag_int)
+  performance::r2_nakagawa(m0_rs)
+  
+  anova(m0, m_ag)
+  anova(m_ag, m_ag_int)
+  anova(m0, m0_rs)
+  
+  
+  
+  # Partition random effect ================
+  m0_re <- ranef(m0)$Field_Name %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "Field_Name") %>%
+    rename(random_effect = "(Intercept)") %>%
+    left_join(Q_df %>%
+            select(Field_Name,DrainageClass,SoilType,MeanSlope_per,Clay_Fraction) %>%
+              distinct(),by="Field_Name")
+  #mag_re <- ranef(m_ag)$Field_Name
+  
+  ggplot(m0_re,aes(x=SoilType,y=random_effect))+
+    geom_boxplot()+
+    my_theme2
+  
+  ggplot(m0_re,aes(x=MeanSlope_per,random_effect))+
+    geom_point()+
+    my_theme2
+  
+  ggplot(m0_re,aes(x=MeanSlope_per,y=Clay_Fraction,color=random_effect))+
+    geom_point(size=4)+
+    my_theme2+
+    theme(legend.position = 'right')+
+    scale_color_distiller(palette = "RdYlBu")
+
 }
 
 # Combine these plots

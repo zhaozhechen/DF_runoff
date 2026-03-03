@@ -149,7 +149,10 @@ MER <- function(df,
                 REML = FALSE) {
   
   # ---- Keep only target variables and drop NA ----
-  vars_to_keep <- unique(c(res_varname, main_varls, random_varls))
+  vars_to_keep <- unique(c(res_varname,
+                           main_varls,
+                           random_varls))
+  
   df2 <- df %>%
     dplyr::select(dplyr::all_of(vars_to_keep)) %>%
     tidyr::drop_na()
@@ -167,12 +170,13 @@ MER <- function(df,
   }
   
   # ---- Build formula ----
-  fixed_effect  <- paste(main_varls, collapse = " + ")
-  random_effect <- paste0("(1|", random_varls, ")", collapse = " + ")
-  
-  # allow intercept-only fixed part if main_varls is empty
+  # Fixed effects
+  fixed_effect <- paste(main_varls, collapse = " + ")
   if (length(main_varls) == 0) fixed_effect <- "1"
   
+  random_effect <- paste0("(1|", random_varls, ")", collapse = " + ")
+  
+  # Full formula
   form <- as.formula(paste0(res_varname, " ~ ", fixed_effect, " + ", random_effect))
   
   # ---- Fit model ----
@@ -188,4 +192,5 @@ MER <- function(df,
   
   return(list(model = model, data = df2, formula = form, title = model_title))
 }
+
 
