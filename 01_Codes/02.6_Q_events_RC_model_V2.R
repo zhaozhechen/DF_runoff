@@ -388,6 +388,84 @@ drop_summary <- drop_df %>%
 
 write.csv(drop_summary, paste0(Output_path, "RC_drop1_summary.csv"), row.names = FALSE)
 
+# Visualize model performance =================
+perf_long <- res_df %>%
+  select(Season, Rep, RMSE_storm, RMSE_ag, RMSE_site, RMSE_full,
+         R2m_storm, R2m_ag, R2m_site, R2m_full,
+         R2c_storm,R2c_ag,R2c_site,R2c_full) %>%
+  tidyr::pivot_longer(
+    cols = -c(Season, Rep),
+    names_to = c("Metric", "Model"),
+    names_pattern = "(RMSE|R2m|R2c)_(storm|ag|site|full)",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    Model = factor(Model, levels = c("storm","ag","site","full")),
+    Metric = factor(Metric, levels = c("RMSE","R2m","R2c")),
+    Season = factor(Season,levels = c("SS","GS","FS"))
+  )
+
+rand_share <- res_df %>%
+  transmute(
+    Season, Rep,
+    storm = R2c_storm - R2m_storm,
+    ag    = R2c_ag    - R2m_ag,
+    site  = R2c_site  - R2m_site,
+    full  = R2c_full  - R2m_full
+  ) %>%
+  tidyr::pivot_longer(
+    cols = -c(Season, Rep),
+    names_to = "Model",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    Metric = "R2_random (R2c - R2m)",
+    Model = factor(Model, levels = c("storm","ag","site","full")),
+    Season = factor(Season, levels = c("SS","GS","FS"))
+  )
+
+perf_long2 <- bind_rows(perf_long, rand_share)
+# RMSE
+g_rmse <- ggplot(filter(perf_long, Metric == "RMSE"),
+                 aes(x = Model, y = Value,fill=Model)) +
+  geom_boxplot(outlier.colour = NA) +
+  facet_wrap(~Season, nrow = 1) +
+  labs(x = "", y = "RMSE (log_RC)") +
+  my_theme2+
+  scale_fill_manual(values = my_color[c(3,2,1,4)])
+
+# Marginal R2: variance explained by fixed effects
+g_r2m <- ggplot(filter(perf_long, Metric == "R2m"),
+                aes(x = Model, y = Value,fill=Model)) +
+  geom_boxplot(outlier.colour = NA) +
+  facet_wrap(~Season, nrow = 1) +
+  labs(x = "", y = "Marginal R² (fixed effects)") +
+  my_theme2+
+  scale_fill_manual(values = my_color[c(3,2,1,4)])
+
+# Conditional R2: variance explained by fixed + random
+g_r2c <- ggplot(filter(perf_long2, Metric == "R2c"),
+                aes(x = Model, y = Value, fill = Model)) +
+  geom_boxplot(outlier.colour = NA) +
+  facet_wrap(~Season, nrow = 1) +
+  labs(x = "", y = "Conditional R² (fixed + random)") +
+  my_theme2 +
+  scale_fill_manual(values = my_color[c(3,2,1,4)])
+
+# Conditional R2 - Marginal R2
+g_r2rand <- ggplot(filter(perf_long2, Metric == "R2_random (R2c - R2m)"),
+                   aes(x = Model, y = Value, fill = Model)) +
+  geom_boxplot(outlier.colour = NA) +
+  facet_wrap(~Season, nrow = 1) +
+  labs(x = "", y = "Random-effect (R²c − R²m)") +
+  my_theme2 +
+  scale_fill_manual(values = my_color[c(3,2,1,4)])
+
+# Combine these 4 plots
+g_model_perform <- plot_grid(g_rmse,g_r2m,g_r2c,g_r2rand,
+                             nrow=2,align="hv")
+print_g(g_model_perform,)
+
 # Visualize model comparisons =============
 # AIC Threshold ref: https://stats.libretexts.org/Bookshelves/Advanced_Statistics/Intermediate_Statistics_with_R_(Greenwood)/08%3A_Multiple_linear_regression/8.13%3A_AICs_for_model_selection
 summary_df <- summary_df %>%
