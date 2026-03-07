@@ -1,8 +1,9 @@
 # Author: Zhaozhe Chen
-# Date: 2026.3.2
+# Date: 2026.3.6
 
 # This code is to model Q event runoff coefficient (RC) using mixed linear regression models
 # RC is converted to log scale for normalily
+# DOY is removed from the model
 
 # Seasons to consider
 # Growing season (GS): May - Sep 
@@ -37,7 +38,8 @@ my_color <- RColorBrewer::brewer.pal(7,"Set2")
 Tile_Y <- "NOTile"
 
 # Agricultural practices to test
-ag_vars <- c("Annual_Tillage","DOY","PerennialFrac")
+#ag_vars <- c("Annual_Tillage","DOY","PerennialFrac")
+ag_vars <- c("Annual_Tillage","PerennialFrac")
 
 # Site-level (time-invariant) variables to test
 site_vars <- c("MeanSlope_per","HG")
@@ -46,7 +48,7 @@ site_vars <- c("MeanSlope_per","HG")
 P_vars <- c("log_I30","log_Dur","log_ARFdays7")
 
 # Output path
-Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/RC_modeling_log/"
+Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Generation/Results/RC_modeling_log_noDOY/"
 
 # Uncertainty/season comparability settings
 set.seed(123)
@@ -175,7 +177,7 @@ for(season in c("SS","GS","FS")){
     
     # Storm + agricultural model ------------
     m_ag <- MER(Q_df_common,
-                vars_to_scale = c(P_vars,"DOY","PerennialFrac"),
+                vars_to_scale = c(P_vars,"PerennialFrac"),
                 main_varls = c(P_vars,ag_vars),
                 random_varls = c("Field_Name"),
                 res_varname = "log_RC",
@@ -193,7 +195,7 @@ for(season in c("SS","GS","FS")){
     
     # Full model: Storm + ag + Site physics ----------
     m_full <- MER(Q_df_common,
-                  vars_to_scale = c(P_vars,"DOY","PerennialFrac","MeanSlope_per"),
+                  vars_to_scale = c(P_vars,"PerennialFrac","MeanSlope_per"),
                   main_varls = c(P_vars,ag_vars,site_fx),
                   random_varls = c("Field_Name"),
                   res_varname = "log_RC",
@@ -278,7 +280,7 @@ for(season in c("SS","GS","FS")){
       # Remaining main effect
       main_drop <- setdiff(full_terms,v_drop)
       # scale vars present in dropped model (continuous only)
-      scale_drop <- intersect(c(P_vars, "DOY","PerennialFrac","MeanSlope_per"), main_drop)
+      scale_drop <- intersect(c(P_vars, "PerennialFrac","MeanSlope_per"), main_drop)
       # Dropped model 
       m_drop <- MER(
         Q_df_common,
@@ -464,7 +466,7 @@ g_r2rand <- ggplot(filter(perf_long2, Metric == "R2_random (R2c - R2m)"),
 # Combine these 4 plots
 g_model_perform <- plot_grid(g_rmse,g_r2m,g_r2c,g_r2rand,
                              nrow=2,align="hv")
-print_g(g_model_perform,)
+print_g(g_model_perform,"Model_performance",14,8)
 
 # Visualize model comparisons =============
 # AIC Threshold ref: https://stats.libretexts.org/Bookshelves/Advanced_Statistics/Intermediate_Statistics_with_R_(Greenwood)/08%3A_Multiple_linear_regression/8.13%3A_AICs_for_model_selection
@@ -606,9 +608,9 @@ for(season in c("SS","GS","FS")){
   # Fit one full model
   m_full_fit <- MER(
     df_fit,
-    vars_to_scale = c(P_vars, "DOY","PerennialFrac","MeanSlope_per"),
+    vars_to_scale = c(P_vars, "PerennialFrac","MeanSlope_per"),
     main_varls = c(P_vars,
-                   "Annual_Tillage","DOY","PerennialFrac",
+                   "Annual_Tillage","PerennialFrac",
                    site_fx),
     random_varls = "Field_Name",
     res_varname = "log_RC",
@@ -621,12 +623,12 @@ for(season in c("SS","GS","FS")){
   g_I30 <- plot(ggpredict(m_full_season, terms = "log_I30"))
   g_Dur <- plot(ggpredict(m_full_season, terms = "log_Dur"))
   g_ARF <- plot(ggpredict(m_full_season, terms = "log_ARFdays7"))
-  g_DSP <- plot(ggpredict(m_full_season, terms = "DOY"))
+  #g_DSP <- plot(ggpredict(m_full_season, terms = "DOY"))
   g_PerennialF <- plot(ggpredict(m_full_season, terms = "PerennialFrac"))
   g_Tillage <- plot(ggpredict(m_full_season, terms = "Annual_Tillage"))
   g_Slope <- plot(ggpredict(m_full_season, terms = "MeanSlope_per"))
   
-  plot_list <- list(g_I30, g_Dur, g_ARF, g_DSP, g_PerennialF, g_Tillage, g_Slope)
+  plot_list <- list(g_I30, g_Dur, g_ARF, g_PerennialF, g_Tillage, g_Slope)
   
   if (use_HG_season) {
     g_HG <- plot(ggpredict(m_full_season, terms = "HG"))
