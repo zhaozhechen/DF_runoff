@@ -54,37 +54,6 @@ Output_path <- "D:/OneDrive - UW-Madison/Research/Discovery Farms/DF Runoff Gene
 set.seed(123)
 n_rep <- 200
 
-# -------- Functions -----------
-rmse <- function(obs, pred) sqrt(mean((obs - pred)^2)) 
-
-# LRT wrapper (in case of fitting issues)
-safe_anova <- function(m_small, m_big) {              
-  out <- tryCatch(anova(m_small, m_big), error = function(e) NULL)
-  out
-}
-
-# Extract random intercept variance (how much site-to-site baseline remains)
-get_re_var <- function(m) {                                
-  vc <- as.data.frame(VarCorr(m))
-  # random intercept variance for Field_Name
-  v <- vc %>% filter(grp == "Field_Name", var1 == "(Intercept)") %>% pull(vcov)
-  if (length(v) == 0) NA_real_ else v
-}
-
-# helper to pull chisq/p from anova output
-get_chi_p <- function(LRT){
-  if (is.null(LRT)) return(list(chisq = NA_real_, p = NA_real_))
-  list(chisq = LRT$Chisq[2], p = LRT$`Pr(>Chisq)`[2])
-}
-
-# helper: decide whether HG is estimable in this sampled dataset
-hg_okay <- function(df, min_n = 5){
-  tab <- table(df$HG)
-  # require at least 2 levels present + each present level has >= min_n
-  if (length(tab) < 2) return(FALSE)
-  all(tab >= min_n)
-}
-
 # ----- Main ----------
 # Preprocessing Q dataset ============
 # If Tile_Y is TRUE, keep Tile sites, otherwise, filter them out
