@@ -22,7 +22,6 @@ Crop_raw_df <- Crop_raw_df %>%
   # Clean Site ID
   mutate(Field_Name = str_replace(Site.ID,"r\\d*$","")) %>%
   filter(Field_Name %in% DF_site_info$Field_Name ) %>%
-
   select(-c(Site.ID,Field.ID))
 
 # P4 and P5 are missing, they are paired sites to P1 and P3, so add them
