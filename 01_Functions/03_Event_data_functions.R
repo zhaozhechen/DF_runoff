@@ -1,9 +1,9 @@
 # Author: Zhaozhe Chen
 # Update Date: 2026.7.27
 
-# This code includes functions to process USGS precipitation and runoff events
+# This code includes functions to process USGS EOF precipitation and runoff events
 
-# Process USGS runoff events
+# Process USGS EOF dataset runoff events (Q and associated P)
 process_runoff_events <- function(runoff_path,site_df){
   
   target_sites <- site_df$Field_Name
@@ -23,19 +23,29 @@ process_runoff_events <- function(runoff_path,site_df){
     dplyr::transmute(
       Field_Name,
       frozen = dplyr::if_else(frozen == 1,"Frozen","Non-Frozen"),
+      # Storm = 0: The flow in this event is associated with baseflow, groundwater flow, melting snow, 
+      # or melting frozen ground and not a monitored precipitation event
+      # Filter out Q events that are not associated with storm
       storm = "Storm",
       unique_storm_number,
       Q_start = parse_usgs_datetime(storm_start),
       Q_end = parse_usgs_datetime(storm_end),
       runoff_volume = as.numeric(runoff_volume),
       peak_discharge = as.numeric(peak_discharge),
+      # Note: below the notes indicate Q event, which is correct. Not P event. Because multiple P events are combined within this Q event.
+      # Total rain during this Q event (Unit: in)
       rain_in = as.numeric(rain),
+      # Duration of all P events overlapping with this Q event.  (Unit: hour)
       duration = as.numeric(duration),
+      # Mean Intensity during this Q event (Unit: in/hour)
       Ievent = as.numeric(Ievent),
+      # Maximum 5-min intensity during this Q event (Unit: in/hour)
       I5 = as.numeric(I5),
       I10 = as.numeric(I10),
       I30 = as.numeric(I30),
       I60 = as.numeric(I60),
+      # Antecedent rainfall (ARF) for each event was calculated by taking the sum of the total amount of rain 
+      # for a period of days (not events) before the beginning of the event associated with the flow event and reported in inches.
       ARFdays1 = as.numeric(ARFdays1),
       ARFdays2 = as.numeric(ARFdays2),
       ARFdays7 = as.numeric(ARFdays7),
@@ -58,6 +68,10 @@ process_runoff_events <- function(runoff_path,site_df){
 }
 
 # Process USGS precipitation events
+# This is wrapper function to process P at each site
+# Including keeping only P events during the monitoring period of site
+# Label whether a P event is associated with a Q event or not
+# Label whether a P event is frozen or not
 process_precipitation_events <- function(precipitation_path,
                                          prism_temperature_path,
                                          site_df){
@@ -108,6 +122,8 @@ process_precipitation_events <- function(precipitation_path,
     # Keep precipitation events during the site's monitoring period
     dplyr::filter(
       as_local_date(P_start) >= Approximate_Start_Date,
+      # No end date: keep everything from start onward
+      # Both start and end defined → keep only within window
       is.na(Approximate_End_Date) |
         as_local_date(P_start) <= Approximate_End_Date
     ) %>%
@@ -192,8 +208,10 @@ match_precipitation_runoff <- function(precipitation_df,runoff_df){
       
       if(length(overlap_local) > 0){
         overlap_q <- q_idx[overlap_local]
+        # If a P event is associated with a Q event, Associated_Q is TRUE, otherwise FALSE
         precipitation_df$Associated_Q[pi] <- TRUE
         precipitation_df$Q_event_count[pi] <- length(overlap_q)
+        # Also get the total Q volume for each P event
         precipitation_df$Q_total_volume_raw[pi] <- sum(
           runoff_df$runoff_volume[overlap_q],
           na.rm=TRUE

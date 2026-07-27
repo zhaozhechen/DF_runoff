@@ -81,8 +81,6 @@ process_site_info <- function(site_metadata_path,
       by=c("SoilType"="Soil_Type")
     ) %>%
     dplyr::mutate(
-      # All retained monitoring outlets are surface outlets
-      Monitoring = "Surface",
       LAT_approx = dplyr::coalesce(LAT_Updated,as.numeric(LAT_approx)),
       LONG_approx = dplyr::coalesce(LONG_Updated,as.numeric(LONG_approx)),
       MeanSlope_per = as.numeric(MeanSlope_per),
@@ -93,6 +91,7 @@ process_site_info <- function(site_metadata_path,
   
   # Include slope for Site AR2
   # Ref: Rock County Discovery Farms report (2024)
+  # https://uwdiscoveryfarms.org/wp-content/uploads/sites/1255/2024/02/Rock-Co-Report-2024-2.pdf
   site_df$MeanSlope_per[site_df$Field_Name == "AR2"] <- 3.4
   
   site_df %>%
@@ -135,7 +134,7 @@ process_tillage_info <- function(tillage_path,target_sites){
     dplyr::arrange(Field_Name,Water_Year) %>%
     dplyr::group_by(Field_Name) %>%
     dplyr::mutate(
-      # Fall uses the preceding summer, which belongs to the prior water year
+      # Fall models uses the preceding summer, which belongs to the prior water year
       Tillage_Summer_Previous = dplyr::if_else(
         Water_Year - dplyr::lag(Water_Year) == 1L,
         dplyr::lag(Tillage_Summer),

@@ -43,47 +43,55 @@ Report_path <- file.path(Project_path,"03_Reports")
 dir.create(Processed_path,recursive=TRUE,showWarnings=FALSE)
 dir.create(Report_path,recursive=TRUE,showWarnings=FALSE)
 
-# Raw event data
+# Raw USGS EOF event data
 Runoff_path <- file.path(
   Raw_path,
   "All_EOF_StormEventLoadsRainCalculated.csv"
 )
+# USGS precipitation data
 Precipitation_path <- file.path(
   Raw_path,
   "All_EOF_RainEvents.csv"
 )
+# PRISM temperature data
 PRISM_T_path <- file.path(
   Raw_path,
   "DF_PRISM_tmean.csv"
 )
 
-# Site and management data
+# Site meta data
 Site_metadata_path <- file.path(
   Raw_path,
   "DF EOF Site & Year Metadata (2004-2023)-Site_Update.csv"
 )
+# Site exact coordinate data
 Site_location_path <- file.path(
   Raw_path,
   "DiscoveryFarms_SiteLocations.xlsx"
 )
+# Site-level tile info (from DF)
 Tile_path <- file.path(
   Raw_path,
   "DF Surface EOF Tile Info.csv"
 )
+# Total tillage pass info (from DF)
 Tillage_path <- file.path(
   Raw_path,
   "DF Surface EOF Tillage Info.csv"
 )
+# Crop residue data (from DF)
 Crop_residue_path <- file.path(
   Raw_path,
   "DF Surface EOF Crop Residue Info.csv"
 )
 
 # Reference data
+# Only keep Start and End time in this one
 Site_time_path <- file.path(
   Reference_path,
   "EOF_Site_Table.csv"
 )
+# Soil Texture lookup table
 Soil_path <- file.path(
   Reference_path,
   "Soil_Texture_Lookup_table.csv"
@@ -146,7 +154,6 @@ Q_events <- PQ_output$runoff
 Site_variables <- DF_site_info %>%
   select(
     Field_Name,
-    Monitoring,
     FarmEnterprise,
     CropRotation,
     LandCover,
@@ -310,8 +317,7 @@ Report_lines <- c(
   "- Spring tillage combines current-water-year fall and spring passes.",
   "- Summer tillage combines current-water-year spring and summer passes.",
   "- Fall and spring use the previous crop; summer uses the current crop.",
-  "- Residue is included for fall and spring only.",
-  "- Cover crops are not included because the available record is incomplete and temporally biased."
+  "- Residue is included for fall and spring only."
 )
 
 writeLines(
