@@ -1,0 +1,29 @@
+﻿Site_ID,LandCover,Tile,Tile Notes
+P1,Cultivated Crops,Yes,Random tile in waterways
+P2,Cultivated Crops,Yes,
+P3,Cultivated Crops,Yes,Random tile in waterways
+R1,Cultivated Crops,No,
+R2,Cultivated Crops,No,
+R3,Cultivated Crops,No,
+H3,Cultivated Crops,No,
+KP3,Cultivated Crops,Yes,Random tile in the low area
+K5,Pasture/Hay,Yes,"Radom tile, WY2009 tile blow out"
+K7,Pasture/Hay,Yes,
+K8,Pasture/Hay,No,No tile in basin but in surrounding area in waterways
+JF2,Pasture/Hay,No,
+JF4,Cultivated Crops ,No,
+JF5,Cultivated Crops ,No,
+WF1,Cultivated Crops ,No,
+WF2,Cultivated Crops,No,
+RE1,Cultivated Crops ,No,
+RE5,Cultivated Crops ,No,
+AR1,Cultivated Crops ,No,
+AR2,Cultivated Crops ,No,
+RS1,Cultivated Crops ,No,
+RS2,Cultivated Crops ,No,
+KD1,Cultivated Crops ,No,
+KD2,Cultivated Crops ,No,
+AO1,Cultivated Crops ,No,
+AO3,Cultivated Crops ,No,
+MT1,Cultivated Crops,No,
+MT2,Pasture/Hay,No,
