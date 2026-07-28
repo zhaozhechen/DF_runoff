@@ -38,11 +38,11 @@ process_site_info <- function(site_metadata_path,
   site_location <- read_xlsx_safe(site_location_path) %>%
     dplyr::transmute(
       Field_Name = normalize_site_id(`Site ID`),
-      Site_Type = as.character(`Site Type`),
+      Monitoring = as.character(`Site Type`),
       LAT_Updated = as.numeric(`GPS Lat`),
       LONG_Updated = as.numeric(`GPS Lon`)
     ) %>%
-    dplyr::filter(Site_Type == "Surface") %>%
+    dplyr::filter(Monitoring == "Surface") %>%
     dplyr::distinct(Field_Name,.keep_all=TRUE)
   
   # Approximate monitoring periods
@@ -85,7 +85,9 @@ process_site_info <- function(site_metadata_path,
       LONG_approx = dplyr::coalesce(LONG_Updated,as.numeric(LONG_approx)),
       MeanSlope_per = as.numeric(MeanSlope_per),
       BasinArea_ac = as.numeric(BasinArea_ac),
-      Clay_Fraction = as.numeric(Clay_Fraction)
+      # The lookup table stores clay as a percentage
+      Clay_Fraction = as.numeric(Clay_Fraction)/100,
+      Hydrologic_Group = group_hydrologic_class(HydrologicGroup)
     ) %>%
     dplyr::select(-LAT_Updated,-LONG_Updated)
   

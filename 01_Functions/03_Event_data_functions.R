@@ -33,23 +33,23 @@ process_runoff_events <- function(runoff_path,site_df){
       runoff_volume = as.numeric(runoff_volume),
       peak_discharge = as.numeric(peak_discharge),
       # Note: below the notes indicate Q event, which is correct. Not P event. Because multiple P events are combined within this Q event.
-      # Total rain during this Q event (Unit: in)
-      rain_in = as.numeric(rain),
+      # Total rain during this Q event (Unit: mm)
+      rain_mm = inch_to_mm(rain),
       # Duration of all P events overlapping with this Q event.  (Unit: hour)
-      duration = as.numeric(duration),
-      # Mean Intensity during this Q event (Unit: in/hour)
-      Ievent = as.numeric(Ievent),
+      duration_hr = as.numeric(duration),
+      # Rainfall intensities during this Q event (Unit: mm/hour)
+      Ievent_mm_hr = inch_to_mm(Ievent),
       # Maximum 5-min intensity during this Q event (Unit: in/hour)
-      I5 = as.numeric(I5),
-      I10 = as.numeric(I10),
-      I30 = as.numeric(I30),
-      I60 = as.numeric(I60),
+      I5_mm_hr = inch_to_mm(I5),
+      I10_mm_hr = inch_to_mm(I10),
+      I30_mm_hr = inch_to_mm(I30),
+      I60_mm_hr = inch_to_mm(I60),
       # Antecedent rainfall (ARF) for each event was calculated by taking the sum of the total amount of rain 
-      # for a period of days (not events) before the beginning of the event associated with the flow event and reported in inches.
-      ARFdays1 = as.numeric(ARFdays1),
-      ARFdays2 = as.numeric(ARFdays2),
-      ARFdays7 = as.numeric(ARFdays7),
-      ARFdays14 = as.numeric(ARFdays14)
+      # for a period of days (not events) before the beginning of the event associated with the flow event.
+      ARFdays1_mm = inch_to_mm(ARFdays1),
+      ARFdays2_mm = inch_to_mm(ARFdays2),
+      ARFdays7_mm = inch_to_mm(ARFdays7),
+      ARFdays14_mm = inch_to_mm(ARFdays14)
     ) %>%
     dplyr::filter(!is.na(Q_start),!is.na(Q_end)) %>%
     dplyr::arrange(Field_Name,Q_start,Q_end) %>%
@@ -61,7 +61,7 @@ process_runoff_events <- function(runoff_path,site_df){
     ) %>%
     dplyr::mutate(
       area_ft2 = BasinArea_ac*43560,
-      runoff_in = runoff_volume/area_ft2*12
+      runoff_mm = inch_to_mm(runoff_volume/area_ft2*12)
     )
   
   runoff_df
@@ -105,9 +105,30 @@ process_precipitation_events <- function(precipitation_path,
       !is.na(P_start),
       !is.na(P_end)
     ) %>%
+    dplyr::transmute(
+      USGS_Station_Number,
+      P_start,
+      P_end,
+      rain_mm = inch_to_mm(rain),
+      duration_hr = as.numeric(duration),
+      Ievent_mm_hr = inch_to_mm(Ievent),
+      I5_mm_hr = inch_to_mm(I5),
+      I10_mm_hr = inch_to_mm(I10),
+      I15_mm_hr = inch_to_mm(I15),
+      I30_mm_hr = inch_to_mm(I30),
+      I60_mm_hr = inch_to_mm(I60),
+      energy_m1 = as.numeric(energy_m1),
+      erosivity_m1 = as.numeric(erosivity_m1),
+      energy_m2 = as.numeric(energy_m2),
+      erosivity_m2 = as.numeric(erosivity_m2),
+      ARFdays1_mm = inch_to_mm(ARFdays1),
+      ARFdays2_mm = inch_to_mm(ARFdays2),
+      ARFdays7_mm = inch_to_mm(ARFdays7),
+      ARFdays14_mm = inch_to_mm(ARFdays14),
+      Field_Name
+    ) %>%
     dplyr::select(
-      -project,
-      -All_Field_Names
+      dplyr::everything()
     ) %>%
     dplyr::left_join(
       site_df %>%
@@ -262,8 +283,8 @@ match_precipitation_runoff <- function(precipitation_df,runoff_df){
   
   precipitation_df <- precipitation_df %>%
     dplyr::mutate(
-      Q_total_in_raw = Q_total_volume_raw/area_ft2*12,
-      Q_total_in = Q_total_volume/area_ft2*12
+      Q_total_mm_raw = inch_to_mm(Q_total_volume_raw/area_ft2*12),
+      Q_total_mm = inch_to_mm(Q_total_volume/area_ft2*12)
     )
   
   runoff_df <- runoff_df %>%

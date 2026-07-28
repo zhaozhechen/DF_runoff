@@ -1,0 +1,8 @@
+"Variable","Definition","Value"
+"Site_Water_Years","Total number of site-water-year records in the management dataset",145
+"Tillage_Coverage_Below_100","Site-water years with tillage coverage less than 100%",29
+"Crop_Coverage_Below_100","Site-water years with crop and residue coverage less than 100%",29
+"Missing_Tillage_Total","Site-water years missing basin-weighted total tillage passes",8
+"Missing_Current_Crop","Site-water years missing the current-crop perennial fraction",0
+"Missing_Fall_Residue","Site-water years missing the fall residue fraction",0
+"Missing_Spring_Residue","Site-water years missing the spring residue fraction",0

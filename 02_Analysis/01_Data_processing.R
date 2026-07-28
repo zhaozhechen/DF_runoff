@@ -33,6 +33,7 @@ if(!dir.exists(file.path(Project_path,"00_Data","Raw"))){
 source(file.path(Project_path,"01_Functions","01_General_data_functions.R"))
 source(file.path(Project_path,"01_Functions","02_Management_data_functions.R"))
 source(file.path(Project_path,"01_Functions","03_Event_data_functions.R"))
+source(file.path(Project_path,"01_Functions","04_Reporting_plotting_functions.R"))
 
 # Data paths ======
 Raw_path <- file.path(Project_path,"00_Data","Raw")
@@ -154,6 +155,7 @@ Q_events <- PQ_output$runoff
 Site_variables <- DF_site_info %>%
   select(
     Field_Name,
+    Monitoring,
     FarmEnterprise,
     CropRotation,
     LandCover,
@@ -161,7 +163,7 @@ Site_variables <- DF_site_info %>%
     Tile,
     Tile_Notes,
     SoilType,
-    HydrologicGroup,
+    Hydrologic_Group,
     DrainageClass,
     MeanSlope_per,
     Clay_Fraction
@@ -252,80 +254,86 @@ P_season_n <- P_analysis_nonfrozen %>%
 Q_season_n <- Q_analysis_nonfrozen %>%
   count(Season,name="n")
 
-Report_lines <- c(
-  "# Data Processing Summary",
-  "",
-  paste0("Generated: ",Sys.Date()),
-  "",
-  "## Processing scope",
-  "",
-  paste0("- Surface monitoring sites retained: ",nrow(DF_site_info)),
-  paste0("- Sites with site-level tile drainage: ",sum(DF_site_info$Tile == "Yes",na.rm=TRUE)),
-  paste0("- All precipitation events: ",nrow(P_analysis_all)),
-  paste0("- Non-frozen precipitation events: ",nrow(P_analysis_nonfrozen)),
-  paste0("- All storm-associated runoff events: ",nrow(Q_analysis_all)),
-  paste0("- Non-frozen runoff events: ",nrow(Q_analysis_nonfrozen)),
-  "",
-  "## Non-frozen events by season",
-  "",
-  "### Precipitation",
-  "",
-  paste0("- ",P_season_n$Season,": ",P_season_n$n),
-  "",
-  "### Runoff",
-  "",
-  paste0("- ",Q_season_n$Season,": ",Q_season_n$n),
-  "",
-  "## Management data availability",
-  "",
-  paste0(
-    "- Precipitation events missing perennial fraction: ",
-    sum(is.na(P_analysis_nonfrozen$PerennialFrac))
+Scope_table <- data.frame(
+  Item=c(
+    "Surface monitoring sites retained",
+    "Sites with site-level tile drainage",
+    "All precipitation events",
+    "Non-frozen precipitation events",
+    "All storm-associated runoff events",
+    "Non-frozen runoff events"
   ),
-  paste0(
-    "- Precipitation events missing seasonal tillage passes: ",
-    sum(is.na(P_analysis_nonfrozen$Tillage_Passes))
+  Value=c(
+    nrow(DF_site_info),
+    sum(DF_site_info$Tile == "Yes",na.rm=TRUE),
+    nrow(P_analysis_all),
+    nrow(P_analysis_nonfrozen),
+    nrow(Q_analysis_all),
+    nrow(Q_analysis_nonfrozen)
+  )
+)
+
+Availability_table <- data.frame(
+  Dataset=c("Precipitation","Precipitation","Precipitation","Runoff","Runoff","Runoff"),
+  Variable=c(
+    "Perennial fraction",
+    "Seasonal tillage passes",
+    "Fall/spring residue fraction",
+    "Perennial fraction",
+    "Seasonal tillage passes",
+    "Fall/spring residue fraction"
   ),
-  paste0(
-    "- Fall/spring precipitation events missing residue fraction: ",
+  Missing=c(
+    sum(is.na(P_analysis_nonfrozen$PerennialFrac)),
+    sum(is.na(P_analysis_nonfrozen$Tillage_Passes)),
     sum(
       is.na(P_analysis_nonfrozen$Residue_Frac) &
         P_analysis_nonfrozen$Season %in% c("Fall","Spring")
-    )
-  ),
-  paste0(
-    "- Runoff events missing perennial fraction: ",
-    sum(is.na(Q_analysis_nonfrozen$PerennialFrac))
-  ),
-  paste0(
-    "- Runoff events missing seasonal tillage passes: ",
-    sum(is.na(Q_analysis_nonfrozen$Tillage_Passes))
-  ),
-  paste0(
-    "- Fall/spring runoff events missing residue fraction: ",
+    ),
+    sum(is.na(Q_analysis_nonfrozen$PerennialFrac)),
+    sum(is.na(Q_analysis_nonfrozen$Tillage_Passes)),
     sum(
       is.na(Q_analysis_nonfrozen$Residue_Frac) &
         Q_analysis_nonfrozen$Season %in% c("Fall","Spring")
     )
-  ),
-  "",
-  "## Important definitions",
-  "",
-  "- Water year runs from October 1 through September 30.",
-  "- Spring is January-May, summer is June-September, and fall is October-December.",
-  "- Fall tillage combines the previous water year's summer passes with the current water year's fall passes.",
-  "- Spring tillage combines current-water-year fall and spring passes.",
-  "- Summer tillage combines current-water-year spring and summer passes.",
-  "- Fall and spring use the previous crop; summer uses the current crop.",
-  "- Residue is included for fall and spring only."
+  )
 )
 
-writeLines(
-  Report_lines,
-  file.path(Report_path,"01_Data_processing_summary.md"),
-  useBytes=TRUE
+Report_body <- c(
+  "<h2>Processing scope</h2>",
+  data_frame_to_html(Scope_table,digits=0),
+  "<h2>Non-frozen events by season</h2>",
+  "<h3>Precipitation</h3>",
+  data_frame_to_html(P_season_n,digits=0),
+  "<h3>Runoff</h3>",
+  data_frame_to_html(Q_season_n,digits=0),
+  "<h2>Management data availability</h2>",
+  data_frame_to_html(Availability_table,digits=0),
+  "<h2>Important definitions</h2>",
+  "<ul>",
+  "<li>Water year runs from October 1 through September 30.</li>",
+  "<li>Spring is January-May, summer is June-September, and fall is October-December.</li>",
+  "<li>Fall tillage combines the previous water year's summer passes with the current water year's fall passes.</li>",
+  "<li>Spring tillage combines current-water-year fall and spring passes.</li>",
+  "<li>Summer tillage combines current-water-year spring and summer passes.</li>",
+  "<li>Fall and spring use the previous crop; summer uses the current crop.</li>",
+  "<li>Residue is included for fall and spring only.</li>",
+  "<li>Hydrologic depths are reported in millimetres and rainfall intensities in millimetres per hour.</li>",
+  "</ul>"
+)
+
+Processing_report <- file.path(
+  Report_path,
+  "01_Data_processing_summary.html"
+)
+
+write_html_report(
+  title="Data Processing Summary",
+  subtitle=paste0("Generated: ",Sys.Date()),
+  body_html=Report_body,
+  output_path=Processing_report
 )
 
 message("Data processing complete.")
 message("Processed data: ",Processed_path)
-message("Report: ",file.path(Report_path,"01_Data_processing_summary.md"))
+message("Report: ",Processing_report)

@@ -83,6 +83,30 @@ remove_bom_names <- function(df){
   df
 }
 
+# Convert hydrologic depth or intensity values from inches to millimetres
+inch_to_mm <- function(x){
+  suppressWarnings(as.numeric(x))*25.4
+}
+
+# Group Hydrologic Group into fewer levels so that each group has sufficient samples
+group_hydrologic_class <- function(x){
+  group <- dplyr::case_when(
+    x %in% c("A","B") ~ "High-infiltration",
+    x %in% c("C") ~ "Moderate-infiltration",
+    x %in% c("B/D","C/D","D") ~ "Slow-infiltration",
+    TRUE ~ NA_character_
+  )
+
+  factor(
+    group,
+    levels=c(
+      "Slow-infiltration",
+      "Moderate-infiltration",
+      "High-infiltration"
+    )
+  )
+}
+
 # Convert common yes/no values to a consistent notation
 standardize_yes_no <- function(x){
   x <- stringr::str_to_lower(stringr::str_squish(as.character(x)))
