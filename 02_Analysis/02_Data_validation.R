@@ -20,6 +20,7 @@ if(!dir.exists(file.path(Project_path,"00_Data","Processed"))){
 
 # Source functions ======
 source(file.path(Project_path,"01_Functions","01_General_data_functions.R"))
+source(file.path(Project_path,"01_Functions","04_Reporting_plotting_functions.R"))
 
 # Data paths ======
 Processed_path <- file.path(Project_path,"00_Data","Processed")
@@ -53,14 +54,28 @@ Crop_residue_field <- read.csv(
   stringsAsFactors=FALSE
 )
 
+Tillage_field <- read.csv(
+  file.path(Processed_path,"Tillage_field_clean.csv"),
+  stringsAsFactors=FALSE
+)
+
 # ------- Main ---------
 # Step 1. Validate site selection =============================
 stopifnot(
   nrow(DF_site_info) == 28,
   !anyDuplicated(DF_site_info$Field_Name),
+  "Monitoring" %in% names(DF_site_info),
   all(DF_site_info$Monitoring == "Surface"),
   all(DF_site_info$Tile %in% c("Yes","No")),
-  sum(DF_site_info$Tile == "Yes") == 6
+  sum(DF_site_info$Tile == "Yes") == 6,
+  all(DF_site_info$Clay_Fraction >= 0,na.rm=TRUE),
+  all(DF_site_info$Clay_Fraction <= 1,na.rm=TRUE),
+  all(
+    as.character(DF_site_info$Hydrologic_Group) ==
+      as.character(
+        group_hydrologic_class(DF_site_info$HydrologicGroup)
+      )
+  )
 )
 
 # Step 2. Validate keys and event sites =======================
@@ -94,6 +109,13 @@ Q_tillage_expected <- case_when(
 stopifnot(
   all.equal(P_df$Tillage_Passes,P_tillage_expected,check.attributes=FALSE),
   all.equal(Q_df$Tillage_Passes,Q_tillage_expected,check.attributes=FALSE),
+  all.equal(
+    Tillage_field$Tillage_Total,
+    Tillage_field$Tillage_Fall +
+      Tillage_field$Tillage_Spring +
+      Tillage_field$Tillage_Summer,
+    check.attributes=FALSE
+  ),
   all(is.na(P_df$Residue_Frac[P_df$Season == "Summer"])),
   all(is.na(Q_df$Residue_Frac[Q_df$Season == "Summer"])),
   all(P_df$Crop_Source[P_df$Season %in% c("Fall","Spring")] == "Previous crop"),
@@ -102,8 +124,91 @@ stopifnot(
   all(Q_df$Crop_Source[Q_df$Season == "Summer"] == "Current crop")
 )
 
-# Step 5. Validate runoff response time =======================
+# Check that each site-water-year total is the basin-weighted sum of fields
+Tillage_weighted_expected <- Tillage_field %>%
+  group_by(Field_Name,Water_Year) %>%
+  summarise(
+    Tillage_Total_Expected=sum(
+      Tillage_Total*Basin_Percentage/100
+    ),
+    Tillage_Fall_Expected=sum(
+      Tillage_Fall*Basin_Percentage/100
+    ),
+    Tillage_Spring_Expected=sum(
+      Tillage_Spring*Basin_Percentage/100
+    ),
+    Tillage_Summer_Expected=sum(
+      Tillage_Summer*Basin_Percentage/100
+    ),
+    .groups="drop"
+  ) %>%
+  left_join(
+    Management_df %>%
+      select(
+        Field_Name,
+        Water_Year,
+        Tillage_Total,
+        Tillage_Fall,
+        Tillage_Spring,
+        Tillage_Summer
+      ),
+    by=c("Field_Name","Water_Year")
+  )
+
 stopifnot(
+  all.equal(
+    Tillage_weighted_expected$Tillage_Total,
+    Tillage_weighted_expected$Tillage_Total_Expected,
+    check.attributes=FALSE
+  ),
+  all.equal(
+    Tillage_weighted_expected$Tillage_Fall,
+    Tillage_weighted_expected$Tillage_Fall_Expected,
+    check.attributes=FALSE
+  ),
+  all.equal(
+    Tillage_weighted_expected$Tillage_Spring,
+    Tillage_weighted_expected$Tillage_Spring_Expected,
+    check.attributes=FALSE
+  ),
+  all.equal(
+    Tillage_weighted_expected$Tillage_Summer,
+    Tillage_weighted_expected$Tillage_Summer_Expected,
+    check.attributes=FALSE
+  )
+)
+
+# Step 5. Validate hydrologic units and runoff response time ===
+Inch_field_pattern <- paste0(
+  "(^rain$|^rain_in$|^runoff_in$|",
+  "^I(event|5|10|15|30|60)$|",
+  "^ARFdays(1|2|7|14)$|_in$)"
+)
+
+stopifnot(
+  !any(grepl(Inch_field_pattern,names(P_df))),
+  !any(grepl(Inch_field_pattern,names(Q_df))),
+  all(
+    c(
+      "rain_mm",
+      "I30_mm_hr",
+      "ARFdays7_mm",
+      "Q_total_mm"
+    ) %in% names(P_df)
+  ),
+  all(
+    c(
+      "rain_mm",
+      "I30_mm_hr",
+      "ARFdays7_mm",
+      "runoff_mm"
+    ) %in% names(Q_df)
+  ),
+  all.equal(
+    Q_df$runoff_mm,
+    inch_to_mm(Q_df$runoff_volume/Q_df$area_ft2*12),
+    check.attributes=FALSE
+  ),
   all(Q_df$Q_response_time_hr >= 0,na.rm=TRUE)
 )
 
@@ -139,70 +244,86 @@ Unclassified_current <- Crop_residue_field %>%
   arrange(Current_Crop)
 
 # Step 7. Generate validation report ==========================
-Report_lines <- c(
-  "# Data Validation Summary",
-  "",
-  paste0("Generated: ",Sys.Date()),
-  "",
-  "## Validation result",
-  "",
-  "**All structural validation checks passed.**",
-  "",
-  paste0("- Unique surface monitoring sites: ",nrow(DF_site_info)),
-  paste0("- Surface sites with site-level tile drainage: ",sum(DF_site_info$Tile == "Yes")),
-  paste0("- Duplicate management site-water-year keys: ",sum(duplicated(Management_df[c("Field_Name","Water_Year")]))),
-  "- Water-year assignment: passed",
-  "- Season assignment: passed",
-  "- Seasonal tillage formulas: passed",
-  "- Seasonal crop selection: passed",
-  "- Summer residue exclusion: passed",
-  "- Non-negative runoff response time: passed",
-  "",
-  "## Source-data coverage flags",
-  "",
-  paste0(
-    "- Site-water-years with tillage coverage below 100%: ",
-    nrow(Tillage_low_coverage)
+Validation_table <- data.frame(
+  Check=c(
+    "Unique surface monitoring sites",
+    "Surface sites with site-level tile drainage",
+    "Duplicate management site-water-year keys",
+    "Water-year assignment",
+    "Season assignment",
+    "Basin-weighted total tillage passes",
+    "Seasonal tillage formulas",
+    "Seasonal crop selection",
+    "Summer residue exclusion",
+    "Inch-to-millimetre conversion",
+    "Non-negative runoff response time"
   ),
-  paste0(
-    "- Site-water-years with crop/residue coverage below 100%: ",
-    nrow(Crop_low_coverage)
+  Result=c(
+    nrow(DF_site_info),
+    sum(DF_site_info$Tile == "Yes"),
+    sum(duplicated(Management_df[c("Field_Name","Water_Year")])),
+    "Passed",
+    "Passed",
+    "Passed",
+    "Passed",
+    "Passed",
+    "Passed",
+    "Passed",
+    "Passed"
+  )
+)
+
+Coverage_table <- data.frame(
+  Flag=c(
+    "Site-water-years with tillage coverage below 100%",
+    "Site-water-years with crop/residue coverage below 100%",
+    "Unique unclassified previous-crop descriptions",
+    "Unique unclassified current-crop descriptions"
   ),
-  paste0(
-    "- Unique unclassified previous-crop descriptions: ",
-    nrow(Unclassified_previous)
-  ),
-  paste0(
-    "- Unique unclassified current-crop descriptions: ",
+  Count=c(
+    nrow(Tillage_low_coverage),
+    nrow(Crop_low_coverage),
+    nrow(Unclassified_previous),
     nrow(Unclassified_current)
   )
 )
 
+Report_body <- c(
+  "<div class=\"callout\"><strong>All structural validation checks passed.</strong></div>",
+  "<h2>Validation result</h2>",
+  data_frame_to_html(Validation_table,digits=0),
+  "<h2>Source-data coverage flags</h2>",
+  "<p>Coverage below 100% reflects the supplied basin percentages. Weighted values remain fractions of the full monitored basin and are not renormalized.</p>",
+  data_frame_to_html(Coverage_table,digits=0)
+)
+
 if(nrow(Unclassified_previous) > 0){
-  Report_lines <- c(
-    Report_lines,
-    "",
-    "### Unclassified previous crops",
-    "",
-    paste0("- ",Unclassified_previous$Previous_Crop)
+  Report_body <- c(
+    Report_body,
+    "<h3>Unclassified previous crops</h3>",
+    data_frame_to_html(Unclassified_previous)
   )
 }
 
 if(nrow(Unclassified_current) > 0){
-  Report_lines <- c(
-    Report_lines,
-    "",
-    "### Unclassified current crops",
-    "",
-    paste0("- ",Unclassified_current$Current_Crop)
+  Report_body <- c(
+    Report_body,
+    "<h3>Unclassified current crops</h3>",
+    data_frame_to_html(Unclassified_current)
   )
 }
 
-writeLines(
-  Report_lines,
-  file.path(Report_path,"02_Data_validation_summary.md"),
-  useBytes=TRUE
+Validation_report <- file.path(
+  Report_path,
+  "02_Data_validation_summary.html"
+)
+
+write_html_report(
+  title="Data Validation Summary",
+  subtitle=paste0("Generated: ",Sys.Date()),
+  body_html=Report_body,
+  output_path=Validation_report
 )
 
 message("All data validation checks passed.")
-message("Report: ",file.path(Report_path,"02_Data_validation_summary.md"))
+message("Report: ",Validation_report)
