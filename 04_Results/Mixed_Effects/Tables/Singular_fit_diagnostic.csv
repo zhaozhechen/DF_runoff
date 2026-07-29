@@ -1,0 +1,25 @@
+"Analysis","Season","Model","Replications","Singular_Replications","Singular_Percent","Missing_Conditional_R2"
+"Runoff coefficient","Fall","Agricultural",200,0,0,0
+"Runoff coefficient","Fall","Full",200,6,3,6
+"Runoff coefficient","Fall","Site",200,0,0,0
+"Runoff coefficient","Fall","Storm",200,0,0,0
+"Runoff coefficient","Spring","Agricultural",200,0,0,0
+"Runoff coefficient","Spring","Full",200,36,18,36
+"Runoff coefficient","Spring","Site",200,21,10.5,21
+"Runoff coefficient","Spring","Storm",200,0,0,0
+"Runoff coefficient","Summer","Agricultural",200,0,0,0
+"Runoff coefficient","Summer","Full",200,11,5.5,11
+"Runoff coefficient","Summer","Site",200,10,5,10
+"Runoff coefficient","Summer","Storm",200,0,0,0
+"Runoff occurrence","Fall","Agricultural",50,0,0,0
+"Runoff occurrence","Fall","Full",50,0,0,0
+"Runoff occurrence","Fall","Site",50,0,0,0
+"Runoff occurrence","Fall","Storm",50,0,0,0
+"Runoff occurrence","Spring","Agricultural",50,0,0,0
+"Runoff occurrence","Spring","Full",50,0,0,0
+"Runoff occurrence","Spring","Site",50,0,0,0
+"Runoff occurrence","Spring","Storm",50,0,0,0
+"Runoff occurrence","Summer","Agricultural",50,0,0,0
+"Runoff occurrence","Summer","Full",50,0,0,0
+"Runoff occurrence","Summer","Site",50,0,0,0
+"Runoff occurrence","Summer","Storm",50,0,0,0
