@@ -51,7 +51,30 @@ source(
 
 # Paths ======
 Processed_path <- file.path(Project_path,"00_Data","Processed")
-Result_path <- file.path(Project_path,"04_Results","Mixed_Effects")
+Dataset_key <- Sys.getenv("DF_EVENT_DATASET","NonFrozen")
+Dataset_key <- match.arg(
+  Dataset_key,
+  c("Frozen","NonFrozen","All")
+)
+
+Dataset_labels <- c(
+  Frozen="Frozen soil conditions",
+  NonFrozen="Non-frozen soil conditions",
+  All="All soil conditions"
+)
+
+Dataset_short_labels <- c(
+  Frozen="Frozen",
+  NonFrozen="Non-frozen",
+  All="All events"
+)
+
+Result_path <- file.path(
+  Project_path,
+  "04_Results",
+  "Mixed_Effects",
+  Dataset_key
+)
 Figure_path <- file.path(Result_path,"Figures")
 Table_path <- file.path(Result_path,"Tables")
 Model_path <- file.path(Result_path,"Models")
@@ -83,7 +106,18 @@ if(
 set.seed(123)
 
 # Model variable definitions ======
-Season_levels <- c("Spring","Summer","Fall")
+All_season_levels <- c(
+  "Pre-growing season",
+  "Growing season",
+  "Post-growing season"
+)
+
+# No frozen events occur during June-September
+Season_levels <- if(Dataset_key == "Frozen"){
+  c("Pre-growing season","Post-growing season")
+}else{
+  All_season_levels
+}
 
 # These are the same storm variables used in the previous mixed models
 Storm_variables <- c(
@@ -93,18 +127,18 @@ Storm_variables <- c(
 )
 
 # Agricultural predictors vary by season
-# Residue is excluded from the summer models
+# Residue is excluded from the growing-season models
 Agricultural_variables <- list(
-  Spring=c(
+  "Pre-growing season"=c(
     "Tillage_Passes",
     "PerennialFrac",
     "Residue_Frac"
   ),
-  Summer=c(
+  "Growing season"=c(
     "Tillage_Passes",
     "PerennialFrac"
   ),
-  Fall=c(
+  "Post-growing season"=c(
     "Tillage_Passes",
     "PerennialFrac",
     "Residue_Frac"
@@ -160,12 +194,32 @@ Variable_group_colors <- c(
 
 Season_colors <- setNames(
   RColorBrewer::brewer.pal(7,"Set2")[c(3,1,2)],
-  c("Spring","Summer","Fall")
+  All_season_levels
 )
 
 # ------- Data import and preprocessing ---------
+keep_precipitation_condition <- function(frozen_flag){
+  if(Dataset_key == "Frozen"){
+    frozen_flag %in% TRUE
+  }else if(Dataset_key == "NonFrozen"){
+    frozen_flag %in% FALSE
+  }else{
+    frozen_flag %in% c(TRUE,FALSE)
+  }
+}
+
+keep_runoff_condition <- function(frozen_status){
+  if(Dataset_key == "Frozen"){
+    frozen_status == "Frozen"
+  }else if(Dataset_key == "NonFrozen"){
+    frozen_status == "Non-Frozen"
+  }else{
+    frozen_status %in% c("Frozen","Non-Frozen")
+  }
+}
+
 P_df <- read.csv(
-  file.path(Processed_path,"NonFrozen_P_analysis.csv"),
+  file.path(Processed_path,"All_P_events.csv"),
   stringsAsFactors=FALSE,
   check.names=FALSE
 ) %>%
@@ -190,20 +244,20 @@ P_df <- read.csv(
     log_ARFdays7=log(ARFdays7_mm+0.1)
   ) %>%
   filter(
-    P_frozen %in% FALSE,
+    keep_precipitation_condition(P_frozen),
     is.finite(log_I30),
     is.finite(log_Dur),
     is.finite(log_ARFdays7)
   )
 
 Q_df <- read.csv(
-  file.path(Processed_path,"NonFrozen_Q_analysis.csv"),
+  file.path(Processed_path,"All_Q_events.csv"),
   stringsAsFactors=FALSE,
   check.names=FALSE
 ) %>%
   filter(
     Monitoring == "Surface",
-    frozen == "Non-Frozen",
+    keep_runoff_condition(frozen),
     rain_mm > 0,
     runoff_mm > 0
   ) %>%
@@ -243,24 +297,38 @@ Q_df <- read.csv(
 stopifnot(
   all(
     P_df$Crop_Source[
-      P_df$Season %in% c("Fall","Spring")
+      P_df$Season %in% c(
+        "Post-growing season",
+        "Pre-growing season"
+      )
     ] == "Previous crop"
   ),
   all(
     Q_df$Crop_Source[
-      Q_df$Season %in% c("Fall","Spring")
+      Q_df$Season %in% c(
+        "Post-growing season",
+        "Pre-growing season"
+      )
     ] == "Previous crop"
   ),
   all(
-    P_df$Crop_Source[P_df$Season == "Summer"] ==
+    P_df$Crop_Source[P_df$Season == "Growing season"] ==
       "Current crop"
   ),
   all(
-    Q_df$Crop_Source[Q_df$Season == "Summer"] ==
+    Q_df$Crop_Source[Q_df$Season == "Growing season"] ==
       "Current crop"
   ),
-  all(is.na(P_df$Residue_Frac[P_df$Season == "Summer"])),
-  all(is.na(Q_df$Residue_Frac[Q_df$Season == "Summer"]))
+  all(
+    is.na(
+      P_df$Residue_Frac[P_df$Season == "Growing season"]
+    )
+  ),
+  all(
+    is.na(
+      Q_df$Residue_Frac[Q_df$Season == "Growing season"]
+    )
+  )
 )
 
 # Prepare one complete-case dataset for one season
@@ -1184,13 +1252,21 @@ Model_variable_table <- data.frame(
     "Response: runoff coefficient",
     "Storm",
     "Agricultural: all seasons",
-    "Agricultural: fall and spring only",
+    "Agricultural: pre- and post-growing seasons only",
     "Site physical properties",
     "Random effect"
   ),
   Definition=c(
-    "Whether a non-frozen precipitation event produced surface runoff (binomial logit model)",
-    "Natural log of the non-frozen event runoff coefficient (Gaussian mixed model)",
+    paste0(
+      "Whether a precipitation event under ",
+      tolower(Dataset_labels[[Dataset_key]]),
+      " produced surface runoff (binomial logit model)"
+    ),
+    paste0(
+      "Natural log of the event runoff coefficient under ",
+      tolower(Dataset_labels[[Dataset_key]]),
+      " (Gaussian mixed model)"
+    ),
     "Log I30, log event duration, and log seven-day antecedent rainfall",
     "Seasonal tillage passes and continuous seasonal perennial crop fraction",
     "Crop-residue fraction",
@@ -1204,17 +1280,17 @@ Agricultural_rule_table <- data.frame(
     "Surface monitoring",
     "Seasons",
     "Tillage",
-    "Fall crop",
-    "Spring crop",
-    "Summer crop",
-    "Fall/spring residue",
-    "Summer residue",
+    "Post-growing-season crop",
+    "Pre-growing-season crop",
+    "Growing-season crop",
+    "Pre-/post-growing-season residue",
+    "Growing-season residue",
     "Tile drainage",
     "Random forest"
   ),
   Implementation=c(
     "Only surface-runoff monitoring records are modeled",
-    "Spring: January-May; Summer: June-September; Fall: October-December",
+    "Pre-growing: January-May; growing: June-September; post-growing: October-December",
     "Continuous basin-weighted total passes from the season-specific current and preceding windows",
     "Continuous perennial fraction from the previous crop",
     "Continuous perennial fraction from the previous crop",
@@ -1277,7 +1353,11 @@ Most_important_variables <- bind_rows(
   )
 
 Report_body <- c(
-  "<div class=\"callout\"><strong>Model scope:</strong> seasonal mixed-effects models are fitted for surface-runoff occurrence and the natural log of the runoff coefficient. The previous balanced-bootstrap, nested-model comparison, drop-one-variable, and marginal-effect logic is retained. Random-forest analyses are excluded.</div>",
+  paste0(
+    "<div class=\"callout\"><strong>Model scope:</strong> seasonal mixed-effects models are fitted for surface-runoff occurrence and the natural log of the runoff coefficient under ",
+    tolower(Dataset_labels[[Dataset_key]]),
+    ". The balanced-bootstrap, nested-model comparison, drop-one-variable, and marginal-effect logic is retained. Random-forest analyses are excluded.</div>"
+  ),
   "<h2>Model definitions</h2>",
   data_frame_to_html(Model_variable_table,digits=2),
   "<h2>Revised seasonal agricultural rules</h2>",
@@ -1286,7 +1366,11 @@ Report_body <- c(
   "<p>Continuous predictors are standardized within each bootstrap sample and within each final seasonal model. Every model includes a site random intercept.</p>",
   data_frame_to_html(Final_specifications,digits=2),
   "<h2>Part 1. Surface-runoff occurrence</h2>",
-  "<p>The response is whether a non-frozen precipitation event produced surface runoff. AUC evaluates discrimination; marginal and conditional R-squared values quantify fixed-effect and total model variation.</p>",
+  paste0(
+    "<p>The response is whether a precipitation event under ",
+    tolower(Dataset_labels[[Dataset_key]]),
+    " produced surface runoff. AUC evaluates discrimination; marginal and conditional R-squared values quantify fixed-effect and total model variation.</p>"
+  ),
   embedded_figure_html(
     file.path(Figure_path,"01_Occurrence_model_performance.png"),
     "Figure 1. Performance of the Storm, Agricultural, Site, and Full runoff-occurrence models across balanced bootstrap replications."
@@ -1339,12 +1423,23 @@ Report_body <- c(
 
 Mixed_model_report <- file.path(
   Report_path,
-  "04_Mixed_effects_model_report.html"
+  paste0(
+    "04_Mixed_effects_model_report_",
+    Dataset_key,
+    ".html"
+  )
 )
 
 write_html_report(
-  title="Discovery Farms Seasonal Mixed-Effects Models",
-  subtitle=paste0("Generated: ",Sys.Date()),
+  title=paste0(
+    "Discovery Farms Seasonal Mixed-Effects Models: ",
+    Dataset_labels[[Dataset_key]]
+  ),
+  subtitle=paste0(
+    Dataset_short_labels[[Dataset_key]],
+    " dataset; generated: ",
+    Sys.Date()
+  ),
   body_html=Report_body,
   output_path=Mixed_model_report
 )

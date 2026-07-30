@@ -1,0 +1,25 @@
+"Analysis","Season","Model","Replications","Singular_Replications","Singular_Percent","Missing_Conditional_R2"
+"Runoff coefficient","Growing season","Agricultural",200,0,0,0
+"Runoff coefficient","Growing season","Full",200,11,5.5,11
+"Runoff coefficient","Growing season","Site",200,10,5,10
+"Runoff coefficient","Growing season","Storm",200,0,0,0
+"Runoff coefficient","Post-growing season","Agricultural",200,0,0,0
+"Runoff coefficient","Post-growing season","Full",200,6,3,6
+"Runoff coefficient","Post-growing season","Site",200,0,0,0
+"Runoff coefficient","Post-growing season","Storm",200,0,0,0
+"Runoff coefficient","Pre-growing season","Agricultural",200,0,0,0
+"Runoff coefficient","Pre-growing season","Full",200,36,18,36
+"Runoff coefficient","Pre-growing season","Site",200,21,10.5,21
+"Runoff coefficient","Pre-growing season","Storm",200,0,0,0
+"Runoff occurrence","Growing season","Agricultural",50,0,0,0
+"Runoff occurrence","Growing season","Full",50,0,0,0
+"Runoff occurrence","Growing season","Site",50,0,0,0
+"Runoff occurrence","Growing season","Storm",50,0,0,0
+"Runoff occurrence","Post-growing season","Agricultural",50,0,0,0
+"Runoff occurrence","Post-growing season","Full",50,0,0,0
+"Runoff occurrence","Post-growing season","Site",50,0,0,0
+"Runoff occurrence","Post-growing season","Storm",50,0,0,0
+"Runoff occurrence","Pre-growing season","Agricultural",50,0,0,0
+"Runoff occurrence","Pre-growing season","Full",50,0,0,0
+"Runoff occurrence","Pre-growing season","Site",50,0,0,0
+"Runoff occurrence","Pre-growing season","Storm",50,0,0,0

@@ -242,33 +242,45 @@ add_seasonal_management <- function(event_df,event_date,management_df){
     dplyr::mutate(
       # Fall and spring use the previous crop; summer uses the current crop
       PerennialFrac = dplyr::case_when(
-        Season %in% c("Fall","Spring") ~ Previous_PerennialFrac,
-        Season == "Summer" ~ Current_PerennialFrac,
+        Season %in% c(
+          "Post-growing season",
+          "Pre-growing season"
+        ) ~ Previous_PerennialFrac,
+        Season == "Growing season" ~ Current_PerennialFrac,
         TRUE ~ NA_real_
       ),
       Crop_Source = dplyr::case_when(
-        Season %in% c("Fall","Spring") ~ "Previous crop",
-        Season == "Summer" ~ "Current crop",
+        Season %in% c(
+          "Post-growing season",
+          "Pre-growing season"
+        ) ~ "Previous crop",
+        Season == "Growing season" ~ "Current crop",
         TRUE ~ NA_character_
       ),
       # Each seasonal model includes tillage during that season and the preceding season
       Tillage_Passes = dplyr::case_when(
-        Season == "Fall" ~ Tillage_Summer_Previous + Tillage_Fall,
-        Season == "Spring" ~ Tillage_Fall + Tillage_Spring,
-        Season == "Summer" ~ Tillage_Spring + Tillage_Summer,
+        Season == "Post-growing season" ~
+          Tillage_Summer_Previous + Tillage_Fall,
+        Season == "Pre-growing season" ~
+          Tillage_Fall + Tillage_Spring,
+        Season == "Growing season" ~
+          Tillage_Spring + Tillage_Summer,
         TRUE ~ NA_real_
       ),
       Tillage_Window = dplyr::case_when(
-        Season == "Fall" ~ "Previous summer + current fall",
-        Season == "Spring" ~ "Current fall + spring",
-        Season == "Summer" ~ "Current spring + summer",
+        Season == "Post-growing season" ~
+          "Previous growing season + current post-growing season",
+        Season == "Pre-growing season" ~
+          "Current post-growing season + pre-growing season",
+        Season == "Growing season" ~
+          "Current pre-growing season + growing season",
         TRUE ~ NA_character_
       ),
       # Residue is included in fall and spring but not summer
       Residue_Frac = dplyr::case_when(
-        Season == "Fall" ~ Residue_Fall_Frac,
-        Season == "Spring" ~ Residue_Spring_Frac,
-        Season == "Summer" ~ NA_real_,
+        Season == "Post-growing season" ~ Residue_Fall_Frac,
+        Season == "Pre-growing season" ~ Residue_Spring_Frac,
+        Season == "Growing season" ~ NA_real_,
         TRUE ~ NA_real_
       ),
       Residue = dplyr::case_when(

@@ -4,5 +4,5 @@
 "Crop_Coverage_Below_100","Site-water years with crop and residue coverage less than 100%",29
 "Missing_Tillage_Total","Site-water years missing basin-weighted total tillage passes",8
 "Missing_Current_Crop","Site-water years missing the current-crop perennial fraction",0
-"Missing_Fall_Residue","Site-water years missing the fall residue fraction",0
-"Missing_Spring_Residue","Site-water years missing the spring residue fraction",0
+"Missing_Fall_Residue","Site-water years missing the post-growing-season residue fraction",0
+"Missing_Spring_Residue","Site-water years missing the pre-growing-season residue fraction",0

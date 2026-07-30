@@ -1,0 +1,13 @@
+"Season","Comparison","Smaller_Model","Larger_Model","Replications","Mean_Delta_AIC","SD_Delta_AIC","Mean_Chisq","SD_Chisq","Significant_Percent"
+"Growing season","Agricultural_Full","Agricultural","Full",50,-5.70439527883803,1.31806034872703,2.29560472116197,1.31806034872703,0
+"Growing season","Site_Full","Site","Full",50,1.92912283777159,4.9162591265134,5.92912283777159,4.9162591265134,34
+"Growing season","Storm_Agricultural","Storm","Agricultural",50,2.24203164884468,4.98100062544287,6.24203164884468,4.98100062544287,36
+"Growing season","Storm_Site","Storm","Site",50,-5.39148646776494,1.61478999452949,2.60851353223506,1.61478999452949,0
+"Post-growing season","Agricultural_Full","Agricultural","Full",50,0.44752609047812,2.80251525334598,8.44752609047812,2.80251525334598,34
+"Post-growing season","Site_Full","Site","Full",50,24.9541188173957,8.22462274277193,30.9541188173957,8.22462274277193,100
+"Post-growing season","Storm_Agricultural","Storm","Agricultural",50,27.5396753976255,8.53611241446045,33.5396753976256,8.53611241446045,100
+"Post-growing season","Storm_Site","Storm","Site",50,3.033082670708,2.88108904084097,11.033082670708,2.88108904084097,66
+"Pre-growing season","Agricultural_Full","Agricultural","Full",50,4.39289611600381,3.53604374797045,12.3928961160038,3.53604374797045,78
+"Pre-growing season","Site_Full","Site","Full",50,0.272475041222597,3.22459259757312,6.2724750412226,3.22459259757312,36
+"Pre-growing season","Storm_Agricultural","Storm","Agricultural",50,0.468078718269858,3.43757973140865,6.46807871826986,3.43757973140865,34
+"Pre-growing season","Storm_Site","Storm","Site",50,4.58849979305107,3.51360822467321,12.5884997930511,3.51360822467321,84
