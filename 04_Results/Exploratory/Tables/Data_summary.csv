@@ -3,6 +3,8 @@
 "Complete site-monitoring years",117
 "All precipitation events",14778
 "All storm-associated runoff events",2068
+"Non-frozne precipitation events",13987
+"Non-frozen storm-associated runoff events",1189
 "Non-frozen runoff events used for runoff coefficients",1131
 "Mean annual non-frozen runoff event number contribution (%)",57.3826705643072
 "Mean annual non-frozen runoff depth contribution (%)",42.0698016251825

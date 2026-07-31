@@ -506,23 +506,63 @@ run_mixed_model_analysis <- function(
   )
 }
 
-# Part 1. Surface-runoff occurrence ============================
-Occurrence_results <- run_mixed_model_analysis(
-  df=P_df,
-  response="Q_Occurred",
-  response_type="occurrence",
-  replications=Occurrence_Replications,
-  analysis_name="Runoff occurrence"
-)
+Refresh_only <- tolower(
+  Sys.getenv("DF_REFRESH_MODEL_OUTPUTS","false")
+) %in% c("true","1","yes")
 
-# Part 2. Surface-runoff coefficient ===========================
-RC_results <- run_mixed_model_analysis(
-  df=Q_df,
-  response="log_RC",
-  response_type="continuous",
-  replications=RC_Replications,
-  analysis_name="Runoff coefficient"
-)
+read_saved_results <- function(file_prefix){
+  read_result_table <- function(table_name){
+    read.csv(
+      file.path(
+        Table_path,
+        paste0(file_prefix,"_",table_name,".csv")
+      ),
+      stringsAsFactors=FALSE,
+      check.names=FALSE
+    )
+  }
+
+  list(
+    Metrics=read_result_table("Model_metrics_replications"),
+    Metrics_Long=read_result_table(
+      "Model_metrics_long_replications"
+    ),
+    Comparisons=read_result_table(
+      "Model_comparisons_replications"
+    ),
+    Drop_One=read_result_table("Drop_one_replications"),
+    Metric_Summary=read_result_table("Model_metric_summary"),
+    Comparison_Summary=read_result_table(
+      "Model_comparison_summary"
+    ),
+    Drop_Summary=read_result_table("Drop_one_summary"),
+    Season_Counts=read_result_table("Seasonal_sample_sizes")
+  )
+}
+
+if(Refresh_only){
+  message("Refreshing figures and reports from saved model results.")
+  Occurrence_results <- read_saved_results("Occurrence")
+  RC_results <- read_saved_results("RC")
+}else{
+  # Part 1. Surface-runoff occurrence ==========================
+  Occurrence_results <- run_mixed_model_analysis(
+    df=P_df,
+    response="Q_Occurred",
+    response_type="occurrence",
+    replications=Occurrence_Replications,
+    analysis_name="Runoff occurrence"
+  )
+
+  # Part 2. Surface-runoff coefficient =========================
+  RC_results <- run_mixed_model_analysis(
+    df=Q_df,
+    response="log_RC",
+    response_type="continuous",
+    replications=RC_Replications,
+    analysis_name="Runoff coefficient"
+  )
+}
 
 # Save model result tables =====================================
 write_model_tables <- function(results,file_prefix){
@@ -555,14 +595,16 @@ write_model_tables <- function(results,file_prefix){
   }
 }
 
-write_model_tables(
-  Occurrence_results,
-  "Occurrence"
-)
-write_model_tables(
-  RC_results,
-  "RC"
-)
+if(!Refresh_only){
+  write_model_tables(
+    Occurrence_results,
+    "Occurrence"
+  )
+  write_model_tables(
+    RC_results,
+    "RC"
+  )
+}
 
 # Fit final full models using all complete observations ========
 fit_final_models <- function(
@@ -693,43 +735,74 @@ fit_final_models <- function(
   )
 }
 
-Occurrence_final <- fit_final_models(
-  Occurrence_results,
-  response="Q_Occurred",
-  response_type="occurrence",
-  analysis_name="Runoff occurrence",
-  file_prefix="Occurrence"
-)
+if(Refresh_only){
+  load_final_models <- function(file_prefix){
+    model_list <- lapply(
+      Season_levels,
+      function(season){
+        readRDS(
+          file.path(
+            Model_path,
+            paste0(file_prefix,"_Full_",season,".rds")
+          )
+        )
+      }
+    )
+    names(model_list) <- Season_levels
+    list(Models=model_list)
+  }
 
-RC_final <- fit_final_models(
-  RC_results,
-  response="log_RC",
-  response_type="continuous",
-  analysis_name="Runoff coefficient",
-  file_prefix="RC"
-)
+  Occurrence_final <- load_final_models("Occurrence")
+  RC_final <- load_final_models("RC")
+  Final_coefficients <- read.csv(
+    file.path(Table_path,"Final_full_model_coefficients.csv"),
+    stringsAsFactors=FALSE,
+    check.names=FALSE
+  )
+  Final_specifications <- read.csv(
+    file.path(Table_path,"Final_full_model_specifications.csv"),
+    stringsAsFactors=FALSE,
+    check.names=FALSE
+  )
+}else{
+  Occurrence_final <- fit_final_models(
+    Occurrence_results,
+    response="Q_Occurred",
+    response_type="occurrence",
+    analysis_name="Runoff occurrence",
+    file_prefix="Occurrence"
+  )
 
-Final_coefficients <- bind_rows(
-  Occurrence_final$Coefficients,
-  RC_final$Coefficients
-)
-Final_specifications <- bind_rows(
-  Occurrence_final$Specifications,
-  RC_final$Specifications
-)
+  RC_final <- fit_final_models(
+    RC_results,
+    response="log_RC",
+    response_type="continuous",
+    analysis_name="Runoff coefficient",
+    file_prefix="RC"
+  )
 
-write.csv(
-  Final_coefficients,
-  file.path(Table_path,"Final_full_model_coefficients.csv"),
-  row.names=FALSE,
-  na=""
-)
-write.csv(
-  Final_specifications,
-  file.path(Table_path,"Final_full_model_specifications.csv"),
-  row.names=FALSE,
-  na=""
-)
+  Final_coefficients <- bind_rows(
+    Occurrence_final$Coefficients,
+    RC_final$Coefficients
+  )
+  Final_specifications <- bind_rows(
+    Occurrence_final$Specifications,
+    RC_final$Specifications
+  )
+
+  write.csv(
+    Final_coefficients,
+    file.path(Table_path,"Final_full_model_coefficients.csv"),
+    row.names=FALSE,
+    na=""
+  )
+  write.csv(
+    Final_specifications,
+    file.path(Table_path,"Final_full_model_specifications.csv"),
+    row.names=FALSE,
+    na=""
+  )
+}
 
 Singular_diagnostic <- bind_rows(
   Occurrence_results$Metrics_Long %>%
@@ -909,27 +982,44 @@ drop_one_figure <- function(results){
       )
     )
   
-  variable_order <- plot_df %>%
-    group_by(Variable_Label) %>%
-    summarise(
-      Importance=mean(Mean_Delta_AIC,na.rm=TRUE),
-      .groups="drop"
+  delta_aic_order <- plot_df %>%
+    arrange(Season,Mean_Delta_AIC) %>%
+    transmute(
+      Variable_Season=paste(
+        Variable_Label,
+        Season,
+        sep="___"
+      )
     ) %>%
-    arrange(Importance) %>%
-    pull(Variable_Label)
+    pull(Variable_Season)
+
+  chisq_order <- plot_df %>%
+    arrange(Season,Mean_Chisq) %>%
+    transmute(
+      Variable_Season=paste(
+        Variable_Label,
+        Season,
+        sep="___"
+      )
+    ) %>%
+    pull(Variable_Season)
   
   plot_df <- plot_df %>%
     mutate(
-      Variable_Label=factor(
-        Variable_Label,
-        levels=variable_order
+      Variable_Season_Delta_AIC=factor(
+        paste(Variable_Label,Season,sep="___"),
+        levels=unique(delta_aic_order)
+      ),
+      Variable_Season_Chisq=factor(
+        paste(Variable_Label,Season,sep="___"),
+        levels=unique(chisq_order)
       )
     )
   
   delta_aic_plot <- ggplot(
     plot_df,
     aes(
-      Variable_Label,
+      Variable_Season_Delta_AIC,
       Mean_Delta_AIC,
       fill=Variable_Group
     )
@@ -945,6 +1035,9 @@ drop_one_figure <- function(results){
     geom_hline(yintercept=0,linetype="dashed") +
     coord_flip() +
     facet_wrap(~Season,nrow=1,scales="free_y") +
+    scale_x_discrete(
+      labels=function(x) sub("___.*$","",x)
+    ) +
     scale_fill_manual(values=Variable_group_colors) +
     labs(
       x=NULL,
@@ -957,7 +1050,7 @@ drop_one_figure <- function(results){
   chisq_plot <- ggplot(
     plot_df,
     aes(
-      Variable_Label,
+      Variable_Season_Chisq,
       Mean_Chisq,
       fill=Variable_Group
     )
@@ -982,6 +1075,9 @@ drop_one_figure <- function(results){
     ) +
     coord_flip() +
     facet_wrap(~Season,nrow=1,scales="free_y") +
+    scale_x_discrete(
+      labels=function(x) sub("___.*$","",x)
+    ) +
     scale_fill_manual(values=Variable_group_colors) +
     scale_y_continuous(expand=expansion(mult=c(0,0.25))) +
     labs(

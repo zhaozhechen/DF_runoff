@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.7.27
+# Update Date: 2026.7.31
 
 # This code makes exploratory figures and summary statistics
 # for the Discovery Farms surface-runoff monitoring sites
@@ -67,8 +67,17 @@ Obsolete_figure_paths <- as.vector(
 
 unlink(Obsolete_figure_paths)
 
-# Reproducible bootstrap intervals and jitter
+# Reproducible jitter
 set.seed(1)
+
+sd_or_zero <- function(x){
+  x <- x[is.finite(x)]
+  if(length(x) > 1){
+    stats::sd(x)
+  }else{
+    0
+  }
+}
 
 # ------- Data import ---------
 DF_site_info <- read.csv(
@@ -252,77 +261,44 @@ Site_summary <- Site_year_summary %>%
   group_by(Field_Name) %>%
   summarise(
     Monitoring_Years=n(),
-    P_Event_CI=list(bootstrap_mean_ci(P_Event_Number)),
-    Precipitation_CI=list(
-      bootstrap_mean_ci(Precipitation_mm)
-    ),
-    Q_Event_CI=list(bootstrap_mean_ci(Q_Event_Number)),
-    Runoff_CI=list(bootstrap_mean_ci(Runoff_mm)),
+    Mean_Annual_P_Events=mean(P_Event_Number),
+    SD_Annual_P_Events=sd_or_zero(P_Event_Number),
+    Mean_Annual_Precipitation_mm=mean(Precipitation_mm),
+    SD_Annual_Precipitation_mm=sd_or_zero(Precipitation_mm),
+    Mean_Annual_Q_Events=mean(Q_Event_Number),
+    SD_Annual_Q_Events=sd_or_zero(Q_Event_Number),
+    Mean_Annual_Runoff_mm=mean(Runoff_mm),
+    SD_Annual_Runoff_mm=sd_or_zero(Runoff_mm),
     .groups="drop"
   ) %>%
   mutate(
-    Mean_Annual_P_Events=vapply(
-      P_Event_CI,
-      function(x) x[["mean"]],
-      numeric(1)
+    Annual_P_Events_Lower=pmax(
+      0,
+      Mean_Annual_P_Events-SD_Annual_P_Events
     ),
-    Annual_P_Events_Lower=vapply(
-      P_Event_CI,
-      function(x) x[["lower"]],
-      numeric(1)
+    Annual_P_Events_Upper=
+      Mean_Annual_P_Events+SD_Annual_P_Events,
+    Annual_Precipitation_Lower=pmax(
+      0,
+      Mean_Annual_Precipitation_mm-
+        SD_Annual_Precipitation_mm
     ),
-    Annual_P_Events_Upper=vapply(
-      P_Event_CI,
-      function(x) x[["upper"]],
-      numeric(1)
+    Annual_Precipitation_Upper=
+      Mean_Annual_Precipitation_mm+
+        SD_Annual_Precipitation_mm,
+    Annual_Q_Events_Lower=pmax(
+      0,
+      Mean_Annual_Q_Events-SD_Annual_Q_Events
     ),
-    Mean_Annual_Precipitation_mm=vapply(
-      Precipitation_CI,
-      function(x) x[["mean"]],
-      numeric(1)
+    Annual_Q_Events_Upper=
+      Mean_Annual_Q_Events+SD_Annual_Q_Events,
+    Annual_Runoff_Lower=pmax(
+      0,
+      Mean_Annual_Runoff_mm-SD_Annual_Runoff_mm
     ),
-    Annual_Precipitation_Lower=vapply(
-      Precipitation_CI,
-      function(x) x[["lower"]],
-      numeric(1)
-    ),
-    Annual_Precipitation_Upper=vapply(
-      Precipitation_CI,
-      function(x) x[["upper"]],
-      numeric(1)
-    ),
-    Mean_Annual_Q_Events=vapply(
-      Q_Event_CI,
-      function(x) x[["mean"]],
-      numeric(1)
-    ),
-    Annual_Q_Events_Lower=vapply(
-      Q_Event_CI,
-      function(x) x[["lower"]],
-      numeric(1)
-    ),
-    Annual_Q_Events_Upper=vapply(
-      Q_Event_CI,
-      function(x) x[["upper"]],
-      numeric(1)
-    ),
-    Mean_Annual_Runoff_mm=vapply(
-      Runoff_CI,
-      function(x) x[["mean"]],
-      numeric(1)
-    ),
-    Annual_Runoff_Lower=vapply(
-      Runoff_CI,
-      function(x) x[["lower"]],
-      numeric(1)
-    ),
-    Annual_Runoff_Upper=vapply(
-      Runoff_CI,
-      function(x) x[["upper"]],
-      numeric(1)
-    )
+    Annual_Runoff_Upper=
+      Mean_Annual_Runoff_mm+SD_Annual_Runoff_mm
   ) %>%
-  select(-ends_with("_CI")) %>%
   left_join(DF_site_info,by="Field_Name")
 
 # Step 2. Site-level management summaries ====================
@@ -390,42 +366,35 @@ Monthly_year_summary <- Site_month_summary %>%
 Monthly_climatology <- Monthly_year_summary %>%
   group_by(Month_Number,Month) %>%
   summarise(
-    P_Event_CI=list(bootstrap_mean_ci(Mean_P_Events_per_Site)),
-    Precipitation_CI=list(
-      bootstrap_mean_ci(Mean_Precipitation_mm_per_Site)
+    Mean_P_Events=mean(Mean_P_Events_per_Site),
+    SD_P_Events=sd_or_zero(Mean_P_Events_per_Site),
+    Mean_Precipitation_mm=mean(
+      Mean_Precipitation_mm_per_Site
     ),
-    Q_Event_CI=list(bootstrap_mean_ci(Mean_Q_Events_per_Site)),
-    Runoff_CI=list(bootstrap_mean_ci(Mean_Runoff_mm_per_Site)),
+    SD_Precipitation_mm=sd_or_zero(
+      Mean_Precipitation_mm_per_Site
+    ),
+    Mean_Q_Events=mean(Mean_Q_Events_per_Site),
+    SD_Q_Events=sd_or_zero(Mean_Q_Events_per_Site),
+    Mean_Runoff_mm=mean(Mean_Runoff_mm_per_Site),
+    SD_Runoff_mm=sd_or_zero(Mean_Runoff_mm_per_Site),
+    Years=n(),
     .groups="drop"
   ) %>%
   mutate(
-    Mean_P_Events=vapply(P_Event_CI,function(x) x[["mean"]],numeric(1)),
-    P_Event_Lower=vapply(P_Event_CI,function(x) x[["lower"]],numeric(1)),
-    P_Event_Upper=vapply(P_Event_CI,function(x) x[["upper"]],numeric(1)),
-    Mean_Precipitation_mm=vapply(
-      Precipitation_CI,
-      function(x) x[["mean"]],
-      numeric(1)
+    P_Event_Lower=pmax(0,Mean_P_Events-SD_P_Events),
+    P_Event_Upper=Mean_P_Events+SD_P_Events,
+    Precipitation_Lower=pmax(
+      0,
+      Mean_Precipitation_mm-SD_Precipitation_mm
     ),
-    Precipitation_Lower=vapply(
-      Precipitation_CI,
-      function(x) x[["lower"]],
-      numeric(1)
-    ),
-    Precipitation_Upper=vapply(
-      Precipitation_CI,
-      function(x) x[["upper"]],
-      numeric(1)
-    ),
-    Mean_Q_Events=vapply(Q_Event_CI,function(x) x[["mean"]],numeric(1)),
-    Q_Event_Lower=vapply(Q_Event_CI,function(x) x[["lower"]],numeric(1)),
-    Q_Event_Upper=vapply(Q_Event_CI,function(x) x[["upper"]],numeric(1)),
-    Mean_Runoff_mm=vapply(Runoff_CI,function(x) x[["mean"]],numeric(1)),
-    Runoff_Lower=vapply(Runoff_CI,function(x) x[["lower"]],numeric(1)),
-    Runoff_Upper=vapply(Runoff_CI,function(x) x[["upper"]],numeric(1)),
-    Years=vapply(Runoff_CI,function(x) x[["n"]],numeric(1))
+    Precipitation_Upper=
+      Mean_Precipitation_mm+SD_Precipitation_mm,
+    Q_Event_Lower=pmax(0,Mean_Q_Events-SD_Q_Events),
+    Q_Event_Upper=Mean_Q_Events+SD_Q_Events,
+    Runoff_Lower=pmax(0,Mean_Runoff_mm-SD_Runoff_mm),
+    Runoff_Upper=Mean_Runoff_mm+SD_Runoff_mm
   ) %>%
-  select(-ends_with("_CI")) %>%
   arrange(Month_Number)
 
 # Step 4. Runoff-coefficient summaries ========================
@@ -891,6 +860,17 @@ Site_order <- Site_summary %>%
 Site_plot_df <- Site_summary %>%
   mutate(Field_Name=factor(Field_Name,levels=Site_order))
 
+Site_event_ymax <- 1.05*max(
+  Site_plot_df$Annual_P_Events_Upper,
+  Site_plot_df$Annual_Q_Events_Upper,
+  na.rm=TRUE
+)
+Site_depth_ymax <- 1.05*max(
+  Site_plot_df$Annual_Precipitation_Upper,
+  Site_plot_df$Annual_Runoff_Upper,
+  na.rm=TRUE
+)
+
 Site_bar_theme <- DF_plot_theme +
   theme(axis.text.x=element_text(angle=55,hjust=1))
 
@@ -918,6 +898,7 @@ Bar_p_events <- ggplot(
     y="Mean annual event number",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_event_ymax)) +
   Site_bar_theme
 
 Bar_q_events <- ggplot(
@@ -944,6 +925,7 @@ Bar_q_events <- ggplot(
     y="Mean annual event number",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_event_ymax)) +
   Site_bar_theme
 
 Bar_p_depth <- ggplot(
@@ -970,6 +952,7 @@ Bar_p_depth <- ggplot(
     y="Mean annual depth (mm)",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_depth_ymax)) +
   Site_bar_theme
 
 Bar_q_depth <- ggplot(
@@ -996,6 +979,7 @@ Bar_q_depth <- ggplot(
     y="Mean annual depth (mm)",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_depth_ymax)) +
   Site_bar_theme
 
 Figure_site_bars <- (
@@ -1012,7 +996,26 @@ save_figure_pair(
 )
 
 # Step 8. Monthly bar plots with uncertainty ==================
-Monthly_bar <- function(df,y,ymin,ymax,title,y_title,fill_color){
+Monthly_event_ymax <- 1.05*max(
+  Monthly_climatology$P_Event_Upper,
+  Monthly_climatology$Q_Event_Upper,
+  na.rm=TRUE
+)
+Monthly_depth_ymax <- 1.05*max(
+  Monthly_climatology$Precipitation_Upper,
+  Monthly_climatology$Runoff_Upper,
+  na.rm=TRUE
+)
+
+Monthly_bar <- function(
+    df,
+    y,
+    ymin,
+    ymax,
+    title,
+    y_title,
+    fill_color,
+    y_limit){
   ggplot(
     df,
     aes(
@@ -1024,6 +1027,7 @@ Monthly_bar <- function(df,y,ymin,ymax,title,y_title,fill_color){
   ) +
     geom_col(fill=fill_color,color="black") +
     geom_errorbar(width=0.2,linewidth=0.5) +
+    scale_y_continuous(limits=c(0,y_limit)) +
     labs(title=title,x=NULL,y=y_title) +
     DF_plot_theme
 }
@@ -1035,7 +1039,8 @@ Monthly_p_events <- Monthly_bar(
   "P_Event_Upper",
   "A. Precipitation-event number",
   "Mean monthly events per site",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_event_ymax
 )
 
 Monthly_q_events <- Monthly_bar(
@@ -1045,7 +1050,8 @@ Monthly_q_events <- Monthly_bar(
   "Q_Event_Upper",
   "B. Runoff-event number",
   "Mean monthly events per site",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_event_ymax
 )
 
 Monthly_p_depth <- Monthly_bar(
@@ -1055,7 +1061,8 @@ Monthly_p_depth <- Monthly_bar(
   "Precipitation_Upper",
   "C. Precipitation depth",
   "Mean monthly total per site (mm)",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_depth_ymax
 )
 
 Monthly_q_depth <- Monthly_bar(
@@ -1065,7 +1072,8 @@ Monthly_q_depth <- Monthly_bar(
   "Runoff_Upper",
   "D. Runoff depth",
   "Mean monthly total per site (mm)",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_depth_ymax
 )
 
 Figure_monthly_bars <- (
@@ -1076,7 +1084,7 @@ Figure_monthly_bars <- (
 ) +
   plot_layout(ncol=2) +
   plot_annotation(
-    subtitle="Error bars are bootstrap 95% confidence intervals across calendar years"
+    subtitle="Error bars show one standard deviation across calendar years"
   )
 
 save_figure_pair(
@@ -1087,7 +1095,24 @@ save_figure_pair(
 )
 
 # Step 9. Monthly boxplots across years =======================
-Monthly_box <- function(df,y,title,y_title,fill_color){
+Monthly_box_event_ymax <- 1.05*max(
+  Monthly_year_summary$Mean_P_Events_per_Site,
+  Monthly_year_summary$Mean_Q_Events_per_Site,
+  na.rm=TRUE
+)
+Monthly_box_depth_ymax <- 1.05*max(
+  Monthly_year_summary$Mean_Precipitation_mm_per_Site,
+  Monthly_year_summary$Mean_Runoff_mm_per_Site,
+  na.rm=TRUE
+)
+
+Monthly_box <- function(
+    df,
+    y,
+    title,
+    y_title,
+    fill_color,
+    y_limit){
   ggplot(df,aes(Month,.data[[y]])) +
     geom_half_violin(
       side="l",
@@ -1111,6 +1136,7 @@ Monthly_box <- function(df,y,title,y_title,fill_color){
       alpha=0.65,
       color=fill_color
     ) +
+    coord_cartesian(ylim=c(0,y_limit)) +
     labs(title=title,x=NULL,y=y_title) +
     DF_plot_theme
 }
@@ -1120,7 +1146,8 @@ Box_p_events <- Monthly_box(
   "Mean_P_Events_per_Site",
   "A. Precipitation-event number",
   "Monthly events per monitored site",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_box_event_ymax
 )
 
 Box_q_events <- Monthly_box(
@@ -1128,7 +1155,8 @@ Box_q_events <- Monthly_box(
   "Mean_Q_Events_per_Site",
   "B. Runoff-event number",
   "Monthly events per monitored site",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_box_event_ymax
 )
 
 Box_p_depth <- Monthly_box(
@@ -1136,7 +1164,8 @@ Box_p_depth <- Monthly_box(
   "Mean_Precipitation_mm_per_Site",
   "C. Precipitation depth",
   "Monthly total per monitored site (mm)",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_box_depth_ymax
 )
 
 Box_q_depth <- Monthly_box(
@@ -1144,7 +1173,8 @@ Box_q_depth <- Monthly_box(
   "Mean_Runoff_mm_per_Site",
   "D. Runoff depth",
   "Monthly total per monitored site (mm)",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_box_depth_ymax
 )
 
 Figure_monthly_boxes <- (
@@ -1828,47 +1858,34 @@ summarize_freeze_monthly <- function(event_df){
     ) %>%
     group_by(Month_Number,Month,Frozen_Status) %>%
     summarise(
-      Event_CI=list(bootstrap_mean_ci(Events_per_Site)),
-      Depth_CI=list(bootstrap_mean_ci(Depth_per_Site_mm)),
+      Mean_Events=mean(Events_per_Site),
+      SD_Events=sd_or_zero(Events_per_Site),
+      Mean_Depth_mm=mean(Depth_per_Site_mm),
+      SD_Depth_mm=sd_or_zero(Depth_per_Site_mm),
+      Years=n(),
       .groups="drop"
     ) %>%
     mutate(
-      Mean_Events=vapply(
-        Event_CI,
-        function(x) x[["mean"]],
-        numeric(1)
-      ),
-      Event_Lower=vapply(
-        Event_CI,
-        function(x) x[["lower"]],
-        numeric(1)
-      ),
-      Event_Upper=vapply(
-        Event_CI,
-        function(x) x[["upper"]],
-        numeric(1)
-      ),
-      Mean_Depth_mm=vapply(
-        Depth_CI,
-        function(x) x[["mean"]],
-        numeric(1)
-      ),
-      Depth_Lower=vapply(
-        Depth_CI,
-        function(x) x[["lower"]],
-        numeric(1)
-      ),
-      Depth_Upper=vapply(
-        Depth_CI,
-        function(x) x[["upper"]],
-        numeric(1)
-      )
-    ) %>%
-    select(-ends_with("_CI"))
+      Event_Lower=pmax(0,Mean_Events-SD_Events),
+      Event_Upper=Mean_Events+SD_Events,
+      Depth_Lower=pmax(0,Mean_Depth_mm-SD_Depth_mm),
+      Depth_Upper=Mean_Depth_mm+SD_Depth_mm
+    )
 }
 
 P_freeze_monthly <- summarize_freeze_monthly(P_freeze_event)
 Q_freeze_monthly <- summarize_freeze_monthly(Q_freeze_event)
+
+Freeze_event_ymax <- 1.05*max(
+  P_freeze_monthly$Event_Upper,
+  Q_freeze_monthly$Event_Upper,
+  na.rm=TRUE
+)
+Freeze_depth_ymax <- 1.05*max(
+  P_freeze_monthly$Depth_Upper,
+  Q_freeze_monthly$Depth_Upper,
+  na.rm=TRUE
+)
 
 Freeze_bar <- function(
     df,
@@ -1876,7 +1893,8 @@ Freeze_bar <- function(
     ymin,
     ymax,
     title,
-    y_title){
+    y_title,
+    y_limit){
   dodge <- position_dodge(width=0.8)
 
   ggplot(
@@ -1900,6 +1918,7 @@ Freeze_bar <- function(
       linewidth=0.5
     ) +
     scale_fill_manual(values=DF_frozen_colors) +
+    scale_y_continuous(limits=c(0,y_limit)) +
     labs(
       title=title,
       x=NULL,
@@ -1917,7 +1936,8 @@ Figure_frozen <- (
     "Event_Lower",
     "Event_Upper",
     "A. Precipitation-event number",
-    "Mean monthly events per site"
+    "Mean monthly events per site",
+    Freeze_event_ymax
   ) +
     Freeze_bar(
       Q_freeze_monthly,
@@ -1925,7 +1945,8 @@ Figure_frozen <- (
       "Event_Lower",
       "Event_Upper",
       "B. Runoff-event number",
-      "Mean monthly events per site"
+      "Mean monthly events per site",
+      Freeze_event_ymax
     ) +
     Freeze_bar(
       P_freeze_monthly,
@@ -1933,7 +1954,8 @@ Figure_frozen <- (
       "Depth_Lower",
       "Depth_Upper",
       "C. Precipitation depth",
-      "Mean monthly total per site (mm)"
+      "Mean monthly total per site (mm)",
+      Freeze_depth_ymax
     ) +
     Freeze_bar(
       Q_freeze_monthly,
@@ -1941,7 +1963,8 @@ Figure_frozen <- (
       "Depth_Lower",
       "Depth_Upper",
       "D. Runoff depth",
-      "Mean monthly total per site (mm)"
+      "Mean monthly total per site (mm)",
+      Freeze_depth_ymax
     )
 ) +
   plot_layout(ncol=2,guides="collect") &
@@ -2023,6 +2046,8 @@ Data_summary_table <- data.frame(
     "Complete site-monitoring years",
     "All precipitation events",
     "All storm-associated runoff events",
+    "Non-frozne precipitation events",
+    "Non-frozen storm-associated runoff events",
     "Non-frozen runoff events used for runoff coefficients",
     "Mean annual non-frozen runoff event number contribution (%)",
     "Mean annual non-frozen runoff depth contribution (%)",
@@ -2034,6 +2059,8 @@ Data_summary_table <- data.frame(
     round(sum(Site_summary$Monitoring_Years),1),
     nrow(P_df),
     nrow(Q_df),
+    sum(P_df$P_frozen == FALSE),
+    sum(Q_df$frozen == "Non-Frozen"),
     nrow(Q_nonfrozen),
     mean(
       Annual_nonfrozen_share$NonFrozen_Q_Event_Percent,
@@ -2156,21 +2183,21 @@ Report_body <- c(
   "<p>Annual site summaries use only calendar years containing all 12 monitored months. Partial first and last monitoring years are retained in the site-year CSV with a completeness flag but are excluded from annual means.</p>",
   embedded_figure_html(
     file.path(Figure_path,"02_Site_event_and_depth_bars.png"),
-    "Figure 2. Mean annual precipitation-event number, runoff-event number, precipitation depth, and surface-runoff depth by site. Error bars are bootstrap 95% confidence intervals across complete monitoring years."
+    "Figure 2. Mean annual precipitation-event number, runoff-event number, precipitation depth, and surface-runoff depth by site. Error bars show one standard deviation across complete monitoring years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   "<h2>Monthly climatology and variation among years</h2>",
   "<p>Monthly totals are first calculated for each monitored site-month. They are then averaged within calendar year and summarized across years.</p>",
   embedded_figure_html(
     file.path(Figure_path,"03_Monthly_event_and_depth_bars.png"),
-    "Figure 3. Average monthly event numbers and depths with bootstrap 95% confidence intervals across years."
+    "Figure 3. Average monthly event numbers and depths with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   embedded_figure_html(
     file.path(Figure_path,"04_Monthly_variation_across_years.png"),
-    "Figure 4. Variation in monthly event numbers and depths."
+    "Figure 4. Variation in monthly event numbers and depths. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   embedded_figure_html(
     file.path(Figure_path,"07_Frozen_nonfrozen_monthly_patterns.png"),
-    "Figure 5. Average monthly event numbers and depths grouped by frozen and non-frozen soil conditions, with bootstrap 95% confidence intervals across years."
+    "Figure 5. Average monthly event numbers and depths grouped by frozen and non-frozen soil conditions, with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   "<h3>Monthly summary statistics</h3>",
   data_frame_to_html(Monthly_report_table,digits=2),

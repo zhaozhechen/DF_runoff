@@ -2,9 +2,8 @@
 # Update Date: 2026.7.30
 
 # This code runs the same mixed-effects workflow for:
-# 1. Frozen soil conditions
-# 2. Non-frozen soil conditions
-# 3. All frozen and non-frozen events combined
+# 1. Non-frozen soil conditions
+# 2. All frozen and non-frozen events combined
 
 Project_path <- normalizePath(
   getwd(),
@@ -34,6 +33,7 @@ Rscript_path <- file.path(
   }
 )
 
+# Number of bootstrapping for Q occurence
 Occurrence_replications <- Sys.getenv(
   "DF_OCCURRENCE_REPLICATIONS",
   "50"
@@ -43,7 +43,7 @@ RC_replications <- Sys.getenv(
   "200"
 )
 
-for(dataset_key in c("Frozen","NonFrozen","All")){
+for(dataset_key in c("NonFrozen","All")){
   message(
     "Starting mixed-effects models: ",
     dataset_key
@@ -69,4 +69,4 @@ for(dataset_key in c("Frozen","NonFrozen","All")){
   }
 }
 
-message("All three mixed-effects datasets are complete.")
+message("Both mixed-effects datasets are complete.")
