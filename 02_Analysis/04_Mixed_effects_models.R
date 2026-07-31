@@ -1361,7 +1361,7 @@ Model_variable_table <- data.frame(
     paste0(
       "Natural log of the event runoff coefficient under ",
       tolower(Dataset_labels[[Dataset_key]]),
-      " (Gaussian mixed model)"
+      " (linear mixed-effects model)"
     ),
     "Log I30, log event duration, and log seven-day antecedent rainfall",
     "Seasonal tillage passes and continuous seasonal perennial crop fraction",
@@ -1501,17 +1501,14 @@ Report_body <- c(
     file.path(Figure_path,"08_RC_marginal_effects.png"),
     "Figure 8. Marginal effects from the final seasonal runoff-coefficient models."
   ),
-  "<h2>Model diagnostics</h2>",
-  "<h3>Singular-fit diagnostic</h3>",
-  "<p>A singular fit indicates that the site random-intercept variance was estimated at the boundary. Conditional R-squared is left missing when the random-effect variance cannot be estimated.</p>",
-  data_frame_to_html(Singular_diagnostic,digits=1),
   "<h2>Full-model performance summary</h2>",
+  "<p>Replications is the number of non-missing estimates available for each metric, not the number of model fits attempted. RMSE, AUC, and marginal R-squared can remain available when the site random-effect variance is estimated at the boundary. Conditional R-squared and the derived random-effect R-squared are unavailable for those fits, so their replication counts can be smaller.</p>",
   data_frame_to_html(Full_metric_report,digits=3),
   "<h2>Variables with the largest drop-one Delta AIC</h2>",
   "<p>Positive Delta AIC indicates that removing the variable reduced model support. The table lists the three largest mean values within each response and season.</p>",
   data_frame_to_html(Most_important_variables,digits=2),
   "<h2>Final full-model coefficients</h2>",
-  "<p>Continuous-predictor coefficients are standardized. Binomial-model p-values are Wald tests; Gaussian mixed-model coefficient tables do not report p-values.</p>",
+  "<p>Continuous-predictor coefficients are standardized. Binomial-model p-values are Wald tests. The linear mixed-effects models report estimates, standard errors, and t statistics; p-values are left blank because lme4::lmer does not assign denominator degrees of freedom or calculate default coefficient p-values.</p>",
   data_frame_to_html(Final_coefficients,digits=4),
   "<h2>Output files</h2>",
   "<p>All figures are saved as PNG and PDF files. Bootstrap results, model summaries, specifications, and coefficients are saved as CSV files. Final fitted seasonal models are saved as RDS files.</p>"
