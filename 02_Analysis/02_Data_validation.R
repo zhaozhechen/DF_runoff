@@ -95,15 +95,21 @@ stopifnot(
 
 # Step 4. Validate seasonal management definitions ============
 P_tillage_expected <- case_when(
-  P_df$Season == "Fall" ~ P_df$Tillage_Summer_Previous + P_df$Tillage_Fall,
-  P_df$Season == "Spring" ~ P_df$Tillage_Fall + P_df$Tillage_Spring,
-  P_df$Season == "Summer" ~ P_df$Tillage_Spring + P_df$Tillage_Summer
+  P_df$Season == "Post-growing season" ~
+    P_df$Tillage_Summer_Previous + P_df$Tillage_Fall,
+  P_df$Season == "Pre-growing season" ~
+    P_df$Tillage_Fall + P_df$Tillage_Spring,
+  P_df$Season == "Growing season" ~
+    P_df$Tillage_Spring + P_df$Tillage_Summer
 )
 
 Q_tillage_expected <- case_when(
-  Q_df$Season == "Fall" ~ Q_df$Tillage_Summer_Previous + Q_df$Tillage_Fall,
-  Q_df$Season == "Spring" ~ Q_df$Tillage_Fall + Q_df$Tillage_Spring,
-  Q_df$Season == "Summer" ~ Q_df$Tillage_Spring + Q_df$Tillage_Summer
+  Q_df$Season == "Post-growing season" ~
+    Q_df$Tillage_Summer_Previous + Q_df$Tillage_Fall,
+  Q_df$Season == "Pre-growing season" ~
+    Q_df$Tillage_Fall + Q_df$Tillage_Spring,
+  Q_df$Season == "Growing season" ~
+    Q_df$Tillage_Spring + Q_df$Tillage_Summer
 )
 
 stopifnot(
@@ -116,12 +122,32 @@ stopifnot(
       Tillage_field$Tillage_Summer,
     check.attributes=FALSE
   ),
-  all(is.na(P_df$Residue_Frac[P_df$Season == "Summer"])),
-  all(is.na(Q_df$Residue_Frac[Q_df$Season == "Summer"])),
-  all(P_df$Crop_Source[P_df$Season %in% c("Fall","Spring")] == "Previous crop"),
-  all(Q_df$Crop_Source[Q_df$Season %in% c("Fall","Spring")] == "Previous crop"),
-  all(P_df$Crop_Source[P_df$Season == "Summer"] == "Current crop"),
-  all(Q_df$Crop_Source[Q_df$Season == "Summer"] == "Current crop")
+  all(is.na(P_df$Residue_Frac[P_df$Season == "Growing season"])),
+  all(is.na(Q_df$Residue_Frac[Q_df$Season == "Growing season"])),
+  all(
+    P_df$Crop_Source[
+      P_df$Season %in% c(
+        "Post-growing season",
+        "Pre-growing season"
+      )
+    ] == "Previous crop"
+  ),
+  all(
+    Q_df$Crop_Source[
+      Q_df$Season %in% c(
+        "Post-growing season",
+        "Pre-growing season"
+      )
+    ] == "Previous crop"
+  ),
+  all(
+    P_df$Crop_Source[P_df$Season == "Growing season"] ==
+      "Current crop"
+  ),
+  all(
+    Q_df$Crop_Source[Q_df$Season == "Growing season"] ==
+      "Current crop"
+  )
 )
 
 # Check that each site-water-year total is the basin-weighted sum of fields

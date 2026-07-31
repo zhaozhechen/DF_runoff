@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.7.27
+# Update Date: 2026.7.31
 
 # This code makes exploratory figures and summary statistics
 # for the Discovery Farms surface-runoff monitoring sites
@@ -67,8 +67,17 @@ Obsolete_figure_paths <- as.vector(
 
 unlink(Obsolete_figure_paths)
 
-# Reproducible bootstrap intervals and jitter
+# Reproducible jitter
 set.seed(1)
+
+sd_or_zero <- function(x){
+  x <- x[is.finite(x)]
+  if(length(x) > 1){
+    stats::sd(x)
+  }else{
+    0
+  }
+}
 
 # ------- Data import ---------
 DF_site_info <- read.csv(
@@ -98,7 +107,15 @@ P_df <- read.csv(
     Event_Date=as.Date(P_start,tz="America/Chicago"),
     Calendar_Year=year(Event_Date),
     Month_Number=month(Event_Date),
-    Month=factor(month.abb[Month_Number],levels=month.abb)
+    Month=factor(month.abb[Month_Number],levels=month.abb),
+    Season=factor(
+      Season,
+      levels=c(
+        "Pre-growing season",
+        "Growing season",
+        "Post-growing season"
+      )
+    )
   )
 
 Q_df <- read.csv(
@@ -113,6 +130,14 @@ Q_df <- read.csv(
     Calendar_Year=year(Event_Date),
     Month_Number=month(Event_Date),
     Month=factor(month.abb[Month_Number],levels=month.abb),
+    Season=factor(
+      Season,
+      levels=c(
+        "Pre-growing season",
+        "Growing season",
+        "Post-growing season"
+      )
+    ),
     Runoff_Coefficient=if_else(
       rain_mm > 0,
       runoff_mm/rain_mm,
@@ -237,10 +262,42 @@ Site_summary <- Site_year_summary %>%
   summarise(
     Monitoring_Years=n(),
     Mean_Annual_P_Events=mean(P_Event_Number),
+    SD_Annual_P_Events=sd_or_zero(P_Event_Number),
     Mean_Annual_Precipitation_mm=mean(Precipitation_mm),
+    SD_Annual_Precipitation_mm=sd_or_zero(Precipitation_mm),
     Mean_Annual_Q_Events=mean(Q_Event_Number),
+    SD_Annual_Q_Events=sd_or_zero(Q_Event_Number),
     Mean_Annual_Runoff_mm=mean(Runoff_mm),
+    SD_Annual_Runoff_mm=sd_or_zero(Runoff_mm),
     .groups="drop"
+  ) %>%
+  mutate(
+    Annual_P_Events_Lower=pmax(
+      0,
+      Mean_Annual_P_Events-SD_Annual_P_Events
+    ),
+    Annual_P_Events_Upper=
+      Mean_Annual_P_Events+SD_Annual_P_Events,
+    Annual_Precipitation_Lower=pmax(
+      0,
+      Mean_Annual_Precipitation_mm-
+        SD_Annual_Precipitation_mm
+    ),
+    Annual_Precipitation_Upper=
+      Mean_Annual_Precipitation_mm+
+        SD_Annual_Precipitation_mm,
+    Annual_Q_Events_Lower=pmax(
+      0,
+      Mean_Annual_Q_Events-SD_Annual_Q_Events
+    ),
+    Annual_Q_Events_Upper=
+      Mean_Annual_Q_Events+SD_Annual_Q_Events,
+    Annual_Runoff_Lower=pmax(
+      0,
+      Mean_Annual_Runoff_mm-SD_Annual_Runoff_mm
+    ),
+    Annual_Runoff_Upper=
+      Mean_Annual_Runoff_mm+SD_Annual_Runoff_mm
   ) %>%
   left_join(DF_site_info,by="Field_Name")
 
@@ -309,42 +366,35 @@ Monthly_year_summary <- Site_month_summary %>%
 Monthly_climatology <- Monthly_year_summary %>%
   group_by(Month_Number,Month) %>%
   summarise(
-    P_Event_CI=list(bootstrap_mean_ci(Mean_P_Events_per_Site)),
-    Precipitation_CI=list(
-      bootstrap_mean_ci(Mean_Precipitation_mm_per_Site)
+    Mean_P_Events=mean(Mean_P_Events_per_Site),
+    SD_P_Events=sd_or_zero(Mean_P_Events_per_Site),
+    Mean_Precipitation_mm=mean(
+      Mean_Precipitation_mm_per_Site
     ),
-    Q_Event_CI=list(bootstrap_mean_ci(Mean_Q_Events_per_Site)),
-    Runoff_CI=list(bootstrap_mean_ci(Mean_Runoff_mm_per_Site)),
+    SD_Precipitation_mm=sd_or_zero(
+      Mean_Precipitation_mm_per_Site
+    ),
+    Mean_Q_Events=mean(Mean_Q_Events_per_Site),
+    SD_Q_Events=sd_or_zero(Mean_Q_Events_per_Site),
+    Mean_Runoff_mm=mean(Mean_Runoff_mm_per_Site),
+    SD_Runoff_mm=sd_or_zero(Mean_Runoff_mm_per_Site),
+    Years=n(),
     .groups="drop"
   ) %>%
   mutate(
-    Mean_P_Events=vapply(P_Event_CI,function(x) x[["mean"]],numeric(1)),
-    P_Event_Lower=vapply(P_Event_CI,function(x) x[["lower"]],numeric(1)),
-    P_Event_Upper=vapply(P_Event_CI,function(x) x[["upper"]],numeric(1)),
-    Mean_Precipitation_mm=vapply(
-      Precipitation_CI,
-      function(x) x[["mean"]],
-      numeric(1)
+    P_Event_Lower=pmax(0,Mean_P_Events-SD_P_Events),
+    P_Event_Upper=Mean_P_Events+SD_P_Events,
+    Precipitation_Lower=pmax(
+      0,
+      Mean_Precipitation_mm-SD_Precipitation_mm
     ),
-    Precipitation_Lower=vapply(
-      Precipitation_CI,
-      function(x) x[["lower"]],
-      numeric(1)
-    ),
-    Precipitation_Upper=vapply(
-      Precipitation_CI,
-      function(x) x[["upper"]],
-      numeric(1)
-    ),
-    Mean_Q_Events=vapply(Q_Event_CI,function(x) x[["mean"]],numeric(1)),
-    Q_Event_Lower=vapply(Q_Event_CI,function(x) x[["lower"]],numeric(1)),
-    Q_Event_Upper=vapply(Q_Event_CI,function(x) x[["upper"]],numeric(1)),
-    Mean_Runoff_mm=vapply(Runoff_CI,function(x) x[["mean"]],numeric(1)),
-    Runoff_Lower=vapply(Runoff_CI,function(x) x[["lower"]],numeric(1)),
-    Runoff_Upper=vapply(Runoff_CI,function(x) x[["upper"]],numeric(1)),
-    Years=vapply(Runoff_CI,function(x) x[["n"]],numeric(1))
+    Precipitation_Upper=
+      Mean_Precipitation_mm+SD_Precipitation_mm,
+    Q_Event_Lower=pmax(0,Mean_Q_Events-SD_Q_Events),
+    Q_Event_Upper=Mean_Q_Events+SD_Q_Events,
+    Runoff_Lower=pmax(0,Mean_Runoff_mm-SD_Runoff_mm),
+    Runoff_Upper=Mean_Runoff_mm+SD_Runoff_mm
   ) %>%
-  select(-ends_with("_CI")) %>%
   arrange(Month_Number)
 
 # Step 4. Runoff-coefficient summaries ========================
@@ -414,11 +464,14 @@ RC_group_summary <- bind_rows(
     filter(
       !is.na(Residue),
       nzchar(Residue),
-      Season %in% c("Fall","Spring")
+      Season %in% c(
+        "Post-growing season",
+        "Pre-growing season"
+      )
     ) %>%
     group_by(Group=Residue) %>%
     summarise(
-      Grouping="Fall/spring residue",
+      Grouping="Pre-/post-growing-season residue",
       Events=n(),
       Median_RC=median(Runoff_Coefficient),
       Mean_RC=mean(Runoff_Coefficient),
@@ -463,8 +516,8 @@ Management_coverage <- data.frame(
     "Site-water years with crop and residue coverage less than 100%",
     "Site-water years missing basin-weighted total tillage passes",
     "Site-water years missing the current-crop perennial fraction",
-    "Site-water years missing the fall residue fraction",
-    "Site-water years missing the spring residue fraction"
+    "Site-water years missing the post-growing-season residue fraction",
+    "Site-water years missing the pre-growing-season residue fraction"
   ),
   Value=as.numeric(Management_coverage_values[1,])
 )
@@ -800,10 +853,23 @@ save_figure_pair(
 )
 
 # Step 7. Site-level bar plots ================================
-Site_order <- sort(unique(Site_summary$Field_Name))
+Site_order <- Site_summary %>%
+  arrange(Hydrologic_Group,Field_Name) %>%
+  pull(Field_Name)
 
 Site_plot_df <- Site_summary %>%
   mutate(Field_Name=factor(Field_Name,levels=Site_order))
+
+Site_event_ymax <- 1.05*max(
+  Site_plot_df$Annual_P_Events_Upper,
+  Site_plot_df$Annual_Q_Events_Upper,
+  na.rm=TRUE
+)
+Site_depth_ymax <- 1.05*max(
+  Site_plot_df$Annual_Precipitation_Upper,
+  Site_plot_df$Annual_Runoff_Upper,
+  na.rm=TRUE
+)
 
 Site_bar_theme <- DF_plot_theme +
   theme(axis.text.x=element_text(angle=55,hjust=1))
@@ -817,6 +883,14 @@ Bar_p_events <- ggplot(
   )
 ) +
   geom_col(color="black") +
+  geom_errorbar(
+    aes(
+      ymin=Annual_P_Events_Lower,
+      ymax=Annual_P_Events_Upper
+    ),
+    width=0.2,
+    linewidth=0.5
+  ) +
   scale_fill_manual(values=DF_infiltration_colors) +
   labs(
     title="A. Precipitation events",
@@ -824,6 +898,7 @@ Bar_p_events <- ggplot(
     y="Mean annual event number",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_event_ymax)) +
   Site_bar_theme
 
 Bar_q_events <- ggplot(
@@ -835,6 +910,14 @@ Bar_q_events <- ggplot(
   )
 ) +
   geom_col(color="black") +
+  geom_errorbar(
+    aes(
+      ymin=Annual_Q_Events_Lower,
+      ymax=Annual_Q_Events_Upper
+    ),
+    width=0.2,
+    linewidth=0.5
+  ) +
   scale_fill_manual(values=DF_infiltration_colors) +
   labs(
     title="B. Runoff events",
@@ -842,6 +925,7 @@ Bar_q_events <- ggplot(
     y="Mean annual event number",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_event_ymax)) +
   Site_bar_theme
 
 Bar_p_depth <- ggplot(
@@ -853,6 +937,14 @@ Bar_p_depth <- ggplot(
   )
 ) +
   geom_col(color="black") +
+  geom_errorbar(
+    aes(
+      ymin=Annual_Precipitation_Lower,
+      ymax=Annual_Precipitation_Upper
+    ),
+    width=0.2,
+    linewidth=0.5
+  ) +
   scale_fill_manual(values=DF_infiltration_colors) +
   labs(
     title="C. Precipitation depth",
@@ -860,6 +952,7 @@ Bar_p_depth <- ggplot(
     y="Mean annual depth (mm)",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_depth_ymax)) +
   Site_bar_theme
 
 Bar_q_depth <- ggplot(
@@ -871,6 +964,14 @@ Bar_q_depth <- ggplot(
   )
 ) +
   geom_col(color="black") +
+  geom_errorbar(
+    aes(
+      ymin=Annual_Runoff_Lower,
+      ymax=Annual_Runoff_Upper
+    ),
+    width=0.2,
+    linewidth=0.5
+  ) +
   scale_fill_manual(values=DF_infiltration_colors) +
   labs(
     title="D. Runoff depth",
@@ -878,6 +979,7 @@ Bar_q_depth <- ggplot(
     y="Mean annual depth (mm)",
     fill="Soil infiltration group"
   ) +
+  scale_y_continuous(limits=c(0,Site_depth_ymax)) +
   Site_bar_theme
 
 Figure_site_bars <- (
@@ -894,7 +996,26 @@ save_figure_pair(
 )
 
 # Step 8. Monthly bar plots with uncertainty ==================
-Monthly_bar <- function(df,y,ymin,ymax,title,y_title,fill_color){
+Monthly_event_ymax <- 1.05*max(
+  Monthly_climatology$P_Event_Upper,
+  Monthly_climatology$Q_Event_Upper,
+  na.rm=TRUE
+)
+Monthly_depth_ymax <- 1.05*max(
+  Monthly_climatology$Precipitation_Upper,
+  Monthly_climatology$Runoff_Upper,
+  na.rm=TRUE
+)
+
+Monthly_bar <- function(
+    df,
+    y,
+    ymin,
+    ymax,
+    title,
+    y_title,
+    fill_color,
+    y_limit){
   ggplot(
     df,
     aes(
@@ -906,6 +1027,7 @@ Monthly_bar <- function(df,y,ymin,ymax,title,y_title,fill_color){
   ) +
     geom_col(fill=fill_color,color="black") +
     geom_errorbar(width=0.2,linewidth=0.5) +
+    scale_y_continuous(limits=c(0,y_limit)) +
     labs(title=title,x=NULL,y=y_title) +
     DF_plot_theme
 }
@@ -917,7 +1039,8 @@ Monthly_p_events <- Monthly_bar(
   "P_Event_Upper",
   "A. Precipitation-event number",
   "Mean monthly events per site",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_event_ymax
 )
 
 Monthly_q_events <- Monthly_bar(
@@ -927,7 +1050,8 @@ Monthly_q_events <- Monthly_bar(
   "Q_Event_Upper",
   "B. Runoff-event number",
   "Mean monthly events per site",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_event_ymax
 )
 
 Monthly_p_depth <- Monthly_bar(
@@ -937,7 +1061,8 @@ Monthly_p_depth <- Monthly_bar(
   "Precipitation_Upper",
   "C. Precipitation depth",
   "Mean monthly total per site (mm)",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_depth_ymax
 )
 
 Monthly_q_depth <- Monthly_bar(
@@ -947,7 +1072,8 @@ Monthly_q_depth <- Monthly_bar(
   "Runoff_Upper",
   "D. Runoff depth",
   "Mean monthly total per site (mm)",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_depth_ymax
 )
 
 Figure_monthly_bars <- (
@@ -958,7 +1084,7 @@ Figure_monthly_bars <- (
 ) +
   plot_layout(ncol=2) +
   plot_annotation(
-    subtitle="Error bars are bootstrap 95% confidence intervals across calendar years"
+    subtitle="Error bars show one standard deviation across calendar years"
   )
 
 save_figure_pair(
@@ -969,7 +1095,24 @@ save_figure_pair(
 )
 
 # Step 9. Monthly boxplots across years =======================
-Monthly_box <- function(df,y,title,y_title,fill_color){
+Monthly_box_event_ymax <- 1.05*max(
+  Monthly_year_summary$Mean_P_Events_per_Site,
+  Monthly_year_summary$Mean_Q_Events_per_Site,
+  na.rm=TRUE
+)
+Monthly_box_depth_ymax <- 1.05*max(
+  Monthly_year_summary$Mean_Precipitation_mm_per_Site,
+  Monthly_year_summary$Mean_Runoff_mm_per_Site,
+  na.rm=TRUE
+)
+
+Monthly_box <- function(
+    df,
+    y,
+    title,
+    y_title,
+    fill_color,
+    y_limit){
   ggplot(df,aes(Month,.data[[y]])) +
     geom_half_violin(
       side="l",
@@ -993,6 +1136,7 @@ Monthly_box <- function(df,y,title,y_title,fill_color){
       alpha=0.65,
       color=fill_color
     ) +
+    coord_cartesian(ylim=c(0,y_limit)) +
     labs(title=title,x=NULL,y=y_title) +
     DF_plot_theme
 }
@@ -1002,7 +1146,8 @@ Box_p_events <- Monthly_box(
   "Mean_P_Events_per_Site",
   "A. Precipitation-event number",
   "Monthly events per monitored site",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_box_event_ymax
 )
 
 Box_q_events <- Monthly_box(
@@ -1010,7 +1155,8 @@ Box_q_events <- Monthly_box(
   "Mean_Q_Events_per_Site",
   "B. Runoff-event number",
   "Monthly events per monitored site",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_box_event_ymax
 )
 
 Box_p_depth <- Monthly_box(
@@ -1018,7 +1164,8 @@ Box_p_depth <- Monthly_box(
   "Mean_Precipitation_mm_per_Site",
   "C. Precipitation depth",
   "Monthly total per monitored site (mm)",
-  DF_response_colors[["Precipitation"]]
+  DF_response_colors[["Precipitation"]],
+  Monthly_box_depth_ymax
 )
 
 Box_q_depth <- Monthly_box(
@@ -1026,7 +1173,8 @@ Box_q_depth <- Monthly_box(
   "Mean_Runoff_mm_per_Site",
   "D. Runoff depth",
   "Monthly total per monitored site (mm)",
-  DF_response_colors[["Runoff"]]
+  DF_response_colors[["Runoff"]],
+  Monthly_box_depth_ymax
 )
 
 Figure_monthly_boxes <- (
@@ -1045,8 +1193,6 @@ save_figure_pair(
 )
 
 # Step 10. Runoff coefficient across sites and years ==========
-RC_site_order <- sort(unique(RC_site_summary$Field_Name))
-
 RC_plot_limit <- quantile(
   Q_nonfrozen$Runoff_Coefficient,
   0.99,
@@ -1062,7 +1208,7 @@ RC_site_plot_df <- Q_nonfrozen %>%
       ),
     by="Field_Name"
   ) %>%
-  mutate(Field_Name=factor(Field_Name,levels=RC_site_order))
+  mutate(Field_Name=as.character(Field_Name))
 
 # Draw the same site distributions using several explanatory-variable colors
 make_rc_site_panel <- function(
@@ -1072,12 +1218,29 @@ make_rc_site_panel <- function(
     values=NULL,
     palette="YlGnBu",
     limits=NULL,
-    labels=waiver()){
+  labels=waiver()){
   fill_type <- match.arg(fill_type)
-  
-  site_plot <- RC_site_plot_df %>%
+
+  panel_df <- RC_site_plot_df %>%
     filter(!is.na(.data[[fill_var]])) %>%
-    ggplot(
+    arrange(.data[[fill_var]],Field_Name)
+
+  panel_site_order <- panel_df %>%
+    select(Field_Name,all_of(fill_var)) %>%
+    distinct() %>%
+    arrange(.data[[fill_var]],Field_Name) %>%
+    pull(Field_Name)
+
+  panel_df <- panel_df %>%
+    mutate(
+      Field_Name=factor(
+        Field_Name,
+        levels=unique(panel_site_order)
+      )
+    )
+
+  site_plot <- ggplot(
+      panel_df,
       aes(
         Field_Name,
         Runoff_Coefficient,
@@ -1211,13 +1374,149 @@ save_figure_pair(
 )
 
 # Step 11. Runoff coefficient across explanatory groups =======
-RC_box_group <- function(df,group_var,title,colors){
-  ggplot(
-    df %>% filter(!is.na(.data[[group_var]])),
+pairwise_group_tests <- function(
+    df,
+    group_var,
+    grouping_label,
+    group_levels){
+  site_group_values <- df %>%
+    filter(
+      is.finite(Runoff_Coefficient),
+      !is.na(Field_Name),
+      !is.na(.data[[group_var]]),
+      as.character(.data[[group_var]]) != ""
+    ) %>%
+    transmute(
+      Field_Name=as.character(Field_Name),
+      Group=as.character(.data[[group_var]]),
+      Runoff_Coefficient
+    ) %>%
+    group_by(Field_Name,Group) %>%
+    summarise(
+      Site_Median_RC=median(Runoff_Coefficient),
+      .groups="drop"
+    )
+
+  observed_levels <- group_levels[
+    group_levels %in% site_group_values$Group
+  ]
+
+  if(length(observed_levels) < 2){
+    return(data.frame())
+  }
+
+  comparison_pairs <- combn(
+    observed_levels,
+    2,
+    simplify=FALSE
+  )
+
+  paired_comparison <- group_var %in% c(
+    "Season",
+    "Residue"
+  )
+
+  test_rows <- lapply(
+    comparison_pairs,
+    function(comparison_pair){
+      group_1 <- comparison_pair[1]
+      group_2 <- comparison_pair[2]
+
+      if(paired_comparison){
+        paired_values <- site_group_values %>%
+          filter(Group %in% comparison_pair) %>%
+          tidyr::pivot_wider(
+            names_from=Group,
+            values_from=Site_Median_RC
+          ) %>%
+          filter(
+            !is.na(.data[[group_1]]),
+            !is.na(.data[[group_2]])
+          )
+
+        sample_1 <- paired_values[[group_1]]
+        sample_2 <- paired_values[[group_2]]
+        sample_size <- nrow(paired_values)
+        test_name <- "Paired Wilcoxon signed-rank test"
+      }else{
+        sample_1 <- site_group_values$Site_Median_RC[
+          site_group_values$Group == group_1
+        ]
+        sample_2 <- site_group_values$Site_Median_RC[
+          site_group_values$Group == group_2
+        ]
+        sample_size <- min(length(sample_1),length(sample_2))
+        test_name <- "Wilcoxon rank-sum test"
+      }
+
+      p_value <- if(
+        length(sample_1) >= 3 &&
+        length(sample_2) >= 3
+      ){
+        tryCatch(
+          suppressWarnings(
+            stats::wilcox.test(
+              sample_1,
+              sample_2,
+              paired=paired_comparison,
+              exact=FALSE
+            )$p.value
+          ),
+          error=function(e) NA_real_
+        )
+      }else{
+        NA_real_
+      }
+
+      data.frame(
+        Grouping=grouping_label,
+        Group_1=group_1,
+        Group_2=group_2,
+        Test=test_name,
+        Sites=sample_size,
+        P_Value=p_value
+      )
+    }
+  )
+
+  bind_rows(test_rows) %>%
+    mutate(
+      P_Adjusted=p.adjust(P_Value,method="BH"),
+      Significance=case_when(
+        P_Adjusted < 0.001 ~ "***",
+        P_Adjusted < 0.01 ~ "**",
+        P_Adjusted < 0.05 ~ "*",
+        TRUE ~ ""
+      )
+    )
+}
+
+RC_box_group <- function(
+    df,
+    group_var,
+    title,
+    colors,
+    test_df=NULL){
+  group_levels <- names(colors)
+  plot_df <- df %>%
+    filter(
+      !is.na(.data[[group_var]]),
+      as.character(.data[[group_var]]) != ""
+    ) %>%
+    mutate(
+      Plot_Group=factor(
+        as.character(.data[[group_var]]),
+        levels=group_levels
+      )
+    ) %>%
+    filter(!is.na(Plot_Group))
+
+  group_plot <- ggplot(
+    plot_df,
     aes(
-      x=.data[[group_var]],
+      x=Plot_Group,
       y=Runoff_Coefficient,
-      fill=.data[[group_var]]
+      fill=Plot_Group
     )
   ) +
     geom_half_violin(
@@ -1233,15 +1532,17 @@ RC_box_group <- function(df,group_var,title,colors){
     ) +
     geom_jitter(
       aes(
-        x=as.numeric(as.factor(.data[[group_var]]))+0.2,
-        color=.data[[group_var]]
+        x=as.numeric(Plot_Group)+0.2,
+        color=Plot_Group
       ),
       width=0.08,
       size=1.5,
       alpha=0.4,
       show.legend=FALSE
     ) +
-    coord_cartesian(ylim=c(0,RC_plot_limit)) +
+    coord_cartesian(
+      ylim=c(0,RC_plot_limit*1.08)
+    ) +
     scale_fill_manual(values=colors) +
     scale_color_manual(values=colors) +
     labs(title=title,x=NULL,y="Runoff coefficient") +
@@ -1250,41 +1551,165 @@ RC_box_group <- function(df,group_var,title,colors){
       legend.position="none",
       axis.text.x=element_text(angle=35,hjust=1)
     )
+
+  if(is.null(test_df) || nrow(test_df) == 0){
+    return(group_plot)
+  }
+
+  significant_tests <- test_df %>%
+    filter(
+      !is.na(P_Adjusted),
+      P_Adjusted < 0.05
+    )
+
+  if(nrow(significant_tests) > 0){
+    significant_tests <- significant_tests %>%
+      mutate(
+        x_1=match(Group_1,group_levels),
+        x_2=match(Group_2,group_levels),
+        y=seq(
+          RC_plot_limit*0.86,
+          RC_plot_limit*1.02,
+          length.out=n()
+        ),
+        tip=RC_plot_limit*0.025
+      )
+
+    group_plot <- group_plot +
+      geom_segment(
+        data=significant_tests,
+        aes(x=x_1,xend=x_2,y=y,yend=y),
+        inherit.aes=FALSE,
+        linewidth=0.5
+      ) +
+      geom_segment(
+        data=significant_tests,
+        aes(
+          x=x_1,
+          xend=x_1,
+          y=y,
+          yend=y-tip
+        ),
+        inherit.aes=FALSE,
+        linewidth=0.5
+      ) +
+      geom_segment(
+        data=significant_tests,
+        aes(
+          x=x_2,
+          xend=x_2,
+          y=y,
+          yend=y-tip
+        ),
+        inherit.aes=FALSE,
+        linewidth=0.5
+      ) +
+      geom_text(
+        data=significant_tests,
+        aes(
+          x=(x_1+x_2)/2,
+          y=y+tip*0.35,
+          label=Significance
+        ),
+        inherit.aes=FALSE,
+        size=5
+      )
+  }
+
+  group_plot
 }
 
 Season_colors <- setNames(
-  DF_colors[c(2,1,6)],
-  c("Spring","Summer","Fall")
+  DF_colors[c(3,1,2)],
+  c(
+    "Pre-growing season",
+    "Growing season",
+    "Post-growing season"
+  )
 )
 Residue_colors <- setNames(
   DF_colors[c(1,2,3)],
   c("No","Yes","Partial")
 )
 
+RC_residue_df <- Q_nonfrozen %>%
+  filter(
+    Season %in% c(
+      "Post-growing season",
+      "Pre-growing season"
+    ),
+    Residue %in% names(Residue_colors)
+  )
+
+RC_season_tests <- pairwise_group_tests(
+  Q_nonfrozen,
+  "Season",
+  "Season",
+  names(Season_colors)
+)
+RC_soil_tests <- pairwise_group_tests(
+  Q_nonfrozen,
+  "Hydrologic_Group",
+  "Soil infiltration group",
+  names(DF_infiltration_colors)
+)
+RC_tile_tests <- pairwise_group_tests(
+  Q_nonfrozen,
+  "Tile",
+  "Site-level tile drainage",
+  names(DF_tile_colors)
+)
+RC_residue_tests <- pairwise_group_tests(
+  RC_residue_df,
+  "Residue",
+  "Pre-/post-growing-season residue",
+  names(Residue_colors)
+)
+
+RC_pairwise_tests <- bind_rows(
+  RC_season_tests,
+  RC_soil_tests,
+  RC_tile_tests,
+  RC_residue_tests
+)
+
+write.csv(
+  RC_pairwise_tests,
+  file.path(
+    Table_path,
+    "Runoff_coefficient_group_pairwise_tests.csv"
+  ),
+  row.names=FALSE,
+  na=""
+)
+
 RC_season <- RC_box_group(
   Q_nonfrozen,
   "Season",
   "A. Season",
-  Season_colors
+  Season_colors,
+  RC_season_tests
 )
 RC_soil <- RC_box_group(
   Q_nonfrozen,
   "Hydrologic_Group",
   "B. Soil infiltration group",
-  DF_infiltration_colors
+  DF_infiltration_colors,
+  RC_soil_tests
 )
 RC_tile <- RC_box_group(
   Q_nonfrozen,
   "Tile",
   "C. Site-level tile drainage",
-  DF_tile_colors
+  DF_tile_colors,
+  RC_tile_tests
 )
 RC_residue <- RC_box_group(
-  Q_nonfrozen %>%
-    filter(Season %in% c("Fall","Spring")),
+  RC_residue_df,
   "Residue",
-  "D. Fall/spring residue",
-  Residue_colors
+  "D. Pre-/post-growing-season residue",
+  Residue_colors,
+  RC_residue_tests
 )
 
 RC_perennial <- Q_nonfrozen %>%
@@ -1340,7 +1765,7 @@ RC_tillage <- Q_nonfrozen %>%
   scale_color_manual(values=DF_infiltration_colors) +
   labs(
     title="F. Seasonal tillage passes",
-    x="Basin-weighted tillage passes",
+    x="Seasonal tillage passes",
     y="Runoff coefficient",
     color="Soil infiltration group"
   ) +
@@ -1434,25 +1859,66 @@ summarize_freeze_monthly <- function(event_df){
     group_by(Month_Number,Month,Frozen_Status) %>%
     summarise(
       Mean_Events=mean(Events_per_Site),
+      SD_Events=sd_or_zero(Events_per_Site),
       Mean_Depth_mm=mean(Depth_per_Site_mm),
+      SD_Depth_mm=sd_or_zero(Depth_per_Site_mm),
+      Years=n(),
       .groups="drop"
+    ) %>%
+    mutate(
+      Event_Lower=pmax(0,Mean_Events-SD_Events),
+      Event_Upper=Mean_Events+SD_Events,
+      Depth_Lower=pmax(0,Mean_Depth_mm-SD_Depth_mm),
+      Depth_Upper=Mean_Depth_mm+SD_Depth_mm
     )
 }
 
 P_freeze_monthly <- summarize_freeze_monthly(P_freeze_event)
 Q_freeze_monthly <- summarize_freeze_monthly(Q_freeze_event)
 
-Freeze_bar <- function(df,y,title,y_title){
+Freeze_event_ymax <- 1.05*max(
+  P_freeze_monthly$Event_Upper,
+  Q_freeze_monthly$Event_Upper,
+  na.rm=TRUE
+)
+Freeze_depth_ymax <- 1.05*max(
+  P_freeze_monthly$Depth_Upper,
+  Q_freeze_monthly$Depth_Upper,
+  na.rm=TRUE
+)
+
+Freeze_bar <- function(
+    df,
+    y,
+    ymin,
+    ymax,
+    title,
+    y_title,
+    y_limit){
+  dodge <- position_dodge(width=0.8)
+
   ggplot(
     df,
-    aes(Month,.data[[y]],fill=Frozen_Status)
+    aes(
+      Month,
+      .data[[y]],
+      ymin=.data[[ymin]],
+      ymax=.data[[ymax]],
+      fill=Frozen_Status
+    )
   ) +
     geom_col(
-      position=position_dodge(width=0.8),
+      position=dodge,
       width=0.72,
       color="black"
     ) +
+    geom_errorbar(
+      position=dodge,
+      width=0.18,
+      linewidth=0.5
+    ) +
     scale_fill_manual(values=DF_frozen_colors) +
+    scale_y_continuous(limits=c(0,y_limit)) +
     labs(
       title=title,
       x=NULL,
@@ -1467,26 +1933,38 @@ Figure_frozen <- (
   Freeze_bar(
     P_freeze_monthly,
     "Mean_Events",
+    "Event_Lower",
+    "Event_Upper",
     "A. Precipitation-event number",
-    "Mean monthly events per site"
+    "Mean monthly events per site",
+    Freeze_event_ymax
   ) +
     Freeze_bar(
       Q_freeze_monthly,
       "Mean_Events",
+      "Event_Lower",
+      "Event_Upper",
       "B. Runoff-event number",
-      "Mean monthly events per site"
+      "Mean monthly events per site",
+      Freeze_event_ymax
     ) +
     Freeze_bar(
       P_freeze_monthly,
       "Mean_Depth_mm",
+      "Depth_Lower",
+      "Depth_Upper",
       "C. Precipitation depth",
-      "Mean monthly total per site (mm)"
+      "Mean monthly total per site (mm)",
+      Freeze_depth_ymax
     ) +
     Freeze_bar(
       Q_freeze_monthly,
       "Mean_Depth_mm",
+      "Depth_Lower",
+      "Depth_Upper",
       "D. Runoff depth",
-      "Mean monthly total per site (mm)"
+      "Mean monthly total per site (mm)",
+      Freeze_depth_ymax
     )
 ) +
   plot_layout(ncol=2,guides="collect") &
@@ -1568,6 +2046,8 @@ Data_summary_table <- data.frame(
     "Complete site-monitoring years",
     "All precipitation events",
     "All storm-associated runoff events",
+    "Non-frozne precipitation events",
+    "Non-frozen storm-associated runoff events",
     "Non-frozen runoff events used for runoff coefficients",
     "Mean annual non-frozen runoff event number contribution (%)",
     "Mean annual non-frozen runoff depth contribution (%)",
@@ -1579,6 +2059,8 @@ Data_summary_table <- data.frame(
     round(sum(Site_summary$Monitoring_Years),1),
     nrow(P_df),
     nrow(Q_df),
+    sum(P_df$P_frozen == FALSE),
+    sum(Q_df$frozen == "Non-Frozen"),
     nrow(Q_nonfrozen),
     mean(
       Annual_nonfrozen_share$NonFrozen_Q_Event_Percent,
@@ -1625,25 +2107,25 @@ Management_audit_table <- data.frame(
   Criterion=c(
     "Tillage representation",
     "Multi-field weighting",
-    "Fall tillage window",
-    "Spring tillage window",
-    "Summer tillage window",
-    "Fall/spring perennial crop fraction",
-    "Summer perennial crop fraction",
-    "Fall residue",
-    "Spring residue",
-    "Summer residue"
+    "Post-growing-season tillage window",
+    "Pre-growing-season tillage window",
+    "Growing-season tillage window",
+    "Pre-/post-growing-season perennial crop fraction",
+    "Growing-season perennial crop fraction",
+    "Post-growing-season residue",
+    "Pre-growing-season residue",
+    "Growing-season residue"
   ),
   Implementation=c(
     "Total number of passes; no legacy tillage category",
     "Field pass counts multiplied by percentage of monitored basin",
-    "Previous-water-year summer + current-water-year fall",
-    "Current-water-year fall + spring",
-    "Current-water-year spring + summer",
-    "Continuous fraction from the previous crop grown in the preceding summer",
-    "Continuous fraction from the current crop grown that summer",
-    "Residue left in fall from previous crop",
-    "Residue left in spring from previous crop",
+    "Previous-water-year growing season + current-water-year post-growing season",
+    "Current-water-year post-growing season + pre-growing season",
+    "Current-water-year pre-growing season + growing season",
+    "Continuous fraction from the previous crop grown in the preceding growing season",
+    "Continuous fraction from the current crop grown that growing season",
+    "Residue left in the post-growing season from the previous crop",
+    "Residue left in the pre-growing season from the previous crop",
     "Excluded"
   ),
   Audit_Result="Passed"
@@ -1701,21 +2183,21 @@ Report_body <- c(
   "<p>Annual site summaries use only calendar years containing all 12 monitored months. Partial first and last monitoring years are retained in the site-year CSV with a completeness flag but are excluded from annual means.</p>",
   embedded_figure_html(
     file.path(Figure_path,"02_Site_event_and_depth_bars.png"),
-    "Figure 2. Mean annual precipitation-event number, runoff-event number, precipitation depth, and surface-runoff depth by site."
+    "Figure 2. Mean annual precipitation-event number, runoff-event number, precipitation depth, and surface-runoff depth by site. Error bars show one standard deviation across complete monitoring years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   "<h2>Monthly climatology and variation among years</h2>",
   "<p>Monthly totals are first calculated for each monitored site-month. They are then averaged within calendar year and summarized across years.</p>",
   embedded_figure_html(
     file.path(Figure_path,"03_Monthly_event_and_depth_bars.png"),
-    "Figure 3. Average monthly event numbers and depths with bootstrap 95% confidence intervals across years."
+    "Figure 3. Average monthly event numbers and depths with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   embedded_figure_html(
     file.path(Figure_path,"04_Monthly_variation_across_years.png"),
-    "Figure 4. Variation in monthly event numbers and depths."
+    "Figure 4. Variation in monthly event numbers and depths. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   embedded_figure_html(
     file.path(Figure_path,"07_Frozen_nonfrozen_monthly_patterns.png"),
-    "Figure 5. Average monthly event numbers and depths groupped frozen and non-frozen conditions."
+    "Figure 5. Average monthly event numbers and depths grouped by frozen and non-frozen soil conditions, with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
   ),
   "<h3>Monthly summary statistics</h3>",
   data_frame_to_html(Monthly_report_table,digits=2),
@@ -1723,14 +2205,17 @@ Report_body <- c(
   "<p>The runoff coefficient is event surface-runoff depth divided by event precipitation depth. Summaries retain all finite non-frozen values; selected boxplot axes are limited at the 99th percentile for readability.</p>",
   embedded_figure_html(
     file.path(Figure_path,"05_Runoff_coefficient_sites_years.png"),
-    "Figure 6. Runoff coefficient distributions across sites, groupped by soil infiltration group, site-level tile drainage, and continuous mean perennial crop fraction, followed by median values across calendar years."
+    "Figure 6. Runoff coefficient distributions across sites, grouped by soil infiltration group, site-level tile drainage, and continuous mean perennial crop fraction, followed by median values across calendar years. Sites are ordered by the displayed group and then alphabetically within groups."
   ),
   embedded_figure_html(
     file.path(Figure_path,"06_Runoff_coefficient_groups.png"),
-    "Figure 7. Runoff coefficients by season, soil infiltration group, site-level tile drainage, fall/spring residue, continuous seasonal perennial crop fraction, and seasonal tillage passes."
+    "Figure 7. Runoff coefficients by season, soil infiltration group, site-level tile drainage, pre-/post-growing-season residue, continuous seasonal perennial crop fraction, and seasonal tillage passes. Brackets show significant Benjamini-Hochberg-adjusted pairwise Wilcoxon comparisons of site-level medians."
   ),
   "<h3>Runoff coefficient summary by group</h3>",
   data_frame_to_html(RC_report_table,digits=3),
+  "<h3>Pairwise comparisons of site-level runoff coefficients</h3>",
+  "<p>Season and residue comparisons use paired Wilcoxon signed-rank tests where the same sites contribute to both groups. Soil-infiltration and tile-drainage comparisons use Wilcoxon rank-sum tests. P-values are adjusted within each grouping variable using the Benjamini-Hochberg method.</p>",
+  data_frame_to_html(RC_pairwise_tests,digits=4),
   "<h2>Output files</h2>",
   "<p>Every figure is saved in both PNG and PDF format. Machine-readable summary tables are saved as CSV files under <code>04_Results/Exploratory/Tables</code>.</p>"
 )

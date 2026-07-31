@@ -8,9 +8,9 @@
 # Site-level tile drainage is retained as an agricultural practice variable
 
 # Seasons:
-# Spring: January-May
-# Summer: June-September
-# Fall: October-December
+# Pre-growing season: January-May
+# Growing season: June-September
+# Post-growing season: October-December
 
 # -------- Global -----------
 library(dplyr)
@@ -278,23 +278,29 @@ Availability_table <- data.frame(
   Variable=c(
     "Perennial fraction",
     "Seasonal tillage passes",
-    "Fall/spring residue fraction",
+    "Pre-/post-growing-season residue fraction",
     "Perennial fraction",
     "Seasonal tillage passes",
-    "Fall/spring residue fraction"
+    "Pre-/post-growing-season residue fraction"
   ),
   Missing=c(
     sum(is.na(P_analysis_nonfrozen$PerennialFrac)),
     sum(is.na(P_analysis_nonfrozen$Tillage_Passes)),
     sum(
       is.na(P_analysis_nonfrozen$Residue_Frac) &
-        P_analysis_nonfrozen$Season %in% c("Fall","Spring")
+        P_analysis_nonfrozen$Season %in% c(
+          "Post-growing season",
+          "Pre-growing season"
+        )
     ),
     sum(is.na(Q_analysis_nonfrozen$PerennialFrac)),
     sum(is.na(Q_analysis_nonfrozen$Tillage_Passes)),
     sum(
       is.na(Q_analysis_nonfrozen$Residue_Frac) &
-        Q_analysis_nonfrozen$Season %in% c("Fall","Spring")
+        Q_analysis_nonfrozen$Season %in% c(
+          "Post-growing season",
+          "Pre-growing season"
+        )
     )
   )
 )
@@ -312,12 +318,12 @@ Report_body <- c(
   "<h2>Important definitions</h2>",
   "<ul>",
   "<li>Water year runs from October 1 through September 30.</li>",
-  "<li>Spring is January-May, summer is June-September, and fall is October-December.</li>",
-  "<li>Fall tillage combines the previous water year's summer passes with the current water year's fall passes.</li>",
-  "<li>Spring tillage combines current-water-year fall and spring passes.</li>",
-  "<li>Summer tillage combines current-water-year spring and summer passes.</li>",
-  "<li>Fall and spring use the previous crop; summer uses the current crop.</li>",
-  "<li>Residue is included for fall and spring only.</li>",
+  "<li>The pre-growing season is January-May, the growing season is June-September, and the post-growing season is October-December.</li>",
+  "<li>Post-growing-season tillage combines the previous water year's growing-season passes with the current water year's post-growing-season passes.</li>",
+  "<li>Pre-growing-season tillage combines current-water-year post-growing- and pre-growing-season passes.</li>",
+  "<li>Growing-season tillage combines current-water-year pre-growing- and growing-season passes.</li>",
+  "<li>Pre- and post-growing seasons use the previous crop; the growing season uses the current crop.</li>",
+  "<li>Residue is included for the pre- and post-growing seasons only.</li>",
   "<li>Hydrologic depths are reported in millimetres and rainfall intensities in millimetres per hour.</li>",
   "</ul>"
 )

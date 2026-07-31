@@ -28,12 +28,19 @@ assign_water_year <- function(x){
 assign_season <- function(x){
   m <- lubridate::month(as_local_date(x))
   season <- dplyr::case_when(
-    m %in% 1:5 ~ "Spring",
-    m %in% 6:9 ~ "Summer",
-    m %in% 10:12 ~ "Fall",
+    m %in% 1:5 ~ "Pre-growing season",
+    m %in% 6:9 ~ "Growing season",
+    m %in% 10:12 ~ "Post-growing season",
     TRUE ~ NA_character_
   )
-  factor(season,levels=c("Spring","Summer","Fall"))
+  factor(
+    season,
+    levels=c(
+      "Pre-growing season",
+      "Growing season",
+      "Post-growing season"
+    )
+  )
 }
 
 # Convert date-time values to their local Central calendar date

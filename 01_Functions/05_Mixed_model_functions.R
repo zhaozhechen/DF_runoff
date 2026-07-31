@@ -49,7 +49,7 @@ make_mixed_formula <- function(response,fixed_terms){
   )
 }
 
-# Fit either the binomial occurrence model or Gaussian continuous-response model
+# Fit either the binomial occurrence model or linear mixed-effects model
 fit_mixed_model <- function(
     df,
     response,
