@@ -1,9 +1,9 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.7.30
+# Update Date: 2026.8.7
 
-# This code runs the same mixed-effects workflow for:
-# 1. Non-frozen soil conditions
-# 2. All frozen and non-frozen events combined
+# This code runs the mixed-effects workflow for all frozen and
+# non-frozen events combined. Frozen-soil condition is included
+# as a binary precipitation-characteristic predictor.
 
 Project_path <- normalizePath(
   getwd(),
@@ -43,7 +43,7 @@ RC_replications <- Sys.getenv(
   "200"
 )
 
-for(dataset_key in c("NonFrozen","All")){
+for(dataset_key in "All"){
   message(
     "Starting mixed-effects models: ",
     dataset_key
@@ -69,4 +69,4 @@ for(dataset_key in c("NonFrozen","All")){
   }
 }
 
-message("Both mixed-effects datasets are complete.")
+message("All-event mixed-effects analysis is complete.")
