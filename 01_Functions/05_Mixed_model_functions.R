@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.7.28
+# Update Date: 2026.8.7
 
 # This code includes shared functions for the seasonal mixed-effects models
 
@@ -247,6 +247,21 @@ fit_model_replication <- function(
     scale_terms,
     factor_min_n=5){
   supported_site_terms <- site_terms
+  supported_storm_terms <- storm_terms
+
+  if(
+    "Frozen" %in% supported_storm_terms &&
+    !factor_has_support(
+      sampled_df,
+      "Frozen",
+      min_n=factor_min_n
+    )
+  ){
+    supported_storm_terms <- setdiff(
+      supported_storm_terms,
+      "Frozen"
+    )
+  }
   
   for(variable in intersect(
       c("Hydrologic_Group","Tile"),
@@ -269,12 +284,12 @@ fit_model_replication <- function(
   )
   
   model_terms <- list(
-    Storm=storm_terms,
-    Agricultural=unique(c(storm_terms,agricultural_terms)),
-    Site=unique(c(storm_terms,supported_site_terms)),
+    Storm=supported_storm_terms,
+    Agricultural=unique(c(supported_storm_terms,agricultural_terms)),
+    Site=unique(c(supported_storm_terms,supported_site_terms)),
     Full=unique(
       c(
-        storm_terms,
+        supported_storm_terms,
         agricultural_terms,
         supported_site_terms
       )
@@ -309,6 +324,7 @@ fit_model_replication <- function(
           Rep=replication,
           Model=model_name,
           n=nrow(model_df),
+          Use_Frozen="Frozen" %in% supported_storm_terms,
           Use_Hydrologic_Group=
             "Hydrologic_Group" %in% supported_site_terms,
           Use_Tile="Tile" %in% supported_site_terms
@@ -325,6 +341,7 @@ fit_model_replication <- function(
       Season,
       Rep,
       n,
+      Use_Frozen,
       Use_Hydrologic_Group,
       Use_Tile,
       Model,

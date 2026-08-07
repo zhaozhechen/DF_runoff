@@ -1,9 +1,9 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.7.28
+# Update Date: 2026.8.7
 
 # This code reproduces the seasonal mixed-effects model workflow
-# Part 1 models surface-runoff occurrence
-# Part 2 models the surface-runoff coefficient
+# Part 1 uses a Mixed-effects logistic model for Runoff occurrence
+# Part 2 uses a Mixed-effects linear regression model for Runoff magnitude
 # Random-forest analyses are not included
 
 # ---------- Global -----------
@@ -51,7 +51,7 @@ source(
 
 # Paths ======
 Processed_path <- file.path(Project_path,"00_Data","Processed")
-Dataset_key <- Sys.getenv("DF_EVENT_DATASET","NonFrozen")
+Dataset_key <- Sys.getenv("DF_EVENT_DATASET","All")
 Dataset_key <- match.arg(
   Dataset_key,
   c("Frozen","NonFrozen","All")
@@ -119,11 +119,12 @@ Season_levels <- if(Dataset_key == "Frozen"){
   All_season_levels
 }
 
-# These are the same storm variables used in the previous mixed models
+# Precipitation-characteristic predictors
+# Frozen soil is included when both frozen and non-frozen observations occur
 Storm_variables <- c(
   "log_I30",
-  "log_Dur",
-  "log_ARFdays7"
+  "log_ARFdays7",
+  "Frozen"
 )
 
 # Agricultural predictors vary by season
@@ -153,7 +154,8 @@ Site_variables <- c(
 )
 
 Continuous_variables <- c(
-  Storm_variables,
+  "log_I30",
+  "log_ARFdays7",
   "Tillage_Passes",
   "PerennialFrac",
   "Residue_Frac",
@@ -163,8 +165,8 @@ Continuous_variables <- c(
 # Friendly labels used in figures and the report
 Variable_labels <- c(
   log_I30="Log 30-minute intensity",
-  log_Dur="Log event duration",
   log_ARFdays7="Log 7-day antecedent rainfall",
+  Frozen="Frozen soil condition",
   Tillage_Passes="Seasonal tillage passes",
   PerennialFrac="Perennial crop fraction",
   Residue_Frac="Crop-residue fraction",
@@ -174,10 +176,22 @@ Variable_labels <- c(
 )
 
 Comparison_labels <- c(
-  Storm_Agricultural="Storm vs. Agricultural",
-  Storm_Site="Storm vs. Site",
-  Agricultural_Full="Agricultural vs. Full",
-  Site_Full="Site vs. Full"
+  Storm_Agricultural="Storm-only vs. Agricultural model",
+  Storm_Site="Storm-only vs. Site physics model",
+  Agricultural_Full="Agricultural vs. Full model",
+  Site_Full="Site physics vs. Full model"
+)
+
+Model_labels <- c(
+  Storm="Storm-only model",
+  Agricultural="Agricultural model",
+  Site="Site physics model",
+  Full="Full model"
+)
+
+Variable_group_labels <- c(
+  Agricultural="Agricultural management",
+  Site="Physical site properties"
 )
 
 Model_colors <- c(
@@ -239,14 +253,16 @@ P_df <- read.csv(
       )
     ),
     Tile=factor(Tile,levels=c("No","Yes")),
+    Frozen=factor(
+      if_else(P_frozen,"Frozen","Non-Frozen"),
+      levels=c("Non-Frozen","Frozen")
+    ),
     log_I30=log(I30_mm_hr),
-    log_Dur=log(duration_hr),
     log_ARFdays7=log(ARFdays7_mm+0.1)
   ) %>%
   filter(
     keep_precipitation_condition(P_frozen),
     is.finite(log_I30),
-    is.finite(log_Dur),
     is.finite(log_ARFdays7)
   )
 
@@ -282,14 +298,16 @@ Q_df <- read.csv(
       )
     ),
     Tile=factor(Tile,levels=c("No","Yes")),
+    Frozen=factor(
+      frozen,
+      levels=c("Non-Frozen","Frozen")
+    ),
     log_I30=log(I30_mm_hr),
-    log_Dur=log(duration_hr),
     log_ARFdays7=log(ARFdays7_mm+0.1)
   ) %>%
   filter(
     is.finite(log_RC),
     is.finite(log_I30),
-    is.finite(log_Dur),
     is.finite(log_ARFdays7)
   )
 
@@ -367,7 +385,8 @@ prepare_season_model_data <- function(
       Hydrologic_Group=droplevels(
         factor(Hydrologic_Group)
       ),
-      Tile=droplevels(factor(Tile))
+      Tile=droplevels(factor(Tile)),
+      Frozen=droplevels(factor(Frozen))
     )
 }
 
@@ -554,13 +573,13 @@ if(Refresh_only){
     analysis_name="Runoff occurrence"
   )
 
-  # Part 2. Surface-runoff coefficient =========================
+  # Part 2. Runoff magnitude ===================================
   RC_results <- run_mixed_model_analysis(
     df=Q_df,
     response="log_RC",
     response_type="continuous",
     replications=RC_Replications,
-    analysis_name="Runoff coefficient"
+    analysis_name="Runoff magnitude"
   )
 }
 
@@ -620,7 +639,18 @@ fit_final_models <- function(
   for(season in Season_levels){
     final_df <- results$Season_Data[[season]]
     agricultural_terms <- Agricultural_variables[[season]]
+    supported_storm_terms <- Storm_variables
     supported_site_terms <- Site_variables
+
+    if(
+      "Frozen" %in% supported_storm_terms &&
+      !factor_has_support(final_df,"Frozen",min_n=5)
+    ){
+      supported_storm_terms <- setdiff(
+        supported_storm_terms,
+        "Frozen"
+      )
+    }
     
     for(variable in intersect(
         c("Hydrologic_Group","Tile"),
@@ -639,7 +669,7 @@ fit_final_models <- function(
     
     full_terms <- unique(
       c(
-        Storm_variables,
+        supported_storm_terms,
         agricultural_terms,
         supported_site_terms
       )
@@ -712,6 +742,10 @@ fit_final_models <- function(
       Season=season,
       Observations=nrow(model_df),
       Sites=dplyr::n_distinct(model_df$Field_Name),
+      Storm_Variables=paste(
+        supported_storm_terms,
+        collapse=" + "
+      ),
       Agricultural_Variables=paste(
         agricultural_terms,
         collapse=" + "
@@ -777,7 +811,7 @@ if(Refresh_only){
     RC_results,
     response="log_RC",
     response_type="continuous",
-    analysis_name="Runoff coefficient",
+    analysis_name="Runoff magnitude",
     file_prefix="RC"
   )
 
@@ -808,7 +842,7 @@ Singular_diagnostic <- bind_rows(
   Occurrence_results$Metrics_Long %>%
     mutate(Analysis="Runoff occurrence"),
   RC_results$Metrics_Long %>%
-    mutate(Analysis="Runoff coefficient")
+    mutate(Analysis="Runoff magnitude")
 ) %>%
   group_by(Analysis,Season,Model) %>%
   summarise(
@@ -838,7 +872,7 @@ model_performance_figure <- function(
   
   metric_labels <- c(
     AUC="AUC",
-    RMSE="RMSE of log runoff coefficient",
+    RMSE="RMSE of log(RC)",
     R2m="Marginal R-squared",
     R2c="Conditional R-squared",
     Random_R2="Random-effect R-squared"
@@ -874,7 +908,11 @@ model_performance_figure <- function(
           outlier.shape=NA
         ) +
         facet_wrap(~Season,nrow=1) +
-        scale_fill_manual(values=Model_colors) +
+        scale_x_discrete(labels=Model_labels) +
+        scale_fill_manual(
+          values=Model_colors,
+          labels=Model_labels
+        ) +
         labs(
           x=NULL,
           y=metric_labels[[metric_name]],
@@ -900,7 +938,8 @@ model_comparison_figure <- function(results){
         Comparison,
         levels=names(Comparison_labels),
         labels=unname(Comparison_labels)
-      )
+      ),
+      Chisq_Label_Y=Mean_Chisq+SD_Chisq
     )
   
   delta_aic_plot <- ggplot(
@@ -916,7 +955,7 @@ model_comparison_figure <- function(results){
       width=0.2
     ) +
     geom_hline(yintercept=0,linetype="dashed") +
-    facet_wrap(~Comparison,scales="free_y",nrow=1) +
+    facet_wrap(~Comparison,nrow=1) +
     scale_fill_manual(values=Season_colors) +
     labs(
       x=NULL,
@@ -943,16 +982,17 @@ model_comparison_figure <- function(results){
     ) +
     geom_text(
       aes(
+        y=Chisq_Label_Y,
         label=paste0(
           "p<0.05: ",
           round(Significant_Percent),
           "%"
         )
       ),
-      vjust=-0.35,
+      vjust=-0.45,
       size=4
     ) +
-    facet_wrap(~Comparison,scales="free_y",nrow=1) +
+    facet_wrap(~Comparison,nrow=1) +
     scale_fill_manual(values=Season_colors) +
     scale_y_continuous(expand=expansion(mult=c(0,0.22))) +
     labs(
@@ -1013,7 +1053,8 @@ drop_one_figure <- function(results){
       Variable_Season_Chisq=factor(
         paste(Variable_Label,Season,sep="___"),
         levels=unique(chisq_order)
-      )
+      ),
+      Chisq_Label_Y=Mean_Chisq+SD_Chisq
     )
   
   delta_aic_plot <- ggplot(
@@ -1038,11 +1079,14 @@ drop_one_figure <- function(results){
     scale_x_discrete(
       labels=function(x) sub("___.*$","",x)
     ) +
-    scale_fill_manual(values=Variable_group_colors) +
+    scale_fill_manual(
+      values=Variable_group_colors,
+      labels=Variable_group_labels
+    ) +
     labs(
       x=NULL,
       y="Mean Delta AIC (dropped - full)",
-      fill="Variable type"
+      fill="Variable category"
     ) +
     DF_plot_theme +
     theme(legend.position="bottom")
@@ -1065,25 +1109,30 @@ drop_one_figure <- function(results){
     ) +
     geom_text(
       aes(
+        y=Chisq_Label_Y,
         label=paste0(
+          "p<0.05: ",
           round(Significant_Percent),
           "%"
         )
       ),
-      hjust=-0.2,
+      hjust=-0.15,
       size=4
     ) +
-    coord_flip() +
+    coord_flip(clip="off") +
     facet_wrap(~Season,nrow=1,scales="free_y") +
     scale_x_discrete(
       labels=function(x) sub("___.*$","",x)
     ) +
-    scale_fill_manual(values=Variable_group_colors) +
-    scale_y_continuous(expand=expansion(mult=c(0,0.25))) +
+    scale_fill_manual(
+      values=Variable_group_colors,
+      labels=Variable_group_labels
+    ) +
+    scale_y_continuous(expand=expansion(mult=c(0,0.38))) +
     labs(
       x=NULL,
       y="Mean likelihood-ratio chi-squared",
-      fill="Variable type"
+      fill="Variable category"
     ) +
     DF_plot_theme +
     theme(legend.position="bottom")
@@ -1151,7 +1200,7 @@ marginal_effect_panel <- function(
   y_title <- if(response_type == "occurrence"){
     "Runoff probability"
   }else{
-    "Log runoff coefficient"
+    "Runoff magnitude: log(RC)"
   }
   
   if(is_numeric_predictor){
@@ -1343,59 +1392,43 @@ save_figure_pair(
 
 # Generate the HTML report =====================================
 Model_variable_table <- data.frame(
-  Variable=c(
-    "Response: occurrence",
-    "Response: runoff coefficient",
-    "Storm",
-    "Agricultural: all seasons",
-    "Agricultural: pre- and post-growing seasons only",
-    "Site physical properties",
+  Component=c(
+    "Response",
+    "Precipitation-characteristics",
+    "Agricultural management",
+    "Physical site properties",
     "Random effect"
   ),
   Definition=c(
-    paste0(
-      "Whether a precipitation event under ",
-      tolower(Dataset_labels[[Dataset_key]]),
-      " produced surface runoff (binomial logit model)"
-    ),
-    paste0(
-      "Natural log of the event runoff coefficient under ",
-      tolower(Dataset_labels[[Dataset_key]]),
-      " (linear mixed-effects model)"
-    ),
-    "Log I30, log event duration, and log seven-day antecedent rainfall",
-    "Seasonal tillage passes and continuous seasonal perennial crop fraction",
-    "Crop-residue fraction",
+    "Runoff occurrence is a binary response analyzed with a Mixed-effects logistic model. Runoff magnitude is defined as log(RC) and analyzed with a Mixed-effects linear regression model.",
+    "Log 30-minute precipitation intensity, log seven-day antecedent precipitation, and binary frozen-soil condition. Frozen-soil condition is omitted when a season contains only one observed level.",
+    "Seasonal tillage passes, continuous perennial crop fraction, and the crop-residue fraction when applicable.",
     "Mean slope, grouped soil infiltration, and binary site-level tile drainage",
     "Site random intercept"
-  )
+  ),
+  check.names=FALSE
 )
 
 Agricultural_rule_table <- data.frame(
-  Rule=c(
-    "Surface monitoring",
-    "Seasons",
-    "Tillage",
-    "Post-growing-season crop",
-    "Pre-growing-season crop",
-    "Growing-season crop",
-    "Pre-/post-growing-season residue",
-    "Growing-season residue",
-    "Tile drainage",
-    "Random forest"
+  Season=c(
+    "Pre-growing season (January-May)",
+    "Growing season (June-September)",
+    "Post-growing season (October-December)"
   ),
-  Implementation=c(
-    "Only surface-runoff monitoring records are modeled",
-    "Pre-growing: January-May; growing: June-September; post-growing: October-December",
-    "Continuous basin-weighted total passes from the season-specific current and preceding windows",
-    "Continuous perennial fraction from the previous crop",
-    "Continuous perennial fraction from the previous crop",
-    "Continuous perennial fraction from the current crop",
-    "Continuous basin-weighted residue fraction",
-    "Excluded",
-    "Binary site-level physical property; all tiled sites are treated as random tile",
-    "Excluded"
-  )
+  `Precipitation-characteristics`=rep(
+    "Log 30-minute intensity, log seven-day antecedent precipitation, and frozen-soil condition when both levels occur",
+    3
+  ),
+  `Agricultural management`=c(
+    "Post-growing- plus pre-growing-season tillage passes; previous summer crop perennial fraction; spring crop-residue fraction",
+    "Pre-growing- plus growing-season tillage passes; current summer crop perennial fraction; crop residue excluded",
+    "Growing- plus post-growing-season tillage passes; previous summer crop perennial fraction; fall crop-residue fraction"
+  ),
+  `Physical site properties`=rep(
+    "Mean slope, grouped soil infiltration, and binary site-level tile drainage",
+    3
+  ),
+  check.names=FALSE
 )
 
 Full_metric_report <- bind_rows(
@@ -1404,7 +1437,7 @@ Full_metric_report <- bind_rows(
     mutate(Analysis="Runoff occurrence"),
   RC_results$Metric_Summary %>%
     filter(Model == "Full") %>%
-    mutate(Analysis="Runoff coefficient")
+    mutate(Analysis="Runoff magnitude")
 ) %>%
   select(
     Analysis,
@@ -1422,7 +1455,7 @@ Most_important_variables <- bind_rows(
   Occurrence_results$Drop_Summary %>%
     mutate(Analysis="Runoff occurrence"),
   RC_results$Drop_Summary %>%
-    mutate(Analysis="Runoff coefficient")
+    mutate(Analysis="Runoff magnitude")
 ) %>%
   group_by(Analysis,Season) %>%
   slice_max(
@@ -1436,6 +1469,10 @@ Most_important_variables <- bind_rows(
       Dropped %in% names(Variable_labels),
       Variable_labels[Dropped],
       Dropped
+    ),
+    Variable_Group=dplyr::recode(
+      Variable_Group,
+      !!!Variable_group_labels
     )
   ) %>%
   select(
@@ -1448,58 +1485,79 @@ Most_important_variables <- bind_rows(
     Significant_Percent
   )
 
+Final_specifications_report <- Final_specifications %>%
+  mutate(
+    Analysis=dplyr::recode(
+      Analysis,
+      `Runoff coefficient`="Runoff magnitude"
+    )
+  ) %>%
+  select(-any_of("Singular")) %>%
+  rename(
+    `Precipitation-characteristics`=Storm_Variables,
+    `Agricultural management`=Agricultural_Variables,
+    `Physical site properties`=Site_Variables
+  )
+
+Final_coefficients_report <- Final_coefficients %>%
+  mutate(
+    Analysis=dplyr::recode(
+      Analysis,
+      `Runoff coefficient`="Runoff magnitude"
+    )
+  )
+
 Report_body <- c(
   paste0(
-    "<div class=\"callout\"><strong>Model scope:</strong> seasonal mixed-effects models are fitted for surface-runoff occurrence and the natural log of the runoff coefficient under ",
-    tolower(Dataset_labels[[Dataset_key]]),
+    "<div class=\"callout\"><strong>Model scope:</strong> Mixed-effects models are fitted for Runoff occurrence and Runoff magnitude, defined as log(RC), using all frozen and non-frozen surface-runoff events. Runoff occurrence is analyzed with a Mixed-effects logistic model, and Runoff magnitude is analyzed with a Mixed-effects linear regression model",
     ". The balanced-bootstrap, nested-model comparison, drop-one-variable, and marginal-effect logic is retained. Random-forest analyses are excluded.</div>"
   ),
   "<h2>Model definitions</h2>",
   data_frame_to_html(Model_variable_table,digits=2),
-  "<h2>Revised seasonal agricultural rules</h2>",
+  "<h2>Season-specific variables and rules</h2>",
   data_frame_to_html(Agricultural_rule_table,digits=2),
   "<h2>Final full-model specifications</h2>",
-  "<p>Continuous predictors are standardized within each bootstrap sample and within each final seasonal model. Every model includes a site random intercept.</p>",
-  data_frame_to_html(Final_specifications,digits=2),
-  "<h2>Part 1. Surface-runoff occurrence</h2>",
+  "<p>Continuous predictors are standardized within each bootstrap sample and within each final seasonal model. Frozen-soil condition is included as a binary precipitation-characteristic predictor whenever both frozen and non-frozen observations occur within a season. Every model includes a site random intercept.</p>",
+  data_frame_to_html(Final_specifications_report,digits=2),
+  "<h2>Part 1. Runoff occurrence</h2>",
   paste0(
     "<p>The response is whether a precipitation event under ",
     tolower(Dataset_labels[[Dataset_key]]),
-    " produced surface runoff. AUC evaluates discrimination; marginal and conditional R-squared values quantify fixed-effect and total model variation.</p>"
+    " produced surface runoff. This response is analyzed with a Mixed-effects logistic model. AUC evaluates discrimination; marginal and conditional R-squared values quantify fixed-effect and total model variation.</p>"
   ),
   embedded_figure_html(
     file.path(Figure_path,"01_Occurrence_model_performance.png"),
-    "Figure 1. Performance of the Storm, Agricultural, Site, and Full runoff-occurrence models across balanced bootstrap replications."
+    "Figure 1. Performance of the Storm-only model, Agricultural model, Site physics model, and Full model for Runoff occurrence across balanced bootstrap replications."
   ),
   embedded_figure_html(
     file.path(Figure_path,"02_Occurrence_model_comparisons.png"),
-    "Figure 2. Nested runoff-occurrence model comparisons using Delta AIC and likelihood-ratio tests."
+    "Figure 2. Nested Runoff occurrence model comparisons using Delta AIC and likelihood-ratio tests."
   ),
   embedded_figure_html(
     file.path(Figure_path,"03_Occurrence_drop_one.png"),
-    "Figure 3. Change in runoff-occurrence model support when each agricultural or site variable is removed from the Full model."
+    "Figure 3. Change in Runoff occurrence model support when each Agricultural management or Physical site properties variable is removed from the Full model."
   ),
   embedded_figure_html(
     file.path(Figure_path,"04_Occurrence_marginal_effects.png"),
-    "Figure 4. Marginal effects from the final seasonal runoff-occurrence models."
+    "Figure 4. Marginal effects from the final seasonal Mixed-effects logistic models for Runoff occurrence."
   ),
-  "<h2>Part 2. Surface-runoff coefficient</h2>",
-  "<p>The response is the natural log of the event runoff coefficient. RMSE is reported on the log-runoff-coefficient scale.</p>",
+  "<h2>Part 2. Runoff magnitude</h2>",
+  "<p>Runoff magnitude is defined as log(RC) and analyzed with a Mixed-effects linear regression model. RMSE is reported on the log(RC) scale.</p>",
   embedded_figure_html(
     file.path(Figure_path,"05_RC_model_performance.png"),
-    "Figure 5. Performance of the Storm, Agricultural, Site, and Full runoff-coefficient models across balanced bootstrap replications."
+    "Figure 5. Performance of the Storm-only model, Agricultural model, Site physics model, and Full model for Runoff magnitude across balanced bootstrap replications."
   ),
   embedded_figure_html(
     file.path(Figure_path,"06_RC_model_comparisons.png"),
-    "Figure 6. Nested runoff-coefficient model comparisons using Delta AIC and likelihood-ratio tests."
+    "Figure 6. Nested Runoff magnitude model comparisons using Delta AIC and likelihood-ratio tests."
   ),
   embedded_figure_html(
     file.path(Figure_path,"07_RC_drop_one.png"),
-    "Figure 7. Change in runoff-coefficient model support when each agricultural or site variable is removed from the Full model."
+    "Figure 7. Change in Runoff magnitude model support when each Agricultural management or Physical site properties variable is removed from the Full model."
   ),
   embedded_figure_html(
     file.path(Figure_path,"08_RC_marginal_effects.png"),
-    "Figure 8. Marginal effects from the final seasonal runoff-coefficient models."
+    "Figure 8. Marginal effects from the final seasonal Mixed-effects linear regression models for Runoff magnitude."
   ),
   "<h2>Full-model performance summary</h2>",
   "<p>Replications is the number of non-missing estimates available for each metric, not the number of model fits attempted. RMSE, AUC, and marginal R-squared can remain available when the site random-effect variance is estimated at the boundary. Conditional R-squared and the derived random-effect R-squared are unavailable for those fits, so their replication counts can be smaller.</p>",
@@ -1508,8 +1566,8 @@ Report_body <- c(
   "<p>Positive Delta AIC indicates that removing the variable reduced model support. The table lists the three largest mean values within each response and season.</p>",
   data_frame_to_html(Most_important_variables,digits=2),
   "<h2>Final full-model coefficients</h2>",
-  "<p>Continuous-predictor coefficients are standardized. Binomial-model p-values are Wald tests. The linear mixed-effects models report estimates, standard errors, and t statistics; p-values are left blank because lme4::lmer does not assign denominator degrees of freedom or calculate default coefficient p-values.</p>",
-  data_frame_to_html(Final_coefficients,digits=4),
+  "<p>Continuous-predictor coefficients are standardized. Mixed-effects logistic model p-values are Wald tests. The Mixed-effects linear regression models report estimates, standard errors, and t statistics; coefficient p-values are unavailable because lme4::lmer does not define denominator degrees of freedom or calculate them by default. Satterthwaite p-values require an explicitly selected method such as lmerTest.</p>",
+  data_frame_to_html(Final_coefficients_report,digits=4),
   "<h2>Output files</h2>",
   "<p>All figures are saved as PNG and PDF files. Bootstrap results, model summaries, specifications, and coefficients are saved as CSV files. Final fitted seasonal models are saved as RDS files.</p>"
 )
