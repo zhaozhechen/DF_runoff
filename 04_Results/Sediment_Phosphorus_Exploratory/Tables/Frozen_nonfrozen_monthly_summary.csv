@@ -1,0 +1,205 @@
+"Month_Number","Month","frozen","Constituent","Metric","Mean","Standard_Deviation","Site_Months","Events","Lower","Upper"
+1,"Jan","Frozen","Suspended sediment","Concentration",63.1982905982906,116.297764116605,39,53,0,179.496054714896
+1,"Jan","Frozen","Suspended sediment","Load",75.2819461538461,148.838425399005,39,53,0,224.120371552851
+1,"Jan","Frozen","Suspended sediment","Yield",4.5923741025641,8.0249182246759,39,53,0,12.61729232724
+1,"Jan","Frozen","Total dissolved solids","Concentration",183.199494949495,158.108684626275,33,45,25.0908103232201,341.30817957577
+1,"Jan","Frozen","Total dissolved solids","Load",241.279727272727,331.283469912029,33,45,0,572.563197184757
+1,"Jan","Frozen","Total dissolved solids","Yield",14.3941333333333,17.2607833954362,33,45,0,31.6549167287695
+1,"Jan","Frozen","Orthophosphate","Concentration",2.24161111111111,3.61312932403246,39,53,0,5.85474043514357
+1,"Jan","Frozen","Orthophosphate","Load",2.66070051282051,3.8304109070149,39,53,0,6.49111141983541
+1,"Jan","Frozen","Orthophosphate","Yield",0.205447871794872,0.364304764694716,39,53,0,0.569752636489588
+1,"Jan","Frozen","Total phosphorus","Concentration",2.70132905982906,4.00428015675872,39,53,0,6.70560921658778
+1,"Jan","Frozen","Total phosphorus","Load",3.22515538461538,4.25619585406465,39,53,0,7.48135123868003
+1,"Jan","Frozen","Total phosphorus","Yield",0.241227384615385,0.387076452024703,39,53,0,0.628303836640088
+2,"Feb","Non-Frozen","Suspended sediment","Concentration",8,0,1,1,8,8
+2,"Feb","Non-Frozen","Suspended sediment","Load",3.73,0,1,1,3.73,3.73
+2,"Feb","Non-Frozen","Suspended sediment","Yield",0.266,0,1,1,0.266,0.266
+2,"Feb","Non-Frozen","Total dissolved solids","Concentration",84,0,1,1,84,84
+2,"Feb","Non-Frozen","Total dissolved solids","Load",39.1,0,1,1,39.1,39.1
+2,"Feb","Non-Frozen","Total dissolved solids","Yield",2.8,0,1,1,2.8,2.8
+2,"Feb","Non-Frozen","Orthophosphate","Concentration",0.192,0,1,1,0.192,0.192
+2,"Feb","Non-Frozen","Orthophosphate","Load",0.0894,0,1,1,0.0894,0.0894
+2,"Feb","Non-Frozen","Orthophosphate","Yield",0.00639,0,1,1,0.00639,0.00639
+2,"Feb","Non-Frozen","Total phosphorus","Concentration",0.277,0,1,1,0.277,0.277
+2,"Feb","Non-Frozen","Total phosphorus","Load",0.129,0,1,1,0.129,0.129
+2,"Feb","Non-Frozen","Total phosphorus","Yield",0.00922,0,1,1,0.00922,0.00922
+2,"Feb","Frozen","Suspended sediment","Concentration",94.2843859649123,448.348286269455,57,107,0,542.632672234367
+2,"Feb","Frozen","Suspended sediment","Load",192.033063157895,487.500404236475,57,107,0,679.533467394369
+2,"Feb","Frozen","Suspended sediment","Yield",24.2393810526316,122.827643162431,57,107,0,147.067024215062
+2,"Feb","Frozen","Total dissolved solids","Concentration",253.413333333333,255.843012982856,30,57,0,509.256346316189
+2,"Feb","Frozen","Total dissolved solids","Load",774.7758,1283.08233273786,30,57,0,2057.85813273786
+2,"Feb","Frozen","Total dissolved solids","Yield",35.3857706666667,42.9683877109273,30,57,0,78.354158377594
+2,"Feb","Frozen","Orthophosphate","Concentration",1.54194152046784,1.98507806929892,57,107,0,3.52701958976676
+2,"Feb","Frozen","Orthophosphate","Load",7.66108210526316,19.5997033385485,57,107,0,27.2607854438117
+2,"Feb","Frozen","Orthophosphate","Yield",0.363731289473684,0.619345613174768,57,107,0,0.983076902648453
+2,"Feb","Frozen","Total phosphorus","Concentration",2.13596637426901,2.66947700395931,57,107,0,4.80544337822831
+2,"Feb","Frozen","Total phosphorus","Load",9.92757315789474,24.869964233016,57,107,0,34.7975373909108
+2,"Feb","Frozen","Total phosphorus","Yield",0.477112584210526,0.783830937599732,57,107,0,1.26094352181026
+3,"Mar","Non-Frozen","Suspended sediment","Concentration",2731.33823529412,9377.58528952699,17,26,0,12108.9235248211
+3,"Mar","Non-Frozen","Suspended sediment","Load",3360.24205882353,10433.8824394655,17,26,0,13794.1244982891
+3,"Mar","Non-Frozen","Suspended sediment","Yield",990.015688235294,3879.19859181488,17,26,0,4869.21428005017
+3,"Mar","Non-Frozen","Total dissolved solids","Concentration",175.072222222222,179.69815857277,9,14,0,354.770380794992
+3,"Mar","Non-Frozen","Total dissolved solids","Load",118.971111111111,184.220255431131,9,14,0,303.191366542242
+3,"Mar","Non-Frozen","Total dissolved solids","Yield",13.1693333333333,27.9716477392734,9,14,0,41.1409810726068
+3,"Mar","Non-Frozen","Orthophosphate","Concentration",1.04397058823529,2.37862559100962,17,26,0,3.42259617924492
+3,"Mar","Non-Frozen","Orthophosphate","Load",0.299050588235294,0.393254171059739,17,26,0,0.692304759295033
+3,"Mar","Non-Frozen","Orthophosphate","Yield",0.0246198235294118,0.0246559799851762,17,26,0,0.049275803514588
+3,"Mar","Non-Frozen","Total phosphorus","Concentration",3.46923529411765,7.52974787948949,17,26,0,10.9989831736071
+3,"Mar","Non-Frozen","Total phosphorus","Load",2.90132235294118,6.88738142042254,17,26,0,9.78870377336372
+3,"Mar","Non-Frozen","Total phosphorus","Yield",0.457199529411765,1.4183560243447,17,26,0,1.87555555375646
+3,"Mar","Frozen","Suspended sediment","Concentration",167.601535714286,509.763972146259,100,211,0,677.365507860545
+3,"Mar","Frozen","Suspended sediment","Load",656.147104,1869.10159557341,100,211,0,2525.24869957341
+3,"Mar","Frozen","Suspended sediment","Yield",90.2517369,578.715929645781,100,211,0,668.967666545781
+3,"Mar","Frozen","Total dissolved solids","Concentration",179.879202741703,109.690806784848,66,158,70.1883959568544,289.570009526551
+3,"Mar","Frozen","Total dissolved solids","Load",574.665151515151,647.581877347134,66,158,0,1222.24702886229
+3,"Mar","Frozen","Total dissolved solids","Yield",37.8803227272727,51.7712735070501,66,158,0,89.6515962343228
+3,"Mar","Frozen","Orthophosphate","Concentration",1.7113975,1.89004046506301,100,211,0,3.60143796506302
+3,"Mar","Frozen","Orthophosphate","Load",5.632453,8.80975093388857,100,211,0,14.4422039338886
+3,"Mar","Frozen","Orthophosphate","Yield",0.351632856,0.495623162918109,100,211,0,0.847256018918109
+3,"Mar","Frozen","Total phosphorus","Concentration",2.31705166666667,2.29597906910573,100,211,0.0210725975609387,4.61303073577239
+3,"Mar","Frozen","Total phosphorus","Load",7.7447057,10.7494178279367,100,211,0,18.4941235279367
+3,"Mar","Frozen","Total phosphorus","Yield",0.502751818,0.619156514200819,100,211,0,1.12190833220082
+4,"Apr","Non-Frozen","Suspended sediment","Concentration",1650.16319444444,4529.13478284687,48,87,0,6179.29797729131
+4,"Apr","Non-Frozen","Suspended sediment","Load",978.477083333333,3290.89955140688,48,87,0,4269.37663474021
+4,"Apr","Non-Frozen","Suspended sediment","Yield",124.58285625,492.284123991024,48,87,0,616.866980241024
+4,"Apr","Non-Frozen","Total dissolved solids","Concentration",287.298245614035,187.317074564134,38,72,99.981171049901,474.615320178169
+4,"Apr","Non-Frozen","Total dissolved solids","Load",264.8345,377.893047960752,38,72,0,642.727547960752
+4,"Apr","Non-Frozen","Total dissolved solids","Yield",23.1719213157895,28.8828768548691,38,72,0,52.0547981706586
+4,"Apr","Non-Frozen","Orthophosphate","Concentration",1.43579861111111,2.01667131379757,48,87,0,3.45246992490868
+4,"Apr","Non-Frozen","Orthophosphate","Load",1.35065795833333,2.74464460581664,48,87,0,4.09530256414997
+4,"Apr","Non-Frozen","Orthophosphate","Yield",0.122674114583333,0.252151157182852,48,87,0,0.374825271766186
+4,"Apr","Non-Frozen","Total phosphorus","Concentration",3.91765625,5.10427537934958,48,87,0,9.02193162934958
+4,"Apr","Non-Frozen","Total phosphorus","Load",2.825535625,4.38129134516099,48,87,0,7.20682697016099
+4,"Apr","Non-Frozen","Total phosphorus","Yield",0.280990560416667,0.501946806031152,48,87,0,0.782937366447819
+4,"Apr","Frozen","Suspended sediment","Concentration",1180.92857142857,2782.95642959922,7,7,0,3963.88500102779
+4,"Apr","Frozen","Suspended sediment","Load",2584.13142857143,5975.04508381158,7,7,0,8559.17651238301
+4,"Apr","Frozen","Suspended sediment","Yield",115.634571428571,265.843484954874,7,7,0,381.478056383446
+4,"Apr","Frozen","Total dissolved solids","Concentration",217,0,1,1,217,217
+4,"Apr","Frozen","Total dissolved solids","Load",1540,0,1,1,1540,1540
+4,"Apr","Frozen","Total dissolved solids","Yield",36.5,0,1,1,36.5,36.5
+4,"Apr","Frozen","Orthophosphate","Concentration",0.379857142857143,0.280011564387038,7,7,0.0998455784701051,0.659868707244181
+4,"Apr","Frozen","Orthophosphate","Load",2.2879,2.71152872072809,7,7,0,4.99942872072809
+4,"Apr","Frozen","Orthophosphate","Yield",0.132594285714286,0.155942068181012,7,7,0,0.288536353895298
+4,"Apr","Frozen","Total phosphorus","Concentration",2.88185714285714,5.27073044996521,7,7,0,8.15258759282235
+4,"Apr","Frozen","Total phosphorus","Load",8.44971428571429,10.950741477396,7,7,0,19.4004557631103
+4,"Apr","Frozen","Total phosphorus","Yield",0.416871428571429,0.480930337000713,7,7,0,0.897801765572141
+5,"May","Non-Frozen","Suspended sediment","Concentration",4184.6017494824,8151.8875715035,46,115,0,12336.4893209859
+5,"May","Non-Frozen","Suspended sediment","Load",7382.97673913043,13966.2392019587,46,115,0,21349.2159410892
+5,"May","Non-Frozen","Suspended sediment","Yield",776.085908695652,2276.10384732071,46,115,0,3052.18975601637
+5,"May","Non-Frozen","Total dissolved solids","Concentration",205.625185185185,189.685258782622,27,66,15.9399264025634,395.310443967807
+5,"May","Non-Frozen","Total dissolved solids","Load",313.96037037037,540.129264481707,27,66,0,854.089634852077
+5,"May","Non-Frozen","Total dissolved solids","Yield",21.773237037037,38.5291963337809,27,66,0,60.302433370818
+5,"May","Non-Frozen","Orthophosphate","Concentration",0.859073654244306,0.871263668374724,46,115,0,1.73033732261903
+5,"May","Non-Frozen","Orthophosphate","Load",1.20288276086957,2.06692446648938,46,115,0,3.26980722735895
+5,"May","Non-Frozen","Orthophosphate","Yield",0.0719198956521739,0.110936105333409,46,115,0,0.182856000985583
+5,"May","Non-Frozen","Total phosphorus","Concentration",6.00491923740511,8.66721956311494,46,115,0,14.67213880052
+5,"May","Non-Frozen","Total phosphorus","Load",10.4175306521739,19.5877483688494,46,115,0,30.0052790210233
+5,"May","Non-Frozen","Total phosphorus","Yield",0.723903413043478,1.25831194791782,46,115,0,1.9822153609613
+6,"Jun","Non-Frozen","Suspended sediment","Concentration",1892.6987745098,4822.87383163365,68,146,0,6715.57260614346
+6,"Jun","Non-Frozen","Suspended sediment","Load",5673.25313088235,19872.0656377079,68,146,0,25545.3187685903
+6,"Jun","Non-Frozen","Suspended sediment","Yield",241.883814558824,801.584248435351,68,146,0,1043.46806299417
+6,"Jun","Non-Frozen","Total dissolved solids","Concentration",162.156,106.948741921724,50,109,55.2072580782763,269.104741921724
+6,"Jun","Non-Frozen","Total dissolved solids","Load",367.197894,563.737242765597,50,109,0,930.935136765597
+6,"Jun","Non-Frozen","Total dissolved solids","Yield",27.94726008,47.3368823330214,50,109,0,75.2841424130214
+6,"Jun","Non-Frozen","Orthophosphate","Concentration",1.07228431372549,1.11826332057939,68,146,0,2.19054763430488
+6,"Jun","Non-Frozen","Orthophosphate","Load",2.3850575,6.35971812923431,68,146,0,8.74477562923431
+6,"Jun","Non-Frozen","Orthophosphate","Yield",0.214942963235294,0.625033804509389,68,146,0,0.839976767744683
+6,"Jun","Non-Frozen","Total phosphorus","Concentration",3.44253725490196,4.65301392213902,68,146,0,8.09555117704098
+6,"Jun","Non-Frozen","Total phosphorus","Load",9.02230779411765,20.9355508668853,68,146,0,29.957858661003
+6,"Jun","Non-Frozen","Total phosphorus","Yield",0.521525602941176,1.0646739849912,68,146,0,1.58619958793238
+7,"Jul","Non-Frozen","Suspended sediment","Concentration",978.791666666667,2032.10576517575,47,92,0,3010.89743184241
+7,"Jul","Non-Frozen","Suspended sediment","Load",1427.27765957447,2772.6692436884,47,92,0,4199.94690326287
+7,"Jul","Non-Frozen","Suspended sediment","Yield",121.29010212766,311.963384022587,47,92,0,433.253486150247
+7,"Jul","Non-Frozen","Total dissolved solids","Concentration",132.050539215686,125.123010110227,34,73,6.92752910545968,257.173549325913
+7,"Jul","Non-Frozen","Total dissolved solids","Load",211.489941176471,289.903389377256,34,73,0,501.393330553726
+7,"Jul","Non-Frozen","Total dissolved solids","Yield",17.3879941176471,29.0788632237267,34,73,0,46.4668573413738
+7,"Jul","Non-Frozen","Orthophosphate","Concentration",0.907047163120567,0.917732747528112,47,92,0,1.82477991064868
+7,"Jul","Non-Frozen","Orthophosphate","Load",1.26084889361702,2.11761228802182,47,92,0,3.37846118163884
+7,"Jul","Non-Frozen","Orthophosphate","Yield",0.082042714893617,0.137476210557961,47,92,0,0.219518925451578
+7,"Jul","Non-Frozen","Total phosphorus","Concentration",2.31070673758865,2.56855700281987,47,92,0,4.87926374040853
+7,"Jul","Non-Frozen","Total phosphorus","Load",3.36218255319149,4.82974064956479,47,92,0,8.19192320275628
+7,"Jul","Non-Frozen","Total phosphorus","Yield",0.235603468085106,0.354392737821354,47,92,0,0.589996205906461
+8,"Aug","Non-Frozen","Suspended sediment","Concentration",466.123106060606,1007.55845594561,44,67,0,1473.68156200621
+8,"Aug","Non-Frozen","Suspended sediment","Load",594.911340909091,1739.3641059549,44,67,0,2334.27544686399
+8,"Aug","Non-Frozen","Suspended sediment","Yield",31.7622863636364,77.6033753500649,44,67,0,109.365661713701
+8,"Aug","Non-Frozen","Total dissolved solids","Concentration",127.666666666667,101.04498448161,26,35,26.6216821850563,228.711651148277
+8,"Aug","Non-Frozen","Total dissolved solids","Load",80.6067307692308,166.642578808072,26,35,0,247.249309577303
+8,"Aug","Non-Frozen","Total dissolved solids","Yield",4.39461538461538,5.7577082665722,26,35,0,10.1523236511876
+8,"Aug","Non-Frozen","Orthophosphate","Concentration",0.910522727272727,0.672527506897282,44,67,0.237995220375445,1.58305023417001
+8,"Aug","Non-Frozen","Orthophosphate","Load",0.744699090909091,1.11676367944999,44,67,0,1.86146277035909
+8,"Aug","Non-Frozen","Orthophosphate","Yield",0.0519477954545455,0.0689046322476925,44,67,0,0.120852427702238
+8,"Aug","Non-Frozen","Total phosphorus","Concentration",2.01836363636364,1.9537236937884,44,67,0.0646399425752364,3.97208733015204
+8,"Aug","Non-Frozen","Total phosphorus","Load",2.18810363636364,3.85889796053532,44,67,0,6.04700159689896
+8,"Aug","Non-Frozen","Total phosphorus","Yield",0.125022159090909,0.170112122172263,44,67,0,0.295134281263172
+9,"Sep","Non-Frozen","Suspended sediment","Concentration",804.345507246377,1110.95960063225,23,49,0,1915.30510787863
+9,"Sep","Non-Frozen","Suspended sediment","Load",1029.39039130435,1473.15098491723,23,49,0,2502.54137622158
+9,"Sep","Non-Frozen","Suspended sediment","Yield",89.3329434782609,197.159908875214,23,49,0,286.492852353475
+9,"Sep","Non-Frozen","Total dissolved solids","Concentration",116.442777777778,50.7808949565936,12,24,65.6618828211842,167.223672734371
+9,"Sep","Non-Frozen","Total dissolved solids","Load",208.765416666667,261.887860252666,12,24,0,470.653276919332
+9,"Sep","Non-Frozen","Total dissolved solids","Yield",17.2038916666667,33.6880273534964,12,24,0,50.8919190201631
+9,"Sep","Non-Frozen","Orthophosphate","Concentration",0.873050724637681,0.973625405113165,23,49,0,1.84667612975085
+9,"Sep","Non-Frozen","Orthophosphate","Load",1.60442130434783,3.17974014419318,23,49,0,4.78416144854101
+9,"Sep","Non-Frozen","Orthophosphate","Yield",0.0960487826086956,0.172094491063896,23,49,0,0.268143273672592
+9,"Sep","Non-Frozen","Total phosphorus","Concentration",2.7329384057971,2.8603716689852,23,49,0,5.59331007478231
+9,"Sep","Non-Frozen","Total phosphorus","Load",3.93410608695652,6.09532504406879,23,49,0,10.0294311310253
+9,"Sep","Non-Frozen","Total phosphorus","Yield",0.269516956521739,0.40155644020899,23,49,0,0.671073396730729
+10,"Oct","Non-Frozen","Suspended sediment","Concentration",1141.28015873016,1262.51570335249,21,37,0,2403.79586208265
+10,"Oct","Non-Frozen","Suspended sediment","Load",2107.71238095238,4557.49300734286,21,37,0,6665.20538829524
+10,"Oct","Non-Frozen","Suspended sediment","Yield",121.164,192.407850001501,21,37,0,313.571850001501
+10,"Oct","Non-Frozen","Total dissolved solids","Concentration",201.545454545455,126.439996548848,11,13,75.1054579966064,327.985451094303
+10,"Oct","Non-Frozen","Total dissolved solids","Load",88.4445454545454,114.533286609058,11,13,0,202.977832063604
+10,"Oct","Non-Frozen","Total dissolved solids","Yield",8.93801909090909,15.9756056111313,11,13,0,24.9136247020404
+10,"Oct","Non-Frozen","Orthophosphate","Concentration",0.868560317460317,0.75342862359122,21,37,0.115131693869097,1.62198894105154
+10,"Oct","Non-Frozen","Orthophosphate","Load",0.930454761904762,1.62681469539902,21,37,0,2.55726945730378
+10,"Oct","Non-Frozen","Orthophosphate","Yield",0.057555619047619,0.0873143389595754,21,37,0,0.144869958007194
+10,"Oct","Non-Frozen","Total phosphorus","Concentration",2.86533333333333,1.75089339417846,21,37,1.11443993915487,4.6162267275118
+10,"Oct","Non-Frozen","Total phosphorus","Load",4.28696666666667,7.27292648294573,21,37,0,11.5598931496124
+10,"Oct","Non-Frozen","Total phosphorus","Yield",0.268013952380952,0.368148557761738,21,37,0,0.63616251014269
+11,"Nov","Non-Frozen","Suspended sediment","Concentration",879.369230769231,871.216394267822,13,17,8.15283650140839,1750.58562503705
+11,"Nov","Non-Frozen","Suspended sediment","Load",1288.57461538462,3011.71027909563,13,17,0,4300.28489448024
+11,"Nov","Non-Frozen","Suspended sediment","Yield",121.606769230769,244.49614632926,13,17,0,366.102915560029
+11,"Nov","Non-Frozen","Total dissolved solids","Concentration",319.125,90.1132389459692,4,5,229.011761054031,409.238238945969
+11,"Nov","Non-Frozen","Total dissolved solids","Load",574.025,614.812819075855,4,5,0,1188.83781907585
+11,"Nov","Non-Frozen","Total dissolved solids","Yield",68.885,93.7765978269632,4,5,0,162.661597826963
+11,"Nov","Non-Frozen","Orthophosphate","Concentration",1.86396153846154,2.54768956165466,13,17,0,4.4116511001162
+11,"Nov","Non-Frozen","Orthophosphate","Load",1.59305153846154,2.7970596354024,13,17,0,4.39011117386394
+11,"Nov","Non-Frozen","Orthophosphate","Yield",0.114631538461538,0.226177591759446,13,17,0,0.340809130220984
+11,"Nov","Non-Frozen","Total phosphorus","Concentration",3.52984615384615,2.5452588881472,13,17,0.984587265698956,6.07510504199335
+11,"Nov","Non-Frozen","Total phosphorus","Load",4.24528461538462,7.23014032042788,13,17,0,11.4754249358125
+11,"Nov","Non-Frozen","Total phosphorus","Yield",0.351311538461538,0.482711582932745,13,17,0,0.834023121394283
+11,"Nov","Frozen","Suspended sediment","Concentration",303,0,1,1,303,303
+11,"Nov","Frozen","Suspended sediment","Load",27.3,0,1,1,27.3,27.3
+11,"Nov","Frozen","Suspended sediment","Yield",0.818,0,1,1,0.818,0.818
+11,"Nov","Frozen","Total dissolved solids","Concentration",172,0,1,1,172,172
+11,"Nov","Frozen","Total dissolved solids","Load",15.5,0,1,1,15.5,15.5
+11,"Nov","Frozen","Total dissolved solids","Yield",0.465,0,1,1,0.465,0.465
+11,"Nov","Frozen","Orthophosphate","Concentration",0.055,0,1,1,0.055,0.055
+11,"Nov","Frozen","Orthophosphate","Load",0.00496,0,1,1,0.00496,0.00496
+11,"Nov","Frozen","Orthophosphate","Yield",0.000149,0,1,1,0.000149,0.000149
+11,"Nov","Frozen","Total phosphorus","Concentration",0.655,0,1,1,0.655,0.655
+11,"Nov","Frozen","Total phosphorus","Load",0.0591,0,1,1,0.0591,0.0591
+11,"Nov","Frozen","Total phosphorus","Yield",0.00177,0,1,1,0.00177,0.00177
+12,"Dec","Non-Frozen","Suspended sediment","Concentration",530.85,853.127580989177,10,11,0,1383.97758098918
+12,"Dec","Non-Frozen","Suspended sediment","Load",616.836,1314.22124462309,10,11,0,1931.05724462309
+12,"Dec","Non-Frozen","Suspended sediment","Yield",62.73525,123.481232387141,10,11,0,186.216482387141
+12,"Dec","Non-Frozen","Total dissolved solids","Concentration",159.5,131.079810293831,7,8,28.4201897061692,290.579810293831
+12,"Dec","Non-Frozen","Total dissolved solids","Load",171.608571428571,289.606189818091,7,8,0,461.214761246663
+12,"Dec","Non-Frozen","Total dissolved solids","Yield",11.3605428571429,19.1584130918036,7,8,0,30.5189559489464
+12,"Dec","Non-Frozen","Orthophosphate","Concentration",1.5681,1.76952093014528,10,11,0,3.33762093014528
+12,"Dec","Non-Frozen","Orthophosphate","Load",1.700146,3.15968209593659,10,11,0,4.85982809593659
+12,"Dec","Non-Frozen","Orthophosphate","Yield",0.111873,0.207610051247258,10,11,0,0.319483051247258
+12,"Dec","Non-Frozen","Total phosphorus","Concentration",2.5227,1.59828922775434,10,11,0.924410772245663,4.12098922775434
+12,"Dec","Non-Frozen","Total phosphorus","Load",2.77584,3.72555965525837,10,11,0,6.50139965525837
+12,"Dec","Non-Frozen","Total phosphorus","Yield",0.203814,0.240886854223674,10,11,0,0.444700854223674
+12,"Dec","Frozen","Suspended sediment","Concentration",656.95652173913,2694.41746914314,23,23,0,3351.37399088227
+12,"Dec","Frozen","Suspended sediment","Load",230.773434782609,931.940725070578,23,23,0,1162.71415985319
+12,"Dec","Frozen","Suspended sediment","Yield",79.416547826087,359.949580386426,23,23,0,439.366128212513
+12,"Dec","Frozen","Total dissolved solids","Concentration",113.333333333333,55.1779490431283,12,12,58.1553842902051,168.511282376462
+12,"Dec","Frozen","Total dissolved solids","Load",99.1666666666667,140.222251984181,12,12,0,239.388918650848
+12,"Dec","Frozen","Total dissolved solids","Yield",4.046475,4.60577819762109,12,12,0,8.65225319762109
+12,"Dec","Frozen","Orthophosphate","Concentration",1.62,2.86897840544489,23,23,0,4.48897840544489
+12,"Dec","Frozen","Orthophosphate","Load",0.59369652173913,1.24066799870293,23,23,0,1.83436452044206
+12,"Dec","Frozen","Orthophosphate","Yield",0.0338753913043478,0.054628559655799,23,23,0,0.0885039509601469
+12,"Dec","Frozen","Total phosphorus","Concentration",2.48847826086957,3.64054694778839,23,23,0,6.12902520865796
+12,"Dec","Frozen","Total phosphorus","Load",0.835,1.34911571914212,23,23,0,2.18411571914212
+12,"Dec","Frozen","Total phosphorus","Yield",0.101979956521739,0.230683642280245,23,23,0,0.332663598801984

@@ -1,0 +1,337 @@
+"Field_Name","Hydrologic_Group","Constituent","Metric","Events","Mean","Standard_Deviation","Median"
+"AO1","High-infiltration","Suspended sediment","Concentration",10,636,1309.26388478412,93
+"AO1","High-infiltration","Suspended sediment","Load",10,489.543,612.307795367475,195.5
+"AO1","High-infiltration","Suspended sediment","Yield",10,22.0389,27.5763709176695,8.805
+"AO1","High-infiltration","Total dissolved solids","Concentration",0,,0,
+"AO1","High-infiltration","Total dissolved solids","Load",0,,0,
+"AO1","High-infiltration","Total dissolved solids","Yield",0,,0,
+"AO1","High-infiltration","Orthophosphate","Concentration",10,0.7302,0.663766993923487,0.411
+"AO1","High-infiltration","Orthophosphate","Load",10,5.25415,10.4437951277036,0.8795
+"AO1","High-infiltration","Orthophosphate","Yield",10,0.2365006,0.469980014638022,0.03955
+"AO1","High-infiltration","Total phosphorus","Concentration",10,3.0153,4.58859850426395,0.8135
+"AO1","High-infiltration","Total phosphorus","Load",10,7.13632,10.9192406940735,4.24
+"AO1","High-infiltration","Total phosphorus","Yield",10,0.321166,0.490672354138233,0.191
+"AO3","High-infiltration","Suspended sediment","Concentration",28,9777.58928571429,15581.7317818095,5010
+"AO3","High-infiltration","Suspended sediment","Load",28,10191.2142857143,21216.6915149669,2190
+"AO3","High-infiltration","Suspended sediment","Yield",28,454.316785714286,944.225515455621,97.85
+"AO3","High-infiltration","Total dissolved solids","Concentration",0,,0,
+"AO3","High-infiltration","Total dissolved solids","Load",0,,0,
+"AO3","High-infiltration","Total dissolved solids","Yield",0,,0,
+"AO3","High-infiltration","Orthophosphate","Concentration",28,0.167142857142857,0.152841412432944,0.134
+"AO3","High-infiltration","Orthophosphate","Load",28,0.36305,1.1143103359544,0.09185
+"AO3","High-infiltration","Orthophosphate","Yield",28,0.0162241428571429,0.0498562502844255,0.0041
+"AO3","High-infiltration","Total phosphorus","Concentration",28,14.501,17.9438098332916,10.2
+"AO3","High-infiltration","Total phosphorus","Load",28,14.6446785714286,23.2330667704357,6.305
+"AO3","High-infiltration","Total phosphorus","Yield",28,0.653760714285714,1.03697253949115,0.2815
+"AR1","High-infiltration","Suspended sediment","Concentration",47,304.240425531915,451.171949125913,123
+"AR1","High-infiltration","Suspended sediment","Load",47,249.976234042553,492.941961151756,50.5
+"AR1","High-infiltration","Suspended sediment","Yield",47,13.5173561702128,26.6724748149821,2.73
+"AR1","High-infiltration","Total dissolved solids","Concentration",14,47.25,51.2905561857751,29
+"AR1","High-infiltration","Total dissolved solids","Load",14,14.9528571428571,22.0748535768544,7.145
+"AR1","High-infiltration","Total dissolved solids","Yield",14,0.808028571428571,1.19327124225065,0.386
+"AR1","High-infiltration","Orthophosphate","Concentration",47,0.605787234042553,0.681592028178856,0.387
+"AR1","High-infiltration","Orthophosphate","Load",47,0.554362127659574,1.18523604036594,0.173
+"AR1","High-infiltration","Orthophosphate","Yield",47,0.0299693191489362,0.0640787335797029,0.00937
+"AR1","High-infiltration","Total phosphorus","Concentration",47,1.28587234042553,0.964873490626605,1.08
+"AR1","High-infiltration","Total phosphorus","Load",47,1.31364425531915,2.10932625507452,0.427
+"AR1","High-infiltration","Total phosphorus","Yield",47,0.0710734042553191,0.11420692490743,0.0231
+"AR2","High-infiltration","Suspended sediment","Concentration",24,5647.74166666667,8413.75307157827,794.5
+"AR2","High-infiltration","Suspended sediment","Load",24,1437.882675,2922.75959767761,94.65
+"AR2","High-infiltration","Suspended sediment","Yield",24,248.05422,504.806938210587,16.35
+"AR2","High-infiltration","Total dissolved solids","Concentration",13,146.953846153846,138.846057532462,104
+"AR2","High-infiltration","Total dissolved solids","Load",13,32.5530769230769,36.7044782428101,17.6
+"AR2","High-infiltration","Total dissolved solids","Yield",13,5.60415384615385,6.31001534396119,3.03
+"AR2","High-infiltration","Orthophosphate","Concentration",24,1.40808333333333,1.93720443841942,0.8315
+"AR2","High-infiltration","Orthophosphate","Load",24,0.477579583333333,0.937003551106812,0.1235
+"AR2","High-infiltration","Orthophosphate","Yield",24,0.0823745833333333,0.161571211893896,0.02135
+"AR2","High-infiltration","Total phosphorus","Concentration",24,7.15608333333333,6.52314143390029,6.715
+"AR2","High-infiltration","Total phosphorus","Load",24,1.90425416666667,2.3349224120764,1.261
+"AR2","High-infiltration","Total phosphorus","Yield",24,0.328698333333333,0.404146810654642,0.2175
+"H3","Moderate-infiltration","Suspended sediment","Concentration",21,2570.61904761905,4890.53932931932,106
+"H3","Moderate-infiltration","Suspended sediment","Load",21,132.96619047619,251.030147422101,27.6
+"H3","Moderate-infiltration","Suspended sediment","Yield",21,8.41069047619048,15.8791212416779,1.75
+"H3","Moderate-infiltration","Total dissolved solids","Concentration",19,316.473684210526,459.219430534159,160
+"H3","Moderate-infiltration","Total dissolved solids","Load",19,222.462842105263,328.046114851295,29.8
+"H3","Moderate-infiltration","Total dissolved solids","Yield",19,14.0831684210526,20.7679601397081,1.88
+"H3","Moderate-infiltration","Orthophosphate","Concentration",21,1.48733333333333,2.0765749524959,0.916
+"H3","Moderate-infiltration","Orthophosphate","Load",21,1.38691928571429,2.50052475267795,0.222
+"H3","Moderate-infiltration","Orthophosphate","Yield",21,0.0877602285714286,0.158243940674154,0.014
+"H3","Moderate-infiltration","Total phosphorus","Concentration",21,4.92,5.82517896720779,2.76
+"H3","Moderate-infiltration","Total phosphorus","Load",21,2.08553333333333,3.34515601150878,0.463
+"H3","Moderate-infiltration","Total phosphorus","Yield",21,0.13216980952381,0.212175525456547,0.0293
+"JF2","High-infiltration","Suspended sediment","Concentration",25,867.196,990.840069705164,522
+"JF2","High-infiltration","Suspended sediment","Load",25,325.68808,565.091842956739,82.7
+"JF2","High-infiltration","Suspended sediment","Yield",25,20.361968,35.3527247650225,5.17
+"JF2","High-infiltration","Total dissolved solids","Concentration",25,196.04,144.676213202678,144
+"JF2","High-infiltration","Total dissolved solids","Load",25,107.14428,132.794847665964,61
+"JF2","High-infiltration","Total dissolved solids","Yield",25,6.6959764,8.29651989439492,3.81
+"JF2","High-infiltration","Orthophosphate","Concentration",25,2.59556,2.26829541506392,1.85
+"JF2","High-infiltration","Orthophosphate","Load",25,1.4298096,2.00987106126131,0.661
+"JF2","High-infiltration","Orthophosphate","Yield",25,0.08937712,0.125686581343674,0.0413
+"JF2","High-infiltration","Total phosphorus","Concentration",25,5.73404,6.657768410411,3.58
+"JF2","High-infiltration","Total phosphorus","Load",25,2.81058,4.20323308725954,0.952
+"JF2","High-infiltration","Total phosphorus","Yield",25,0.17555672,0.262125825129288,0.0595
+"JF4","Moderate-infiltration","Suspended sediment","Concentration",55,226.369090909091,551.887174081646,39
+"JF4","Moderate-infiltration","Suspended sediment","Load",55,160.164923636364,300.486228184576,25.8
+"JF4","Moderate-infiltration","Suspended sediment","Yield",55,11.4381563636364,21.4315373817398,1.84
+"JF4","Moderate-infiltration","Total dissolved solids","Concentration",55,102.445454545455,73.4602483034742,83
+"JF4","Moderate-infiltration","Total dissolved solids","Load",55,86.6829090909091,112.41314139391,39.1
+"JF4","Moderate-infiltration","Total dissolved solids","Yield",55,6.19476363636364,8.02869816706995,2.8
+"JF4","Moderate-infiltration","Orthophosphate","Concentration",55,0.859363636363636,1.0168306855606,0.538
+"JF4","Moderate-infiltration","Orthophosphate","Load",55,0.747308,1.11434855076923,0.3
+"JF4","Moderate-infiltration","Orthophosphate","Yield",55,0.0533512545454545,0.0795612784928415,0.0214
+"JF4","Moderate-infiltration","Total phosphorus","Concentration",55,1.41536363636364,1.44310532409488,0.96
+"JF4","Moderate-infiltration","Total phosphorus","Load",55,1.22031018181818,1.6931506627187,0.527
+"JF4","Moderate-infiltration","Total phosphorus","Yield",55,0.0871404,0.120915679847968,0.0376
+"JF5","High-infiltration","Suspended sediment","Concentration",41,1613.3,2861.63208064908,337
+"JF5","High-infiltration","Suspended sediment","Load",41,3230.83060243902,8149.36537580481,77.8
+"JF5","High-infiltration","Suspended sediment","Yield",41,96.8132626829268,244.269622119446,2.33
+"JF5","High-infiltration","Total dissolved solids","Concentration",41,124.907317073171,78.0198833318914,108
+"JF5","High-infiltration","Total dissolved solids","Load",41,119.203365853659,188.353074006075,30.4
+"JF5","High-infiltration","Total dissolved solids","Yield",41,3.56807365853659,5.64083385590719,0.909
+"JF5","High-infiltration","Orthophosphate","Concentration",41,0.574536585365854,0.481701364828925,0.361
+"JF5","High-infiltration","Orthophosphate","Load",41,0.403612926829268,0.627523780359135,0.119
+"JF5","High-infiltration","Orthophosphate","Yield",41,0.0120822317073171,0.0187741812877744,0.00357
+"JF5","High-infiltration","Total phosphorus","Concentration",41,2.78065853658537,3.00122827030664,1.87
+"JF5","High-infiltration","Total phosphorus","Load",41,3.92844,8.05682412546377,0.668
+"JF5","High-infiltration","Total phosphorus","Yield",41,0.117485909756098,0.24073076767639,0.02
+"K5","Slow-infiltration","Suspended sediment","Concentration",52,120.969230769231,251.177626812504,50.5
+"K5","Slow-infiltration","Suspended sediment","Load",52,149.616267307692,420.506467246905,16.85
+"K5","Slow-infiltration","Suspended sediment","Yield",52,9.83163865384615,27.5984217037335,1.105
+"K5","Slow-infiltration","Total dissolved solids","Concentration",52,422.730769230769,204.075833212454,398
+"K5","Slow-infiltration","Total dissolved solids","Load",52,388.971153846154,569.810075839358,140
+"K5","Slow-infiltration","Total dissolved solids","Yield",52,25.5875384615385,37.5069186069803,9.215
+"K5","Slow-infiltration","Orthophosphate","Concentration",52,4.40538461538462,1.98871962114406,4.56
+"K5","Slow-infiltration","Orthophosphate","Load",52,4.67325192307692,8.30038795000478,1.0615
+"K5","Slow-infiltration","Orthophosphate","Yield",52,0.307269038461538,0.545817890495843,0.0699
+"K5","Slow-infiltration","Total phosphorus","Concentration",52,5.48942307692308,2.53499848277909,5.51
+"K5","Slow-infiltration","Total phosphorus","Load",52,5.92345961538462,10.4788894594062,1.535
+"K5","Slow-infiltration","Total phosphorus","Yield",52,0.389647692307692,0.689374806947131,0.10065
+"K7","Slow-infiltration","Suspended sediment","Concentration",32,59.746875,97.8264427092448,20
+"K7","Slow-infiltration","Suspended sediment","Load",32,124.34209375,450.908473922073,12.02
+"K7","Slow-infiltration","Suspended sediment","Yield",32,10.381990625,37.6905758546835,1.005
+"K7","Slow-infiltration","Total dissolved solids","Concentration",32,265.090625,151.570482613195,212
+"K7","Slow-infiltration","Total dissolved solids","Load",32,259.4290625,368.689930738724,92.35
+"K7","Slow-infiltration","Total dissolved solids","Yield",32,21.62553125,30.7336327875761,7.7
+"K7","Slow-infiltration","Orthophosphate","Concentration",32,2.05196875,0.911337637385023,1.94
+"K7","Slow-infiltration","Orthophosphate","Load",32,2.823396875,5.45930169914138,0.831
+"K7","Slow-infiltration","Orthophosphate","Yield",32,0.235294375,0.455127938191205,0.06935
+"K7","Slow-infiltration","Total phosphorus","Concentration",32,2.413,0.954291630545418,2.225
+"K7","Slow-infiltration","Total phosphorus","Load",32,3.3891875,6.44727532371922,1.2465
+"K7","Slow-infiltration","Total phosphorus","Yield",32,0.2825978125,0.53745145273173,0.10395
+"K8","Moderate-infiltration","Suspended sediment","Concentration",40,74.1475,171.437731818365,22.5
+"K8","Moderate-infiltration","Suspended sediment","Load",40,20.317345,48.3679836134424,3.4
+"K8","Moderate-infiltration","Suspended sediment","Yield",40,4.06435,9.6758757416418,0.68
+"K8","Moderate-infiltration","Total dissolved solids","Concentration",40,243.3,84.6150256402642,229
+"K8","Moderate-infiltration","Total dissolved solids","Load",40,67.302925,71.0060403293314,39.05
+"K8","Moderate-infiltration","Total dissolved solids","Yield",40,13.455985,14.194628452748,7.8
+"K8","Moderate-infiltration","Orthophosphate","Concentration",40,1.2186,0.589706002369629,1.14
+"K8","Moderate-infiltration","Orthophosphate","Load",40,0.353232,0.386941543767703,0.2095
+"K8","Moderate-infiltration","Orthophosphate","Yield",40,0.0705775,0.0773040322612356,0.0419
+"K8","Moderate-infiltration","Total phosphorus","Concentration",40,1.5538,0.7820277455895,1.435
+"K8","Moderate-infiltration","Total phosphorus","Load",40,0.46308,0.561801599800554,0.227
+"K8","Moderate-infiltration","Total phosphorus","Yield",40,0.09264175,0.112384218389473,0.0454
+"KD1","Moderate-infiltration","Suspended sediment","Concentration",49,3663.87755102041,11350.4139363444,666
+"KD1","Moderate-infiltration","Suspended sediment","Load",49,2267.97951020408,7393.30856310041,68
+"KD1","Moderate-infiltration","Suspended sediment","Yield",49,871.754204081633,2841.6761874829,26.1
+"KD1","Moderate-infiltration","Total dissolved solids","Concentration",0,,0,
+"KD1","Moderate-infiltration","Total dissolved solids","Load",0,,0,
+"KD1","Moderate-infiltration","Total dissolved solids","Yield",0,,0,
+"KD1","Moderate-infiltration","Orthophosphate","Concentration",49,0.304775510204082,0.616857873463914,0.122
+"KD1","Moderate-infiltration","Orthophosphate","Load",49,0.0984037142857143,0.305862493386666,0.0441
+"KD1","Moderate-infiltration","Orthophosphate","Yield",49,0.0378613265306122,0.117791436460697,0.017
+"KD1","Moderate-infiltration","Total phosphorus","Concentration",49,2.47924489795918,3.02437969212016,1.54
+"KD1","Moderate-infiltration","Total phosphorus","Load",49,1.11145102040816,2.42248701390761,0.227
+"KD1","Moderate-infiltration","Total phosphorus","Yield",49,0.427534489795918,0.931038107016529,0.0873
+"KD2","Moderate-infiltration","Suspended sediment","Concentration",42,844.714285714286,1033.2705424705,458.5
+"KD2","Moderate-infiltration","Suspended sediment","Load",42,2481.60738095238,4480.04658820564,978
+"KD2","Moderate-infiltration","Suspended sediment","Yield",42,125.38219047619,226.486057994019,49.35
+"KD2","Moderate-infiltration","Total dissolved solids","Concentration",0,,0,
+"KD2","Moderate-infiltration","Total dissolved solids","Load",0,,0,
+"KD2","Moderate-infiltration","Total dissolved solids","Yield",0,,0,
+"KD2","Moderate-infiltration","Orthophosphate","Concentration",42,0.825,0.591784692224477,0.6395
+"KD2","Moderate-infiltration","Orthophosphate","Load",42,1.9403619047619,2.21373472367536,1.38
+"KD2","Moderate-infiltration","Orthophosphate","Yield",42,0.0979423809523809,0.111560110884376,0.0697
+"KD2","Moderate-infiltration","Total phosphorus","Concentration",42,2.4037619047619,1.65933296632939,1.965
+"KD2","Moderate-infiltration","Total phosphorus","Load",42,6.36716666666667,7.98432879692453,3.435
+"KD2","Moderate-infiltration","Total phosphorus","Yield",42,0.321695238095238,0.403391683985278,0.1735
+"KP3","Slow-infiltration","Suspended sediment","Concentration",23,171.695652173913,176.016123947007,122
+"KP3","Slow-infiltration","Suspended sediment","Load",23,135.875717391304,286.064952435187,17.5
+"KP3","Slow-infiltration","Suspended sediment","Yield",23,22.2695047826087,46.8538799628016,2.87
+"KP3","Slow-infiltration","Total dissolved solids","Concentration",23,216.130434782609,191.185845888194,148
+"KP3","Slow-infiltration","Total dissolved solids","Load",23,91.8887391304348,121.618257078232,40.1
+"KP3","Slow-infiltration","Total dissolved solids","Yield",23,15.0663391304348,19.9305185912947,6.57
+"KP3","Slow-infiltration","Orthophosphate","Concentration",23,3.534,3.61668317410002,2.68
+"KP3","Slow-infiltration","Orthophosphate","Load",23,1.93807782608696,3.06831821366505,0.407
+"KP3","Slow-infiltration","Orthophosphate","Yield",23,0.317464347826087,0.502367534144132,0.0668
+"KP3","Slow-infiltration","Total phosphorus","Concentration",23,4.25821739130435,4.28377407897333,3.54
+"KP3","Slow-infiltration","Total phosphorus","Load",23,2.36696086956522,3.55664005893958,0.574
+"KP3","Slow-infiltration","Total phosphorus","Yield",23,0.387744782608696,0.582229894409647,0.0941
+"MT1","Slow-infiltration","Suspended sediment","Concentration",7,87.5285714285714,49.9318440238196,79
+"MT1","Slow-infiltration","Suspended sediment","Load",7,129.638571428571,131.390372862521,141
+"MT1","Slow-infiltration","Suspended sediment","Yield",7,16.859,17.0696028170937,18.4
+"MT1","Slow-infiltration","Total dissolved solids","Concentration",0,,0,
+"MT1","Slow-infiltration","Total dissolved solids","Load",0,,0,
+"MT1","Slow-infiltration","Total dissolved solids","Yield",0,,0,
+"MT1","Slow-infiltration","Orthophosphate","Concentration",7,0.668714285714286,0.479885303756955,0.418
+"MT1","Slow-infiltration","Orthophosphate","Load",7,0.751014285714286,0.605082006641996,0.498
+"MT1","Slow-infiltration","Orthophosphate","Yield",7,0.09752,0.0784981876648542,0.0647
+"MT1","Slow-infiltration","Total phosphorus","Concentration",7,0.978428571428571,0.519497788619887,0.847
+"MT1","Slow-infiltration","Total phosphorus","Load",7,1.32771428571429,1.23551928546741,0.975
+"MT1","Slow-infiltration","Total phosphorus","Yield",7,0.172428571428571,0.160565819466512,0.127
+"MT2","Slow-infiltration","Suspended sediment","Concentration",13,9.28461538461539,5.58865609275405,8
+"MT2","Slow-infiltration","Suspended sediment","Load",13,7.33277692307692,9.80643886927987,2.48
+"MT2","Slow-infiltration","Suspended sediment","Yield",13,1.30825230769231,1.75003679729958,0.443
+"MT2","Slow-infiltration","Total dissolved solids","Concentration",0,,0,
+"MT2","Slow-infiltration","Total dissolved solids","Load",0,,0,
+"MT2","Slow-infiltration","Total dissolved solids","Yield",0,,0,
+"MT2","Slow-infiltration","Orthophosphate","Concentration",13,1.03861538461538,0.71973867230423,0.814
+"MT2","Slow-infiltration","Orthophosphate","Load",13,0.836653846153846,1.15930754735703,0.261
+"MT2","Slow-infiltration","Orthophosphate","Yield",13,0.149333076923077,0.206971227202584,0.0466
+"MT2","Slow-infiltration","Total phosphorus","Concentration",13,1.25292307692308,0.834232427797999,0.953
+"MT2","Slow-infiltration","Total phosphorus","Load",13,1.01896923076923,1.3651812745228,0.325
+"MT2","Slow-infiltration","Total phosphorus","Yield",13,0.181950769230769,0.243677900874,0.058
+"P1","Moderate-infiltration","Suspended sediment","Concentration",48,676.7875,1503.98403718116,134.5
+"P1","Moderate-infiltration","Suspended sediment","Load",48,1055.85060416667,3788.61173948922,62.75
+"P1","Moderate-infiltration","Suspended sediment","Yield",48,51.4505908333333,184.58974165899,3.065
+"P1","Moderate-infiltration","Total dissolved solids","Concentration",29,345.310344827586,222.468152367331,288
+"P1","Moderate-infiltration","Total dissolved solids","Load",29,342.149655172414,394.97268933147,145
+"P1","Moderate-infiltration","Total dissolved solids","Yield",29,16.6886896551724,19.2615697051769,7.08
+"P1","Moderate-infiltration","Orthophosphate","Concentration",48,0.907270833333333,0.455819474324824,0.765
+"P1","Moderate-infiltration","Orthophosphate","Load",48,1.047040625,1.42573351200305,0.3255
+"P1","Moderate-infiltration","Orthophosphate","Yield",48,0.0511108666666667,0.0695747275888134,0.01585
+"P1","Moderate-infiltration","Total phosphorus","Concentration",48,2.48995833333333,2.4823865058013,1.81
+"P1","Moderate-infiltration","Total phosphorus","Load",48,3.27861208333333,6.769244614636,0.8715
+"P1","Moderate-infiltration","Total phosphorus","Yield",48,0.160203391666667,0.331161131838459,0.0425
+"P2","Moderate-infiltration","Suspended sediment","Concentration",39,1063.90769230769,2716.15441410371,119
+"P2","Moderate-infiltration","Suspended sediment","Load",39,796.820307692308,2613.90922490049,62.8
+"P2","Moderate-infiltration","Suspended sediment","Yield",39,36.0399102564103,118.163867810883,2.84
+"P2","Moderate-infiltration","Total dissolved solids","Concentration",18,252.888888888889,144.312116359315,195
+"P2","Moderate-infiltration","Total dissolved solids","Load",18,199.194444444444,186.876843598137,131.5
+"P2","Moderate-infiltration","Total dissolved solids","Yield",18,9.01016666666667,8.45491735966849,5.935
+"P2","Moderate-infiltration","Orthophosphate","Concentration",39,0.131948717948718,0.0921723068120242,0.115
+"P2","Moderate-infiltration","Orthophosphate","Load",39,0.0678623076923077,0.0573225182381758,0.0518
+"P2","Moderate-infiltration","Orthophosphate","Yield",39,0.00306966666666667,0.00259253936003551,0.00235
+"P2","Moderate-infiltration","Total phosphorus","Concentration",39,1.67348717948718,3.26064897376189,0.419
+"P2","Moderate-infiltration","Total phosphorus","Load",39,1.16969974358974,3.07126047576603,0.21
+"P2","Moderate-infiltration","Total phosphorus","Yield",39,0.0529172564102564,0.138745086839085,0.00951
+"P3","Moderate-infiltration","Suspended sediment","Concentration",52,837.805769230769,1904.89102178262,93.5
+"P3","Moderate-infiltration","Suspended sediment","Load",52,868.515153846154,3197.57801834776,30.45
+"P3","Moderate-infiltration","Suspended sediment","Yield",52,65.8267326923077,242.626001153108,2.31
+"P3","Moderate-infiltration","Total dissolved solids","Concentration",31,294.161290322581,185.918278960442,263
+"P3","Moderate-infiltration","Total dissolved solids","Load",31,269.758064516129,363.684914703367,110
+"P3","Moderate-infiltration","Total dissolved solids","Yield",31,20.4156451612903,27.4823966016411,8.37
+"P3","Moderate-infiltration","Orthophosphate","Concentration",52,0.345192307692308,0.300769408022846,0.293
+"P3","Moderate-infiltration","Orthophosphate","Load",52,0.417305192307692,1.34681736668557,0.106
+"P3","Moderate-infiltration","Orthophosphate","Yield",52,0.0316294230769231,0.102066300062484,0.00803
+"P3","Moderate-infiltration","Total phosphorus","Concentration",52,1.76073076923077,2.87892829403095,0.573
+"P3","Moderate-infiltration","Total phosphorus","Load",52,1.91232365384615,5.303146512349,0.3005
+"P3","Moderate-infiltration","Total phosphorus","Yield",52,0.144765288461538,0.401229503390801,0.0228
+"R1","High-infiltration","Suspended sediment","Concentration",64,374.63125,669.596966880493,58.55
+"R1","High-infiltration","Suspended sediment","Load",64,294.861403125,923.083019123746,28.95
+"R1","High-infiltration","Suspended sediment","Yield",64,17.4476053125,54.5787320784746,1.71
+"R1","High-infiltration","Total dissolved solids","Concentration",55,116.8,108.00410314565,108
+"R1","High-infiltration","Total dissolved solids","Load",55,114.786554545455,229.63969855355,43
+"R1","High-infiltration","Total dissolved solids","Yield",55,6.78969218181818,13.5728550272522,2.54
+"R1","High-infiltration","Orthophosphate","Concentration",64,2.17440625,2.50002872185882,1.2
+"R1","High-infiltration","Orthophosphate","Load",64,2.52403859375,5.1154001898301,0.4815
+"R1","High-infiltration","Orthophosphate","Yield",64,0.149373859375,0.302990496858616,0.0285
+"R1","High-infiltration","Total phosphorus","Concentration",64,3.270203125,3.37881548315329,1.98
+"R1","High-infiltration","Total phosphorus","Load",64,3.484048125,6.58233987097387,0.8165
+"R1","High-infiltration","Total phosphorus","Yield",64,0.206241734375,0.389805587082792,0.0483
+"R2","High-infiltration","Suspended sediment","Concentration",57,697.608771929825,1546.94839907024,65
+"R2","High-infiltration","Suspended sediment","Load",57,360.179385964912,1671.97495981576,25.4
+"R2","High-infiltration","Suspended sediment","Yield",57,20.9255701754386,96.9928604999265,1.48
+"R2","High-infiltration","Total dissolved solids","Concentration",48,112.979166666667,81.3228866750506,100
+"R2","High-infiltration","Total dissolved solids","Load",48,82.254375,110.696897222969,24.65
+"R2","High-infiltration","Total dissolved solids","Yield",48,4.77883333333333,6.42741600216002,1.435
+"R2","High-infiltration","Orthophosphate","Concentration",57,2.46684210526316,3.23071604618119,1.36
+"R2","High-infiltration","Orthophosphate","Load",57,2.13499614035088,4.27972377939476,0.444
+"R2","High-infiltration","Orthophosphate","Yield",57,0.124237807017544,0.249274920066139,0.0258
+"R2","High-infiltration","Total phosphorus","Concentration",57,3.8829649122807,3.94841771638116,2.71
+"R2","High-infiltration","Total phosphorus","Load",57,2.88335315789474,5.37102131840702,0.884
+"R2","High-infiltration","Total phosphorus","Yield",57,0.167853596491228,0.313087302931162,0.0514
+"R3","High-infiltration","Suspended sediment","Concentration",60,534.405,942.058775816679,170
+"R3","High-infiltration","Suspended sediment","Load",60,368.168783333333,873.286819816174,38.45
+"R3","High-infiltration","Suspended sediment","Yield",60,9.31682333333333,22.0922543855776,0.9725
+"R3","High-infiltration","Total dissolved solids","Concentration",51,139.958823529412,113.125714453383,108
+"R3","High-infiltration","Total dissolved solids","Load",51,357.167396078431,737.827234871693,52.7
+"R3","High-infiltration","Total dissolved solids","Yield",51,9.04101458823529,18.6649867708439,1.34
+"R3","High-infiltration","Orthophosphate","Concentration",60,2.16121666666667,2.31615448455574,1.17
+"R3","High-infiltration","Orthophosphate","Load",60,6.07110133333333,14.0103792419609,0.541
+"R3","High-infiltration","Orthophosphate","Yield",60,0.153757611666667,0.35499206020459,0.0137
+"R3","High-infiltration","Total phosphorus","Concentration",60,3.26016666666667,2.73575104902838,2.37
+"R3","High-infiltration","Total phosphorus","Load",60,7.8623765,18.2827304620731,1.22
+"R3","High-infiltration","Total phosphorus","Yield",60,0.198785298333333,0.461617711745737,0.03085
+"RE1","High-infiltration","Suspended sediment","Concentration",26,298.715384615385,425.22696592978,37.85
+"RE1","High-infiltration","Suspended sediment","Load",26,14.5367692307692,21.865178225311,5.055
+"RE1","High-infiltration","Suspended sediment","Yield",26,1.54687307692308,2.32627105842078,0.538
+"RE1","High-infiltration","Total dissolved solids","Concentration",12,90.3166666666667,43.2847198177021,74.9
+"RE1","High-infiltration","Total dissolved solids","Load",12,31.023,46.3391404185196,4.015
+"RE1","High-infiltration","Total dissolved solids","Yield",12,3.2883,4.90282226885699,0.4275
+"RE1","High-infiltration","Orthophosphate","Concentration",26,2.13796153846154,2.86522323710763,0.877
+"RE1","High-infiltration","Orthophosphate","Load",26,1.01468269230769,1.89615165984065,0.1357
+"RE1","High-infiltration","Orthophosphate","Yield",26,0.107971692307692,0.201805774063433,0.01446
+"RE1","High-infiltration","Total phosphorus","Concentration",26,2.69857692307692,2.6857310092126,2.165
+"RE1","High-infiltration","Total phosphorus","Load",26,1.10047846153846,1.9736455148191,0.187
+"RE1","High-infiltration","Total phosphorus","Yield",26,0.117081807692308,0.209856024806727,0.01985
+"RE5","High-infiltration","Suspended sediment","Concentration",33,159.40303030303,198.833619964105,92.3
+"RE5","High-infiltration","Suspended sediment","Load",33,68.4300606060606,144.181237416433,7.02
+"RE5","High-infiltration","Suspended sediment","Yield",33,7.05626060606061,14.8707086032605,0.723
+"RE5","High-infiltration","Total dissolved solids","Concentration",15,86.0333333333333,43.6387715334928,72
+"RE5","High-infiltration","Total dissolved solids","Load",15,54.5678666666667,111.380851708302,3.87
+"RE5","High-infiltration","Total dissolved solids","Yield",15,5.62458,11.4761898160745,0.399
+"RE5","High-infiltration","Orthophosphate","Concentration",33,1.6019696969697,2.09683308057724,0.755
+"RE5","High-infiltration","Orthophosphate","Load",33,1.41961,3.3376111021442,0.101
+"RE5","High-infiltration","Orthophosphate","Yield",33,0.146453736363636,0.34461971173137,0.0104
+"RE5","High-infiltration","Total phosphorus","Concentration",33,1.98075757575758,2.02251797010408,1.21
+"RE5","High-infiltration","Total phosphorus","Load",33,1.59354,3.49838916026541,0.108
+"RE5","High-infiltration","Total phosphorus","Yield",33,0.164572212121212,0.361068543064,0.0111
+"RS1","Moderate-infiltration","Suspended sediment","Concentration",21,147.938095238095,207.396963517286,62.7
+"RS1","Moderate-infiltration","Suspended sediment","Load",21,38.4035714285714,99.1395492276273,1.83
+"RS1","Moderate-infiltration","Suspended sediment","Yield",21,18.295319047619,47.2483683352941,0.87
+"RS1","Moderate-infiltration","Total dissolved solids","Concentration",0,,0,
+"RS1","Moderate-infiltration","Total dissolved solids","Load",0,,0,
+"RS1","Moderate-infiltration","Total dissolved solids","Yield",0,,0,
+"RS1","Moderate-infiltration","Orthophosphate","Concentration",21,0.651666666666667,0.74871017979812,0.338
+"RS1","Moderate-infiltration","Orthophosphate","Load",21,0.120110952380952,0.323379224408507,0.0234
+"RS1","Moderate-infiltration","Orthophosphate","Yield",21,0.0570480952380952,0.153450229964606,0.0112
+"RS1","Moderate-infiltration","Total phosphorus","Concentration",21,1.60480952380952,2.80577865518732,0.941
+"RS1","Moderate-infiltration","Total phosphorus","Load",21,0.307990476190476,0.657657090667136,0.0476
+"RS1","Moderate-infiltration","Total phosphorus","Yield",21,0.146460476190476,0.31256704540748,0.0227
+"RS2","Moderate-infiltration","Suspended sediment","Concentration",20,150.71,222.333315210815,94.5
+"RS2","Moderate-infiltration","Suspended sediment","Load",20,45.6835,140.006303727443,8.215
+"RS2","Moderate-infiltration","Suspended sediment","Yield",20,24.02615,73.6544625533915,4.325
+"RS2","Moderate-infiltration","Total dissolved solids","Concentration",0,,0,
+"RS2","Moderate-infiltration","Total dissolved solids","Load",0,,0,
+"RS2","Moderate-infiltration","Total dissolved solids","Yield",0,,0,
+"RS2","Moderate-infiltration","Orthophosphate","Concentration",20,0.21335,0.122213478023196,0.1815
+"RS2","Moderate-infiltration","Orthophosphate","Load",20,0.0514725,0.0678112952767108,0.0254
+"RS2","Moderate-infiltration","Orthophosphate","Yield",20,0.0270793,0.0356643923455727,0.0134
+"RS2","Moderate-infiltration","Total phosphorus","Concentration",20,0.56505,0.356280267412284,0.431
+"RS2","Moderate-infiltration","Total phosphorus","Load",20,0.1376635,0.197878343839819,0.0593
+"RS2","Moderate-infiltration","Total phosphorus","Yield",20,0.072429,0.104074205960535,0.03125
+"WF1","High-infiltration","Suspended sediment","Concentration",63,940.284126984127,1838.63446447018,126
+"WF1","High-infiltration","Suspended sediment","Load",63,1766.37415873016,4067.35765389356,64
+"WF1","High-infiltration","Suspended sediment","Yield",63,41.9191857142857,96.532494736606,1.52
+"WF1","High-infiltration","Total dissolved solids","Concentration",63,132.119047619048,65.5242330379179,120
+"WF1","High-infiltration","Total dissolved solids","Load",63,189.814444444444,301.97727630156,75.6
+"WF1","High-infiltration","Total dissolved solids","Yield",63,4.50471587301587,7.15981017265497,1.8
+"WF1","High-infiltration","Orthophosphate","Concentration",63,0.807412698412698,0.982092953272962,0.594
+"WF1","High-infiltration","Orthophosphate","Load",63,0.879463492063492,1.17298322682802,0.429
+"WF1","High-infiltration","Orthophosphate","Yield",63,0.0208811428571429,0.0278573199645676,0.0102
+"WF1","High-infiltration","Total phosphorus","Concentration",63,2.33093650793651,2.63960762524633,1.18
+"WF1","High-infiltration","Total phosphorus","Load",63,3.22614761904762,5.1997096663321,1.17
+"WF1","High-infiltration","Total phosphorus","Yield",63,0.0766271587301587,0.123476932804133,0.0278
+"WF2","Slow-infiltration","Suspended sediment","Concentration",58,2207.28965517241,5506.05170417187,102
+"WF2","Slow-infiltration","Suspended sediment","Load",58,1581.15870689655,3270.24641728366,91.05
+"WF2","Slow-infiltration","Suspended sediment","Yield",58,236.073810344828,488.425048063185,13.6
+"WF2","Slow-infiltration","Total dissolved solids","Concentration",58,147.855172413793,111.103482934358,116
+"WF2","Slow-infiltration","Total dissolved solids","Load",58,209.104827586207,338.901423737601,91.9
+"WF2","Slow-infiltration","Total dissolved solids","Yield",58,31.2159310344828,50.5710878112802,13.7
+"WF2","Slow-infiltration","Orthophosphate","Concentration",58,0.465068965517241,1.31014252421513,0.1915
+"WF2","Slow-infiltration","Orthophosphate","Load",58,0.612438448275862,1.67241755062376,0.172
+"WF2","Slow-infiltration","Orthophosphate","Yield",58,0.0914677586206896,0.249943985451359,0.02565
+"WF2","Slow-infiltration","Total phosphorus","Concentration",58,2.29996551724138,4.39053790000971,0.65
+"WF2","Slow-infiltration","Total phosphorus","Load",58,2.06825344827586,3.13062297758688,0.6545
+"WF2","Slow-infiltration","Total phosphorus","Yield",58,0.308604137931034,0.466969957183973,0.09755

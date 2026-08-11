@@ -1,0 +1,13 @@
+"Metric","Combination","Phosphorus","Solids","Events","Spearman_Rho","Spearman_P"
+"Concentration","Orthophosphate vs Suspended sediment","Orthophosphate","Suspended sediment",1050,-0.211012990507898,4.93694911079877e-12
+"Concentration","Orthophosphate vs Total dissolved solids","Orthophosphate","Total dissolved solids",694,0.422701488286046,1.88272629914104e-31
+"Concentration","Total phosphorus vs Suspended sediment","Total phosphorus","Suspended sediment",1050,0.475886309405977,1.88554604473096e-60
+"Concentration","Total phosphorus vs Total dissolved solids","Total phosphorus","Total dissolved solids",694,0.416516769301752,1.6892734823255e-30
+"Load","Orthophosphate vs Suspended sediment","Orthophosphate","Suspended sediment",1050,0.412836261569057,1.78584138117031e-44
+"Load","Orthophosphate vs Total dissolved solids","Orthophosphate","Total dissolved solids",694,0.821913294175667,2.67725129428913e-171
+"Load","Total phosphorus vs Suspended sediment","Total phosphorus","Suspended sediment",1050,0.752184013872916,4.72658754659731e-192
+"Load","Total phosphorus vs Total dissolved solids","Total phosphorus","Total dissolved solids",694,0.850098953129665,6.75912474425785e-195
+"Yield","Orthophosphate vs Suspended sediment","Orthophosphate","Suspended sediment",1050,0.378151715566272,4.94123891577554e-37
+"Yield","Orthophosphate vs Total dissolved solids","Orthophosphate","Total dissolved solids",694,0.834369303598865,3.54200737986353e-181
+"Yield","Total phosphorus vs Suspended sediment","Total phosphorus","Suspended sediment",1050,0.738897976383278,6.83789020156047e-182
+"Yield","Total phosphorus vs Total dissolved solids","Total phosphorus","Total dissolved solids",694,0.857050329038295,1.79830144152359e-201
