@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.8.10
+# Update Date: 2026.8.24
 
 # This code conducts exploratory analysis of measured sediment and phosphorus
 # observations from Discovery Farms surface-runoff monitoring sites
@@ -387,8 +387,11 @@ Measurement_long <- WQ_df %>%
     Residue,
     PerennialFrac,
     Tillage_Passes,
+    MeanSlope_per,
     runoff_mm,
     rain_mm,
+    I30_mm_hr,
+    ARFdays7_mm,
     all_of(Measurement_lookup$Column)
   ) %>%
   pivot_longer(
@@ -1054,7 +1057,7 @@ Load_runoff_correlations <- Load_long %>%
 Scatter_annotations <- Load_runoff_correlations %>%
   mutate(
     Label=paste0(
-      "Spearman ρ = ",sprintf("%.2f",Spearman_Rho),
+      "Spearman rho = ",sprintf("%.2f",Spearman_Rho),
       "\np ",ifelse(Spearman_P < 0.001,"< 0.001",paste0("= ",sprintf("%.3f",Spearman_P)))
     )
   )
@@ -1524,7 +1527,7 @@ make_phosphorus_solids_figure <- function(metric_name,figure_number){
     filter(Metric == metric_name) %>%
     mutate(
       Label=paste0(
-        "Spearman ρ = ",sprintf("%.2f",Spearman_Rho),
+        "Spearman rho = ",sprintf("%.2f",Spearman_Rho),
         "\np ",
         ifelse(
           Spearman_P < 0.001,
@@ -1601,7 +1604,734 @@ Figure_phosphorus_sediment_load <-
 Figure_phosphorus_sediment_yield <-
   make_phosphorus_solids_figure("Yield",15)
 
-# Step 11. Output machine-readable tables ====================
+# Step 11. Phosphorus-to-sediment ratios =====================
+# Ratios are expressed as pounds of phosphorus per ton of suspended sediment
+# The non-orthophosphate fraction is an operational difference (total P -
+# orthophosphate), not a directly measured particulate-phosphorus variable
+Ratio_levels <- c(
+  "Total phosphorus / suspended sediment",
+  "Orthophosphate / suspended sediment",
+  "Non-orthophosphate P / suspended sediment"
+)
+
+P_sediment_ratio_events <- bind_rows(
+  WQ_df %>%
+    transmute(
+      WQ_event_id,
+      Field_Name,
+      Event_Date,
+      Calendar_Year,
+      Month_Number,
+      Month,
+      Season,
+      frozen,
+      Ratio=Ratio_levels[1],
+      P_Load_lb=total_phosphorus_unfiltered_load_pounds,
+      Sediment_Load_lb=suspended_sediment_load_pounds
+    ),
+  WQ_df %>%
+    transmute(
+      WQ_event_id,
+      Field_Name,
+      Event_Date,
+      Calendar_Year,
+      Month_Number,
+      Month,
+      Season,
+      frozen,
+      Ratio=Ratio_levels[2],
+      P_Load_lb=orthophosphate_load_pounds,
+      Sediment_Load_lb=suspended_sediment_load_pounds
+    ),
+  WQ_df %>%
+    transmute(
+      WQ_event_id,
+      Field_Name,
+      Event_Date,
+      Calendar_Year,
+      Month_Number,
+      Month,
+      Season,
+      frozen,
+      Ratio=Ratio_levels[3],
+      P_Load_lb=total_phosphorus_unfiltered_load_pounds-
+        orthophosphate_load_pounds,
+      Sediment_Load_lb=suspended_sediment_load_pounds
+    )
+) %>%
+  filter(
+    is.finite(P_Load_lb),
+    P_Load_lb > 0,
+    is.finite(Sediment_Load_lb),
+    Sediment_Load_lb > 0
+  ) %>%
+  mutate(
+    Ratio=factor(Ratio,levels=Ratio_levels),
+    P_per_Sediment_lb_per_ton=2000*P_Load_lb/Sediment_Load_lb
+  )
+
+P_sediment_ratio_monthly_site_year <- P_sediment_ratio_events %>%
+  group_by(
+    Field_Name,
+    Calendar_Year,
+    Month_Number,
+    Month,
+    Season,
+    Ratio
+  ) %>%
+  summarise(
+    Events=n(),
+    Median_lb_P_per_ton_sediment=median(P_per_Sediment_lb_per_ton),
+    .groups="drop"
+  )
+
+P_sediment_ratio_monthly_summary <- P_sediment_ratio_monthly_site_year %>%
+  group_by(Month_Number,Month,Season,Ratio) %>%
+  summarise(
+    Site_Years=n(),
+    Median=median(Median_lb_P_per_ton_sediment),
+    Q25=quantile(Median_lb_P_per_ton_sediment,0.25),
+    Q75=quantile(Median_lb_P_per_ton_sediment,0.75),
+    .groups="drop"
+  )
+
+P_sediment_ratio_annual_site <- P_sediment_ratio_events %>%
+  group_by(Field_Name,Calendar_Year,Ratio) %>%
+  summarise(
+    Events=n(),
+    Median_lb_P_per_ton_sediment=median(P_per_Sediment_lb_per_ton),
+    .groups="drop"
+  )
+
+P_sediment_ratio_annual_summary <- P_sediment_ratio_annual_site %>%
+  group_by(Calendar_Year,Ratio) %>%
+  summarise(
+    Sites=n(),
+    Median=median(Median_lb_P_per_ton_sediment),
+    Q25=quantile(Median_lb_P_per_ton_sediment,0.25),
+    Q75=quantile(Median_lb_P_per_ton_sediment,0.75),
+    .groups="drop"
+  )
+
+Figure_ratio_month <- ggplot(
+  P_sediment_ratio_monthly_summary,
+  aes(Month_Number,Median,color=Season,group=1)
+) +
+  geom_linerange(aes(ymin=Q25,ymax=Q75),linewidth=0.7) +
+  geom_line(color="grey35",linewidth=0.7) +
+  geom_point(size=3.2,alpha=0.8) +
+  facet_wrap(~Ratio,scales="free_y",ncol=1) +
+  scale_x_continuous(breaks=1:12,labels=month.abb) +
+  scale_y_log10(labels=label_number()) +
+  scale_color_manual(values=Season_colors,drop=FALSE) +
+  labs(
+    x=NULL,
+    y="Phosphorus per suspended sediment (lb/ton, log scale)",
+    color=NULL,
+    title="Monthly phosphorus-to-sediment ratios",
+    subtitle="Points are medians and vertical lines are interquartile ranges across site-years"
+  ) +
+  DF_plot_theme +
+  theme(
+    axis.text.x=element_text(angle=35,hjust=1),
+    legend.position="bottom"
+  )
+
+Figure_ratio_year <- ggplot(
+  P_sediment_ratio_annual_summary,
+  aes(Calendar_Year,Median,color=Ratio,fill=Ratio)
+) +
+  geom_ribbon(aes(ymin=Q25,ymax=Q75),alpha=0.15,color=NA) +
+  geom_line(linewidth=0.9) +
+  geom_point(size=2.8,alpha=0.8) +
+  scale_y_log10(labels=label_number()) +
+  scale_color_manual(
+    values=setNames(DF_colors[c(3,2,6)],Ratio_levels),
+    drop=FALSE
+  ) +
+  scale_fill_manual(
+    values=setNames(DF_colors[c(3,2,6)],Ratio_levels),
+    drop=FALSE
+  ) +
+  labs(
+    x="Calendar year",
+    y="Phosphorus per suspended sediment (lb/ton, log scale)",
+    color=NULL,
+    fill=NULL,
+    title="Annual phosphorus-to-sediment ratios",
+    subtitle="Lines are medians and ribbons are interquartile ranges across sites"
+  ) +
+  DF_plot_theme +
+  theme(legend.position="bottom") +
+  guides(color=guide_legend(nrow=2),fill="none")
+
+Figure_ratio_temporal <- Figure_ratio_month / Figure_ratio_year +
+  plot_layout(heights=c(1.7,1))
+
+save_figure_pair(
+  Figure_ratio_temporal,
+  file.path(Figure_path,"16_Phosphorus_to_sediment_temporal_patterns"),
+  width=15,
+  height=17
+)
+
+P_sediment_ratio_group_summary <- bind_rows(
+  P_sediment_ratio_events %>%
+    group_by(Field_Name,Ratio,Season) %>%
+    summarise(Site_Median=median(P_per_Sediment_lb_per_ton),.groups="drop") %>%
+    rename(Group=Season) %>%
+    mutate(Grouping="Season"),
+  P_sediment_ratio_events %>%
+    group_by(Field_Name,Ratio,frozen) %>%
+    summarise(Site_Median=median(P_per_Sediment_lb_per_ton),.groups="drop") %>%
+    rename(Group=frozen) %>%
+    mutate(Grouping="Soil condition")
+) %>%
+  mutate(
+    Group=as.character(Group),
+    Group=factor(
+      Group,
+      levels=c(Season_levels,"Non-Frozen","Frozen")
+    )
+  )
+
+ratio_pairwise_tests <- function(grouping_name,group_levels){
+  ratio_df <- P_sediment_ratio_group_summary %>%
+    filter(Grouping == grouping_name) %>%
+    mutate(Group=as.character(Group))
+
+  bind_rows(
+    lapply(
+      Ratio_levels,
+      function(ratio_name){
+        current_df <- ratio_df %>% filter(Ratio == ratio_name)
+        comparison_pairs <- combn(group_levels,2,simplify=FALSE)
+
+        bind_rows(
+          lapply(
+            comparison_pairs,
+            function(comparison_pair){
+              paired_values <- current_df %>%
+                filter(Group %in% comparison_pair) %>%
+                select(Field_Name,Group,Site_Median) %>%
+                pivot_wider(names_from=Group,values_from=Site_Median) %>%
+                filter(
+                  !is.na(.data[[comparison_pair[1]]]),
+                  !is.na(.data[[comparison_pair[2]]])
+                )
+
+              p_value <- if(nrow(paired_values) >= 3){
+                suppressWarnings(
+                  wilcox.test(
+                    paired_values[[comparison_pair[1]]],
+                    paired_values[[comparison_pair[2]]],
+                    paired=TRUE,
+                    exact=FALSE
+                  )$p.value
+                )
+              }else{
+                NA_real_
+              }
+
+              data.frame(
+                Ratio=ratio_name,
+                Grouping=grouping_name,
+                Group_1=comparison_pair[1],
+                Group_2=comparison_pair[2],
+                X_1=match(comparison_pair[1],group_levels),
+                X_2=match(comparison_pair[2],group_levels),
+                Test="Paired Wilcoxon signed-rank test",
+                Sites=nrow(paired_values),
+                P_Value=p_value
+              )
+            }
+          )
+        )
+      }
+    )
+  ) %>%
+    group_by(Ratio,Grouping) %>%
+    mutate(
+      P_Adjusted=p.adjust(P_Value,method="BH"),
+      Significance=case_when(
+        P_Adjusted < 0.001 ~ "***",
+        P_Adjusted < 0.01 ~ "**",
+        P_Adjusted < 0.05 ~ "*",
+        TRUE ~ ""
+      )
+    ) %>%
+    ungroup()
+}
+
+P_sediment_ratio_group_tests <- bind_rows(
+  ratio_pairwise_tests("Season",Season_levels),
+  ratio_pairwise_tests("Soil condition",c("Non-Frozen","Frozen"))
+)
+
+add_ratio_brackets <- function(plot,plot_df,test_df){
+  significant_tests <- test_df %>%
+    filter(!is.na(P_Adjusted),P_Adjusted < 0.05)
+
+  if(nrow(significant_tests) == 0){
+    return(plot)
+  }
+
+  bracket_df <- plot_df %>%
+    group_by(Ratio) %>%
+    summarise(Panel_Max=max(Site_Median,na.rm=TRUE),.groups="drop") %>%
+    right_join(significant_tests,by="Ratio") %>%
+    mutate(Ratio=factor(Ratio,levels=Ratio_levels)) %>%
+    group_by(Ratio) %>%
+    arrange(P_Adjusted,.by_group=TRUE) %>%
+    mutate(
+      Bracket_Order=row_number(),
+      Y=Panel_Max*1.45^Bracket_Order,
+      Tip=Y/1.10,
+      Label_Y=Y*1.07
+    ) %>%
+    ungroup()
+
+  plot +
+    geom_segment(
+      data=bracket_df,
+      aes(x=X_1,xend=X_2,y=Y,yend=Y),
+      inherit.aes=FALSE,
+      linewidth=0.5
+    ) +
+    geom_segment(
+      data=bracket_df,
+      aes(x=X_1,xend=X_1,y=Y,yend=Tip),
+      inherit.aes=FALSE,
+      linewidth=0.5
+    ) +
+    geom_segment(
+      data=bracket_df,
+      aes(x=X_2,xend=X_2,y=Y,yend=Tip),
+      inherit.aes=FALSE,
+      linewidth=0.5
+    ) +
+    geom_text(
+      data=bracket_df,
+      aes(x=(X_1+X_2)/2,y=Label_Y,label=Significance),
+      inherit.aes=FALSE,
+      size=5
+    )
+}
+
+Ratio_season_plot <- P_sediment_ratio_group_summary %>%
+  filter(Grouping == "Season") %>%
+  ggplot(aes(Group,Site_Median,fill=Group,color=Group)) +
+  geom_half_violin(side="l",alpha=0.5,trim=TRUE,color=NA) +
+  geom_boxplot(color="black",width=0.14,outlier.shape=NA,alpha=0.8) +
+  geom_jitter(
+    aes(x=as.numeric(Group)+0.2),
+    width=0.08,
+    size=1.6,
+    alpha=0.6
+  ) +
+  facet_wrap(~Ratio,scales="free_y",ncol=1) +
+  scale_y_log10(labels=label_number()) +
+  scale_fill_manual(values=Season_colors,drop=TRUE) +
+  scale_color_manual(values=Season_colors,drop=TRUE) +
+  labs(
+    x=NULL,
+    y="Site median (lb P/ton sediment, log scale)",
+    fill=NULL,
+    title="Ratios across seasons"
+  ) +
+  DF_plot_theme +
+  theme(axis.text.x=element_text(angle=25,hjust=1),legend.position="none") +
+  guides(color="none")
+
+Frozen_colors <- setNames(
+  RColorBrewer::brewer.pal(7,"Set2")[c(3,2)],
+  c("Non-Frozen","Frozen")
+)
+
+Ratio_frozen_plot <- P_sediment_ratio_group_summary %>%
+  filter(Grouping == "Soil condition") %>%
+  mutate(
+    Group=factor(
+      as.character(Group),
+      levels=c("Non-Frozen","Frozen")
+    )
+  ) %>%
+  ggplot(aes(Group,Site_Median,fill=Group,color=Group)) +
+  geom_half_violin(side="l",alpha=0.5,trim=TRUE,color=NA) +
+  geom_boxplot(color="black",width=0.14,outlier.shape=NA,alpha=0.8) +
+  geom_jitter(
+    aes(x=as.numeric(Group)+0.2),
+    width=0.08,
+    size=1.6,
+    alpha=0.6
+  ) +
+  facet_wrap(~Ratio,scales="free_y",ncol=1) +
+  scale_y_log10(labels=label_number()) +
+  scale_fill_manual(values=Frozen_colors,drop=TRUE) +
+  scale_color_manual(values=Frozen_colors,drop=TRUE) +
+  labs(
+    x=NULL,
+    y="Site median (lb P/ton sediment, log scale)",
+    fill=NULL,
+    title="Ratios under frozen and non-frozen conditions"
+  ) +
+  DF_plot_theme +
+  theme(axis.text.x=element_text(angle=20,hjust=1),legend.position="none") +
+  guides(color="none")
+
+Ratio_season_plot <- add_ratio_brackets(
+  Ratio_season_plot,
+  P_sediment_ratio_group_summary %>% filter(Grouping == "Season"),
+  P_sediment_ratio_group_tests %>% filter(Grouping == "Season")
+)
+
+Ratio_frozen_plot <- add_ratio_brackets(
+  Ratio_frozen_plot,
+  P_sediment_ratio_group_summary %>% filter(Grouping == "Soil condition"),
+  P_sediment_ratio_group_tests %>% filter(Grouping == "Soil condition")
+)
+
+Figure_ratio_groups <- Ratio_season_plot | Ratio_frozen_plot
+
+save_figure_pair(
+  Figure_ratio_groups,
+  file.path(Figure_path,"17_Phosphorus_to_sediment_across_groups"),
+  width=18,
+  height=14
+)
+
+# Step 12. Constituent concentration versus runoff depth =====
+Concentration_lookup <- Measurement_lookup %>%
+  filter(Metric == "Concentration")
+
+Concentration_runoff_long <- WQ_df %>%
+  select(
+    WQ_event_id,
+    Field_Name,
+    Season,
+    frozen,
+    runoff_mm,
+    all_of(Concentration_lookup$Column)
+  ) %>%
+  pivot_longer(
+    cols=all_of(Concentration_lookup$Column),
+    names_to="Column",
+    values_to="Concentration"
+  ) %>%
+  left_join(Concentration_lookup,by="Column") %>%
+  mutate(Constituent=factor(Constituent,levels=Constituent_levels)) %>%
+  filter(
+    is.finite(runoff_mm),
+    runoff_mm > 0,
+    is.finite(Concentration),
+    Concentration > 0,
+    !is.na(Season)
+  )
+
+Concentration_runoff_correlations <- Concentration_runoff_long %>%
+  group_by(Constituent) %>%
+  group_modify(
+    ~{
+      correlation_test <- suppressWarnings(
+        cor.test(.x$runoff_mm,.x$Concentration,method="spearman",exact=FALSE)
+      )
+      log_model <- lm(log10(Concentration)~log10(runoff_mm),data=.x)
+      model_summary <- summary(log_model)
+      data.frame(
+        Events=nrow(.x),
+        Spearman_Rho=unname(correlation_test$estimate),
+        Spearman_P=correlation_test$p.value,
+        Log_Log_Slope=unname(coef(log_model)[2]),
+        Adjusted_R2=model_summary$adj.r.squared,
+        Log_Log_Slope_P=coef(model_summary)[2,4]
+      )
+    }
+  ) %>%
+  ungroup()
+
+Concentration_scatter_annotations <- Concentration_runoff_correlations %>%
+  mutate(
+    Label=paste0(
+      "Spearman rho = ",sprintf("%.2f",Spearman_Rho),
+      "\np ",ifelse(
+        Spearman_P < 0.001,
+        "< 0.001",
+        paste0("= ",sprintf("%.3f",Spearman_P))
+      )
+    )
+  )
+
+Figure_concentration_runoff <- ggplot(
+  Concentration_runoff_long,
+  aes(runoff_mm,Concentration,color=Season)
+) +
+  geom_smooth(
+    aes(group=Constituent),
+    method="lm",
+    formula=y~x,
+    se=TRUE,
+    color="black",
+    fill="grey75",
+    linewidth=0.8
+  ) +
+  geom_point(aes(shape=frozen),size=2.2,alpha=0.65) +
+  geom_label(
+    data=Concentration_scatter_annotations,
+    aes(x=Inf,y=Inf,label=Label),
+    inherit.aes=FALSE,
+    hjust=1.05,
+    vjust=1.15,
+    size=3.8,
+    linewidth=0.25,
+    fill=alpha("white",0.85)
+  ) +
+  facet_wrap(~Constituent,scales="free_y",ncol=2) +
+  scale_x_log10(labels=label_number()) +
+  scale_y_log10(labels=label_number()) +
+  scale_color_manual(values=Season_colors,drop=FALSE) +
+  scale_shape_manual(values=c("Non-Frozen"=16,"Frozen"=17),drop=FALSE) +
+  guides(
+    color=guide_legend(nrow=1,order=1),
+    shape=guide_legend(nrow=1,order=2)
+  ) +
+  labs(
+    x="Runoff depth (mm, log scale)",
+    y="Constituent concentration (mg/L, log scale)",
+    color=NULL,
+    shape="Soil condition",
+    title="Constituent concentration versus runoff depth"
+  ) +
+  DF_plot_theme +
+  theme(legend.position="bottom")
+
+save_figure_pair(
+  Figure_concentration_runoff,
+  file.path(Figure_path,"18_Concentration_vs_runoff_depth"),
+  width=14,
+  height=10
+)
+
+# Step 13. Monthly variability and candidate drivers =========
+# Log10 IQR is a robust spread measure that can be compared among variables
+# spanning different concentration and load scales
+Monthly_variability_summary <- Measurement_long %>%
+  filter(
+    Metric %in% c("Concentration","Load"),
+    is.finite(Value),
+    Value > 0,
+    !is.na(Month)
+  ) %>%
+  group_by(Metric,Constituent,Month_Number,Month,Season) %>%
+  summarise(
+    Events=n(),
+    Sites=n_distinct(Field_Name),
+    Log10_SD=sd_or_zero(log10(Value)),
+    Log10_IQR=IQR(log10(Value)),
+    Log10_MAD=mad(log10(Value)),
+    Q75_to_Q25_Ratio=10^Log10_IQR,
+    .groups="drop"
+  )
+
+Figure_monthly_variability <- ggplot(
+  Monthly_variability_summary,
+  aes(Month_Number,Log10_IQR,color=Season,group=1)
+) +
+  geom_line(color="grey35",linewidth=0.7) +
+  geom_point(size=3,alpha=0.8) +
+  facet_grid(Metric~Constituent,scales="free_y") +
+  scale_x_continuous(breaks=1:12,labels=month.abb) +
+  scale_color_manual(values=Season_colors,drop=FALSE) +
+  labs(
+    x=NULL,
+    y="Monthly variability (IQR of log10 values)",
+    color=NULL,
+    title="Monthly variability in sediment and phosphorus",
+    subtitle="Larger values indicate a wider event distribution within a month"
+  ) +
+  DF_plot_theme +
+  theme(
+    axis.text.x=element_text(angle=45,hjust=1),
+    legend.position="bottom"
+  )
+
+save_figure_pair(
+  Figure_monthly_variability,
+  file.path(Figure_path,"19_Monthly_target_variability"),
+  width=20,
+  height=10
+)
+
+Driver_lookup <- c(
+  runoff_mm="Runoff depth",
+  rain_mm="Precipitation depth",
+  I30_mm_hr="Maximum 30-minute intensity",
+  ARFdays7_mm="Seven-day antecedent precipitation",
+  MeanSlope_per="Mean slope",
+  PerennialFrac="Perennial crop fraction",
+  Tillage_Passes="Tillage passes",
+  frozen_numeric="Frozen soil"
+)
+
+Target_driver_long <- Measurement_long %>%
+  filter(
+    Metric %in% c("Concentration","Load"),
+    is.finite(Value),
+    Value > 0
+  ) %>%
+  mutate(frozen_numeric=ifelse(frozen == "Frozen",1,0)) %>%
+  pivot_longer(
+    cols=all_of(names(Driver_lookup)),
+    names_to="Driver_column",
+    values_to="Driver_value"
+  ) %>%
+  mutate(
+    Driver=unname(Driver_lookup[Driver_column]),
+    Driver=factor(Driver,levels=unname(Driver_lookup))
+  ) %>%
+  filter(is.finite(Driver_value))
+
+safe_spearman_summary <- function(target,driver){
+  keep <- is.finite(target) & is.finite(driver)
+  target <- target[keep]
+  driver <- driver[keep]
+  if(
+    length(target) < 10 ||
+    length(unique(target)) < 2 ||
+    length(unique(driver)) < 2
+  ){
+    return(data.frame(Events=length(target),Spearman_Rho=NA_real_,P_Value=NA_real_))
+  }
+  result <- suppressWarnings(
+    cor.test(target,driver,method="spearman",exact=FALSE)
+  )
+  data.frame(
+    Events=length(target),
+    Spearman_Rho=unname(result$estimate),
+    P_Value=result$p.value
+  )
+}
+
+Monthly_target_driver_associations <- Target_driver_long %>%
+  group_by(Metric,Constituent,Month_Number,Month,Driver) %>%
+  group_modify(
+    ~safe_spearman_summary(log10(.x$Value),.x$Driver_value)
+  ) %>%
+  ungroup() %>%
+  group_by(Metric,Constituent,Month) %>%
+  mutate(P_Adjusted=p.adjust(P_Value,method="BH")) %>%
+  ungroup()
+
+Figure_monthly_driver_associations <- Monthly_target_driver_associations %>%
+  filter(is.finite(Spearman_Rho)) %>%
+  ggplot(aes(Month,Driver,fill=Spearman_Rho)) +
+  geom_tile(color="black",linewidth=0.25) +
+  geom_point(
+    data=~filter(.x,!is.na(P_Adjusted),P_Adjusted < 0.05),
+    shape=8,
+    size=2.2,
+    color="black"
+  ) +
+  facet_grid(Metric~Constituent) +
+  scale_fill_gradient2(
+    low="#2166AC",
+    mid="white",
+    high="#B2182B",
+    midpoint=0,
+    limits=c(-1,1),
+    guide=guide_colorbar(
+      frame.colour="black",
+      frame.linewidth=0.4,
+      ticks.colour="black",
+      title.position="top",
+      barwidth=grid::unit(7,"cm")
+    )
+  ) +
+  labs(
+    x=NULL,
+    y=NULL,
+    fill="Spearman correlation",
+    title="Monthly associations with candidate drivers",
+    subtitle="Asterisks identify Benjamini-Hochberg-adjusted p < 0.05 within each target and month"
+  ) +
+  DF_plot_theme +
+  theme(
+    axis.text.x=element_text(angle=45,hjust=1,size=10),
+    axis.text.y=element_text(size=10),
+    legend.position="bottom"
+  )
+
+save_figure_pair(
+  Figure_monthly_driver_associations,
+  file.path(Figure_path,"20_Monthly_target_driver_associations"),
+  width=22,
+  height=13
+)
+
+Variability_driver_long <- Target_driver_long %>%
+  group_by(Metric,Constituent,Month_Number) %>%
+  mutate(
+    Log10_Value=log10(Value),
+    Absolute_Log_Deviation=abs(Log10_Value-median(Log10_Value,na.rm=TRUE))
+  ) %>%
+  ungroup()
+
+Variability_driver_associations <- Variability_driver_long %>%
+  group_by(Metric,Constituent,Season,Driver) %>%
+  group_modify(
+    ~safe_spearman_summary(.x$Absolute_Log_Deviation,.x$Driver_value)
+  ) %>%
+  ungroup() %>%
+  group_by(Metric,Constituent,Season) %>%
+  mutate(P_Adjusted=p.adjust(P_Value,method="BH")) %>%
+  ungroup()
+
+Figure_variability_drivers <- Variability_driver_associations %>%
+  filter(is.finite(Spearman_Rho)) %>%
+  ggplot(aes(Season,Driver,fill=Spearman_Rho)) +
+  geom_tile(color="black",linewidth=0.3) +
+  geom_point(
+    data=~filter(.x,!is.na(P_Adjusted),P_Adjusted < 0.05),
+    shape=8,
+    size=2.3,
+    color="black"
+  ) +
+  facet_grid(Metric~Constituent) +
+  scale_fill_gradient2(
+    low="#2166AC",
+    mid="white",
+    high="#B2182B",
+    midpoint=0,
+    limits=c(-1,1),
+    guide=guide_colorbar(
+      frame.colour="black",
+      frame.linewidth=0.4,
+      ticks.colour="black",
+      title.position="top",
+      barwidth=grid::unit(7,"cm")
+    )
+  ) +
+  labs(
+    x=NULL,
+    y=NULL,
+    fill="Spearman correlation",
+    title="Associations with within-month event variability",
+    subtitle="Positive values indicate greater departure from the monthly median; asterisks identify adjusted p < 0.05"
+  ) +
+  DF_plot_theme +
+  theme(
+    axis.text.x=element_text(angle=30,hjust=1,size=10),
+    axis.text.y=element_text(size=10),
+    legend.position="bottom"
+  )
+
+save_figure_pair(
+  Figure_variability_drivers,
+  file.path(Figure_path,"21_Variability_driver_associations"),
+  width=22,
+  height=13
+)
+
+# Step 14. Output machine-readable tables ====================
 write.csv(
   Data_summary,
   file.path(Table_path,"Data_summary.csv"),
@@ -1676,9 +2406,84 @@ write.csv(
   na=""
 )
 
-# Step 12. Generate the HTML report ==========================
+write.csv(
+  P_sediment_ratio_events,
+  file.path(Table_path,"P_sediment_ratio_events.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  P_sediment_ratio_monthly_site_year,
+  file.path(Table_path,"P_sediment_ratio_monthly_site_year.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  P_sediment_ratio_monthly_summary,
+  file.path(Table_path,"P_sediment_ratio_monthly_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  P_sediment_ratio_annual_summary,
+  file.path(Table_path,"P_sediment_ratio_annual_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  P_sediment_ratio_group_tests,
+  file.path(Table_path,"P_sediment_ratio_group_tests.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Concentration_runoff_correlations,
+  file.path(Table_path,"Concentration_runoff_correlations.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Monthly_variability_summary,
+  file.path(Table_path,"Monthly_variability_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Monthly_target_driver_associations,
+  file.path(Table_path,"Monthly_target_driver_associations.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Variability_driver_associations,
+  file.path(Table_path,"Variability_driver_associations.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+# Step 15. Generate the HTML report ==========================
 Strongest_load_relationship <- Load_runoff_correlations %>%
   filter(is.finite(Spearman_Rho)) %>%
+  slice_max(abs(Spearman_Rho),n=1,with_ties=FALSE)
+
+Strongest_concentration_relationship <- Concentration_runoff_correlations %>%
+  filter(is.finite(Spearman_Rho)) %>%
+  slice_max(abs(Spearman_Rho),n=1,with_ties=FALSE)
+
+Strongest_variability_association <- Variability_driver_associations %>%
+  filter(
+    is.finite(Spearman_Rho),
+    !is.na(P_Adjusted),
+    P_Adjusted < 0.05
+  ) %>%
   slice_max(abs(Spearman_Rho),n=1,with_ties=FALSE)
 
 Key_findings <- c(
@@ -1686,7 +2491,7 @@ Key_findings <- c(
   paste0(
     "<p>The strongest rank correlation between constituent load and runoff depth was observed for ",
     html_escape(as.character(Strongest_load_relationship$Constituent)),
-    " (Spearman ρ = ",
+    " (Spearman rho = ",
     sprintf("%.2f",Strongest_load_relationship$Spearman_Rho),
     ", p ",
     ifelse(
@@ -1695,6 +2500,38 @@ Key_findings <- c(
       paste0("= ",format_p_value(Strongest_load_relationship$Spearman_P))
     ),
     ").</p>"
+  ),
+  paste0(
+    "<p>The strongest concentration-runoff association was observed for ",
+    html_escape(as.character(Strongest_concentration_relationship$Constituent)),
+    " (Spearman rho = ",
+    sprintf("%.2f",Strongest_concentration_relationship$Spearman_Rho),
+    ", p ",
+    ifelse(
+      Strongest_concentration_relationship$Spearman_P < 0.001,
+      "&lt; 0.001",
+      paste0("= ",format_p_value(Strongest_concentration_relationship$Spearman_P))
+    ),
+    "). This relationship is evaluated separately from the load-runoff relationship because concentration is not mathematically multiplied by runoff volume.</p>"
+  ),
+  paste0(
+    "<p>The largest supported association with within-month event variability was for ",
+    html_escape(as.character(Strongest_variability_association$Driver)),
+    " and ",
+    tolower(html_escape(as.character(Strongest_variability_association$Constituent))),
+    " ",
+    tolower(html_escape(as.character(Strongest_variability_association$Metric))),
+    " during the ",
+    tolower(html_escape(as.character(Strongest_variability_association$Season))),
+    " (Spearman rho = ",
+    sprintf("%.2f",Strongest_variability_association$Spearman_Rho),
+    ", adjusted p ",
+    ifelse(
+      Strongest_variability_association$P_Adjusted < 0.001,
+      "&lt; 0.001",
+      paste0("= ",format_p_value(Strongest_variability_association$P_Adjusted))
+    ),
+    "). These exploratory associations do not establish causal effects.</p>"
   )
 )
 
@@ -1711,6 +2548,32 @@ Load_correlation_report <- Load_runoff_correlations %>%
   mutate(
     Spearman_P=format_p_value(Spearman_P),
     Log_Log_Slope_P=format_p_value(Log_Log_Slope_P)
+  )
+
+Concentration_correlation_report <- Concentration_runoff_correlations %>%
+  mutate(
+    Spearman_P=format_p_value(Spearman_P),
+    Log_Log_Slope_P=format_p_value(Log_Log_Slope_P)
+  )
+
+Ratio_group_tests_report <- P_sediment_ratio_group_tests %>%
+  mutate(
+    P_Value=format_p_value(P_Value),
+    P_Adjusted=format_p_value(P_Adjusted)
+  )
+
+Largest_monthly_variability_report <- Monthly_variability_summary %>%
+  group_by(Metric,Constituent) %>%
+  slice_max(Log10_IQR,n=1,with_ties=FALSE) %>%
+  ungroup() %>%
+  select(
+    Metric,
+    Constituent,
+    Month,
+    Events,
+    Sites,
+    Log10_IQR,
+    Q75_to_Q25_Ratio
   )
 
 Significant_group_tests_report <- Categorical_group_tests %>%
@@ -1827,6 +2690,45 @@ Report_body <- c(
   ),
   "<h3>Phosphorus-sediment and phosphorus-solids correlations</h3>",
   data_frame_to_html(Phosphorus_solids_report,digits=3),
+  "<h2>Phosphorus relative to suspended-sediment export</h2>",
+  "<p>Phosphorus-to-sediment ratios address the proposed characterization of nutrient composition and nutrient relationships with soil loss. Ratios are calculated from event loads and expressed as pounds of phosphorus per ton of suspended sediment. Total phosphorus and orthophosphate ratios use measured variables. Non-orthophosphate P is calculated as total phosphorus minus orthophosphate only when that difference is positive; it is an operational residual and should not be interpreted as a directly measured particulate-phosphorus fraction.</p>",
+  embedded_figure_html(
+    file.path(Figure_path,"16_Phosphorus_to_sediment_temporal_patterns.png"),
+    "Figure 16. Monthly and annual changes in phosphorus-to-suspended-sediment load ratios. Monthly estimates summarize site-year medians, and annual estimates summarize site medians. Interquartile ranges describe spatial and interannual variation without annualizing partial monitoring years."
+  ),
+  embedded_figure_html(
+    file.path(Figure_path,"17_Phosphorus_to_sediment_across_groups.png"),
+    "Figure 17. Site-level median phosphorus-to-suspended-sediment ratios across seasons and frozen-soil conditions."
+  ),
+  "<h3>Overall ratio comparisons</h3>",
+  "<p>Paired Wilcoxon signed-rank tests compare site-level median ratios among seasons and between frozen and non-frozen conditions. P-values are adjusted within each ratio and grouping using the Benjamini-Hochberg method. Significant comparisons are shown with brackets.</p>",
+  data_frame_to_html(Ratio_group_tests_report,digits=3),
+  "<h2>Constituent concentration and runoff depth</h2>",
+  "<p>Concentration-runoff relationships are shown separately from load-runoff relationships. Both axes are log scaled; points are colored by season and shaped by frozen-soil condition. Black lines show linear fits on the displayed log-log scales, while labels report Spearman rank correlations.</p>",
+  embedded_figure_html(
+    file.path(Figure_path,"18_Concentration_vs_runoff_depth.png"),
+    "Figure 18. Event constituent concentrations versus surface-runoff depth."
+  ),
+  "<h3>Concentration-runoff relationship statistics</h3>",
+  data_frame_to_html(Concentration_correlation_report,digits=3),
+  "<h2>Monthly variability and candidate explanatory variables</h2>",
+  "<p>Monthly variability is summarized using the interquartile range of log10-transformed event values. This robust measure describes the spread among events without bootstrapping and permits comparison among constituents with very different numerical scales. The Q75-to-Q25 ratio translates the log-scale spread into a multiplicative range.</p>",
+  embedded_figure_html(
+    file.path(Figure_path,"19_Monthly_target_variability.png"),
+    "Figure 19. Monthly variability of sediment and phosphorus concentrations and loads."
+  ),
+  "<h3>Month with greatest variability for each target</h3>",
+  data_frame_to_html(Largest_monthly_variability_report,digits=3),
+  "<p>The monthly association analysis evaluates runoff depth, precipitation depth, maximum 30-minute intensity, seven-day antecedent precipitation, mean slope, perennial crop fraction, tillage passes, and frozen-soil condition. Spearman correlations are calculated separately by month, constituent, and measurement form. Asterisks identify associations with Benjamini-Hochberg-adjusted p &lt; 0.05. Management variables are included as descriptive candidate explanations, not as estimates of causal management effects.</p>",
+  embedded_figure_html(
+    file.path(Figure_path,"20_Monthly_target_driver_associations.png"),
+    "Figure 20. Month-specific associations between constituent concentrations or loads and candidate explanatory variables."
+  ),
+  "<p>Within-month event variability is defined as the absolute distance of each log10-transformed value from its constituent-specific monthly median. Positive correlations indicate that larger values of an explanatory variable are associated with observations farther from the typical value for that month.</p>",
+  embedded_figure_html(
+    file.path(Figure_path,"21_Variability_driver_associations.png"),
+    "Figure 21. Seasonal associations between candidate explanatory variables and within-month event variability."
+  ),
   "<h2>Output files</h2>",
   "<p>Every figure is saved in PNG and PDF format. Machine-readable summary tables are saved under <code>04_Results/Sediment_Phosphorus_Exploratory/Tables</code>.</p>"
 )

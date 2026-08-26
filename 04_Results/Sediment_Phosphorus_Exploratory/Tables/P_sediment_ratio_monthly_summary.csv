@@ -1,0 +1,37 @@
+"Month_Number","Month","Season","Ratio","Site_Years","Median","Q25","Q75"
+1,"Jan","Pre-growing season","Total phosphorus / suspended sediment",39,179.310344827586,65.527022814994,459.157302473445
+1,"Jan","Pre-growing season","Orthophosphate / suspended sediment",39,134.320987654321,51.1099044687077,363.878506845864
+1,"Jan","Pre-growing season","Non-orthophosphate P / suspended sediment",39,28.0542986425339,12.6181290542847,50.2669612545131
+2,"Feb","Pre-growing season","Total phosphorus / suspended sediment",57,104.479299363057,44.4564636982172,302.379134860051
+2,"Feb","Pre-growing season","Orthophosphate / suspended sediment",57,80.1242236024845,28.2722513089005,267.932489451477
+2,"Feb","Pre-growing season","Non-orthophosphate P / suspended sediment",57,30.4832713754647,11.0599078341014,52.6495726495726
+3,"Mar","Pre-growing season","Total phosphorus / suspended sediment",105,80.5663265306122,23.7435897435897,208.599779492833
+3,"Mar","Pre-growing season","Orthophosphate / suspended sediment",105,60.9145748444757,17.2820512820513,172.612612612613
+3,"Mar","Pre-growing season","Non-orthophosphate P / suspended sediment",105,15.7397959183673,6.46153846153846,34.9206349206349
+4,"Apr","Pre-growing season","Total phosphorus / suspended sediment",53,29.5726495726496,6.03636363636364,75.538029386344
+4,"Apr","Pre-growing season","Orthophosphate / suspended sediment",53,21.0982098765432,0.967676767676768,64.1584158415842
+4,"Apr","Pre-growing season","Non-orthophosphate P / suspended sediment",53,8.13333333333333,4.14012738853503,13.1111111111111
+5,"May","Pre-growing season","Total phosphorus / suspended sediment",46,6.03248646323233,3.43212949738908,10.3959241189845
+5,"May","Pre-growing season","Orthophosphate / suspended sediment",46,1.83503163503164,0.316444746695298,5.94113492854769
+5,"May","Pre-growing season","Non-orthophosphate P / suspended sediment",46,3.81876588892732,2.77181355592482,5.83311190403887
+6,"Jun","Growing season","Total phosphorus / suspended sediment",68,9.26030666428018,4.32826546800635,14.3920489956374
+6,"Jun","Growing season","Orthophosphate / suspended sediment",68,3.6469083554846,0.968429541595925,9.39972130984374
+6,"Jun","Growing season","Non-orthophosphate P / suspended sediment",67,4.09240924092409,2.92187831666291,5.95836744350229
+7,"Jul","Growing season","Total phosphorus / suspended sediment",47,16.3265306122449,5.65837346174425,25.4657044690267
+7,"Jul","Growing season","Orthophosphate / suspended sediment",47,10.5102040816327,2.23079286515331,20.3042361846349
+7,"Jul","Growing season","Non-orthophosphate P / suspended sediment",47,4.76190476190476,3.41923025916564,6.81860765627524
+8,"Aug","Growing season","Total phosphorus / suspended sediment",44,15.8293305372866,7.65923810213441,47.7193446382976
+8,"Aug","Growing season","Orthophosphate / suspended sediment",44,8.57671159190748,2.840756859035,28.3672248803828
+8,"Aug","Growing season","Non-orthophosphate P / suspended sediment",44,6.25626053470944,4.70801437136289,11.4976631933803
+9,"Sep","Growing season","Total phosphorus / suspended sediment",23,10.2505000635532,6.01117110407745,17.6517640811179
+9,"Sep","Growing season","Orthophosphate / suspended sediment",23,4.40851063829787,1.76726679058969,10.6966522663399
+9,"Sep","Growing season","Non-orthophosphate P / suspended sediment",23,4.61276595744681,4.130199339978,6.67711041285637
+10,"Oct","Post-growing season","Total phosphorus / suspended sediment",21,7.30021598272138,4.67766295707472,12.9842931937173
+10,"Oct","Post-growing season","Orthophosphate / suspended sediment",21,2.32553656597774,0.581981981981982,7.75916230366492
+10,"Oct","Post-growing season","Non-orthophosphate P / suspended sediment",21,4.66338259441708,3.90455049944506,7.44635085369936
+11,"Nov","Post-growing season","Total phosphorus / suspended sediment",14,6.12816775031337,4.86097493720127,32.0163975551907
+11,"Nov","Post-growing season","Orthophosphate / suspended sediment",14,1.57492525678062,0.738853945353526,16.7405582922824
+11,"Nov","Post-growing season","Non-orthophosphate P / suspended sediment",14,4.14663358680137,3.59871794871795,5.86946001367056
+12,"Dec","Post-growing season","Total phosphorus / suspended sediment",33,48.3870967741936,18.5915492957746,114.457831325301
+12,"Dec","Post-growing season","Orthophosphate / suspended sediment",33,33.8368580060423,5.76047904191617,106.626506024096
+12,"Dec","Post-growing season","Non-orthophosphate P / suspended sediment",32,8.06991433134892,5.29328680624792,14.7635586875348

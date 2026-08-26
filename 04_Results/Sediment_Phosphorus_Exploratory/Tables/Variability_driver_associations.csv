@@ -1,0 +1,193 @@
+"Metric","Constituent","Season","Driver","Events","Spearman_Rho","P_Value","P_Adjusted"
+"Concentration","Suspended sediment","Pre-growing season","Runoff depth",607,0.0170377800363196,0.675266376426038,0.771733001629758
+"Concentration","Suspended sediment","Pre-growing season","Precipitation depth",607,0.233459942354497,5.86353862677387e-09,2.34541545070955e-08
+"Concentration","Suspended sediment","Pre-growing season","Maximum 30-minute intensity",422,0.220866498283858,4.64063804312658e-06,9.28127608625316e-06
+"Concentration","Suspended sediment","Pre-growing season","Seven-day antecedent precipitation",607,0.194168571538889,1.43639086882692e-06,3.83037565020511e-06
+"Concentration","Suspended sediment","Pre-growing season","Mean slope",607,0.0601708226494062,0.138676679395027,0.184902239193369
+"Concentration","Suspended sediment","Pre-growing season","Perennial crop fraction",602,-0.00739158443152528,0.856380801489854,0.856380801489854
+"Concentration","Suspended sediment","Pre-growing season","Tillage passes",571,0.0937232250206812,0.0251170874099177,0.0401873398558683
+"Concentration","Suspended sediment","Pre-growing season","Frozen soil",607,-0.270576286347218,1.20670998672008e-11,9.65367989376062e-11
+"Concentration","Suspended sediment","Growing season","Runoff depth",354,0.0702793387821296,0.187084585154882,0.261918419216835
+"Concentration","Suspended sediment","Growing season","Precipitation depth",354,-0.0725124502710349,0.173424945998675,0.261918419216835
+"Concentration","Suspended sediment","Growing season","Maximum 30-minute intensity",352,-0.0609668937626309,0.253939324113515,0.296262544799101
+"Concentration","Suspended sediment","Growing season","Seven-day antecedent precipitation",354,-0.0882858262840282,0.097226120749898,0.226860948416429
+"Concentration","Suspended sediment","Growing season","Mean slope",354,0.0346962560101961,0.515244524012888,0.515244524012888
+"Concentration","Suspended sediment","Growing season","Perennial crop fraction",352,0.125013071473999,0.0189597186215843,0.0663590151755451
+"Concentration","Suspended sediment","Growing season","Tillage passes",331,0.148023839534289,0.00698105168342587,0.0488673617839811
+"Concentration","Suspended sediment","Growing season","Frozen soil",354,,,
+"Concentration","Suspended sediment","Post-growing season","Runoff depth",89,0.0310530191214927,0.772671745274332,0.970752217085517
+"Concentration","Suspended sediment","Post-growing season","Precipitation depth",89,-0.045383924653275,0.672794216411982,0.970752217085517
+"Concentration","Suspended sediment","Post-growing season","Maximum 30-minute intensity",86,-0.120327034527247,0.26978677042117,0.719431387789787
+"Concentration","Suspended sediment","Post-growing season","Seven-day antecedent precipitation",89,-0.064408674803694,0.548730462954697,0.970752217085517
+"Concentration","Suspended sediment","Post-growing season","Mean slope",89,0.226716508566664,0.0326380732282081,0.161841408912267
+"Concentration","Suspended sediment","Post-growing season","Perennial crop fraction",86,-0.221440525526454,0.0404603522280667,0.161841408912267
+"Concentration","Suspended sediment","Post-growing season","Tillage passes",67,0.0228585998017235,0.854320581351449,0.970752217085517
+"Concentration","Suspended sediment","Post-growing season","Frozen soil",89,0.00394218330983645,0.970752217085517,0.970752217085517
+"Concentration","Total dissolved solids","Pre-growing season","Runoff depth",414,-0.104721705941469,0.0331559896297159,0.0884159723459091
+"Concentration","Total dissolved solids","Pre-growing season","Precipitation depth",414,-0.0131845387035092,0.789110239359118,0.789110239359118
+"Concentration","Total dissolved solids","Pre-growing season","Maximum 30-minute intensity",273,0.078845488876425,0.194017194854282,0.388034389708563
+"Concentration","Total dissolved solids","Pre-growing season","Seven-day antecedent precipitation",414,-0.0418211915580364,0.396029370594868,0.597472111900897
+"Concentration","Total dissolved solids","Pre-growing season","Mean slope",414,-0.158351053898949,0.00122650027403707,0.00490600109614829
+"Concentration","Total dissolved solids","Pre-growing season","Perennial crop fraction",414,-0.0373821462821311,0.448104083925673,0.597472111900897
+"Concentration","Total dissolved solids","Pre-growing season","Tillage passes",383,0.16513661805425,0.00118062525649,0.00490600109614829
+"Concentration","Total dissolved solids","Pre-growing season","Frozen soil",414,0.0291224895449441,0.554594972312842,0.633822825500391
+"Concentration","Total dissolved solids","Growing season","Runoff depth",241,0.077784765097225,0.228941590979877,0.267098522809856
+"Concentration","Total dissolved solids","Growing season","Precipitation depth",241,0.0920704244341361,0.154181943124636,0.267098522809856
+"Concentration","Total dissolved solids","Growing season","Maximum 30-minute intensity",239,0.0828249995892582,0.201982482094263,0.267098522809856
+"Concentration","Total dissolved solids","Growing season","Seven-day antecedent precipitation",241,-0.0780593009950434,0.227297784159382,0.267098522809856
+"Concentration","Total dissolved solids","Growing season","Mean slope",241,-0.0269738940692749,0.676937253452655,0.676937253452655
+"Concentration","Total dissolved solids","Growing season","Perennial crop fraction",241,0.345156782944144,3.78971610044366e-08,2.65280127031056e-07
+"Concentration","Total dissolved solids","Growing season","Tillage passes",220,0.160436588939389,0.017239918527222,0.060339714845277
+"Concentration","Total dissolved solids","Growing season","Frozen soil",241,,,
+"Concentration","Total dissolved solids","Post-growing season","Runoff depth",39,-0.108748486183805,0.509897776527519,0.679863702036693
+"Concentration","Total dissolved solids","Post-growing season","Precipitation depth",39,-0.0193437311099381,0.906953533672261,0.935681901546131
+"Concentration","Total dissolved solids","Post-growing season","Maximum 30-minute intensity",37,0.185194225575145,0.272486395474211,0.544972790948423
+"Concentration","Total dissolved solids","Post-growing season","Seven-day antecedent precipitation",39,0.27849443347137,0.0860229383407,0.301097793036131
+"Concentration","Total dissolved solids","Post-growing season","Mean slope",39,-0.0133560516386873,0.935681901546131,0.935681901546131
+"Concentration","Total dissolved solids","Post-growing season","Perennial crop fraction",36,0.268804373372274,0.112911672388549,0.301097793036131
+"Concentration","Total dissolved solids","Post-growing season","Tillage passes",25,-0.431116505209153,0.031427532684724,0.251420261477792
+"Concentration","Total dissolved solids","Post-growing season","Frozen soil",39,-0.152291244785122,0.354690472153836,0.567504755446137
+"Concentration","Orthophosphate","Pre-growing season","Runoff depth",607,0.131483070090837,0.00116699803511106,0.00933598428088845
+"Concentration","Orthophosphate","Pre-growing season","Precipitation depth",607,0.0300797503508263,0.459466415491781,0.976460796995952
+"Concentration","Orthophosphate","Pre-growing season","Maximum 30-minute intensity",422,-0.0154920371909726,0.75099898046143,0.976460796995952
+"Concentration","Orthophosphate","Pre-growing season","Seven-day antecedent precipitation",607,-0.0119878551760581,0.76818408324957,0.976460796995952
+"Concentration","Orthophosphate","Pre-growing season","Mean slope",607,-0.0785442886461525,0.0530977975998656,0.212391190399462
+"Concentration","Orthophosphate","Pre-growing season","Perennial crop fraction",602,-0.00697999865322246,0.864298301069558,0.976460796995952
+"Concentration","Orthophosphate","Pre-growing season","Tillage passes",571,0.00123751143904208,0.976460796995952,0.976460796995952
+"Concentration","Orthophosphate","Pre-growing season","Frozen soil",607,-0.0112115867030958,0.78280668314716,0.976460796995952
+"Concentration","Orthophosphate","Growing season","Runoff depth",354,0.235928691770535,7.23117361966075e-06,2.53091076688126e-05
+"Concentration","Orthophosphate","Growing season","Precipitation depth",354,0.0300909559122126,0.572561308337754,0.610056571672533
+"Concentration","Orthophosphate","Growing season","Maximum 30-minute intensity",352,-0.0272746596421094,0.610056571672533,0.610056571672533
+"Concentration","Orthophosphate","Growing season","Seven-day antecedent precipitation",354,-0.183572444011351,0.000518093781585543,0.00120888549036627
+"Concentration","Orthophosphate","Growing season","Mean slope",354,-0.0442836099107286,0.406170328200507,0.56863845948071
+"Concentration","Orthophosphate","Growing season","Perennial crop fraction",352,0.246304957956016,2.91243126617343e-06,2.0387018863214e-05
+"Concentration","Orthophosphate","Growing season","Tillage passes",331,0.116877188919244,0.0335332388804118,0.0586831680407207
+"Concentration","Orthophosphate","Growing season","Frozen soil",354,,,
+"Concentration","Orthophosphate","Post-growing season","Runoff depth",89,-0.0937707485690861,0.382088932004877,0.747263625257598
+"Concentration","Orthophosphate","Post-growing season","Precipitation depth",89,-0.155619499090381,0.14532480274623,0.387532807323279
+"Concentration","Orthophosphate","Post-growing season","Maximum 30-minute intensity",86,-0.207907181978456,0.0547462245370634,0.218984898148253
+"Concentration","Orthophosphate","Post-growing season","Seven-day antecedent precipitation",89,-0.0698973517300562,0.515120544657815,0.747263625257598
+"Concentration","Orthophosphate","Post-growing season","Mean slope",89,-0.0625341710747258,0.560447718943199,0.747263625257598
+"Concentration","Orthophosphate","Post-growing season","Perennial crop fraction",86,-0.226999534183608,0.0355686449169814,0.218984898148253
+"Concentration","Orthophosphate","Post-growing season","Tillage passes",67,-0.0377089624264449,0.761920158817763,0.858130237168116
+"Concentration","Orthophosphate","Post-growing season","Frozen soil",89,0.0192178982478492,0.858130237168116,0.858130237168116
+"Concentration","Total phosphorus","Pre-growing season","Runoff depth",607,0.0585709880380178,0.149500468554072,0.398667916144192
+"Concentration","Total phosphorus","Pre-growing season","Precipitation depth",607,-0.0209951878211373,0.6056749974205,0.819669002898462
+"Concentration","Total phosphorus","Pre-growing season","Maximum 30-minute intensity",422,-0.00156624095911275,0.974408805387544,0.974408805387544
+"Concentration","Total phosphorus","Pre-growing season","Seven-day antecedent precipitation",607,0.0176598132277184,0.66412260740265,0.819669002898462
+"Concentration","Total phosphorus","Pre-growing season","Mean slope",607,-0.0260796903821765,0.521315035889307,0.819669002898462
+"Concentration","Total phosphorus","Pre-growing season","Perennial crop fraction",602,-0.0147916799982607,0.717210377536154,0.819669002898462
+"Concentration","Total phosphorus","Pre-growing season","Tillage passes",571,0.0611074887824017,0.144740294185362,0.398667916144192
+"Concentration","Total phosphorus","Pre-growing season","Frozen soil",607,-0.06903468381655,0.0892523197361144,0.398667916144192
+"Concentration","Total phosphorus","Growing season","Runoff depth",354,0.159718765758469,0.00257970164269114,0.00647046898986015
+"Concentration","Total phosphorus","Growing season","Precipitation depth",354,0.0707759821169408,0.183980295284716,0.257572413398603
+"Concentration","Total phosphorus","Growing season","Maximum 30-minute intensity",352,0.0559656336146499,0.295056047124458,0.295056047124458
+"Concentration","Total phosphorus","Growing season","Seven-day antecedent precipitation",354,-0.056538927016713,0.288753541435622,0.295056047124458
+"Concentration","Total phosphorus","Growing season","Mean slope",354,-0.0882166125454277,0.0974896672109593,0.170606917619179
+"Concentration","Total phosphorus","Growing season","Perennial crop fraction",352,0.186189426565875,0.000445497900609387,0.00311848530426571
+"Concentration","Total phosphorus","Growing season","Tillage passes",331,0.163952210245585,0.00277305813851149,0.00647046898986015
+"Concentration","Total phosphorus","Growing season","Frozen soil",354,,,
+"Concentration","Total phosphorus","Post-growing season","Runoff depth",89,-0.0367904933893671,0.732132503129234,0.732132503129234
+"Concentration","Total phosphorus","Post-growing season","Precipitation depth",89,-0.162181605052765,0.128898205855908,0.257796411711816
+"Concentration","Total phosphorus","Post-growing season","Maximum 30-minute intensity",86,-0.230615316932573,0.0326607893150095,0.130643157260038
+"Concentration","Total phosphorus","Post-growing season","Seven-day antecedent precipitation",89,-0.147166265096722,0.168746321260927,0.269994114017483
+"Concentration","Total phosphorus","Post-growing season","Mean slope",89,0.275030248760176,0.00909504484136595,0.0727603587309276
+"Concentration","Total phosphorus","Post-growing season","Perennial crop fraction",86,-0.13831828554725,0.204064759750283,0.272086346333711
+"Concentration","Total phosphorus","Post-growing season","Tillage passes",67,0.049145777439006,0.692884275721464,0.732132503129234
+"Concentration","Total phosphorus","Post-growing season","Frozen soil",89,0.190211154289642,0.0741932951832969,0.197848787155458
+"Load","Suspended sediment","Pre-growing season","Runoff depth",607,-0.109203404797988,0.00708129348803697,0.0566503479042957
+"Load","Suspended sediment","Pre-growing season","Precipitation depth",607,0.00896393669353542,0.825561960074178,0.93005090498126
+"Load","Suspended sediment","Pre-growing season","Maximum 30-minute intensity",422,0.0810017363435875,0.0965558063983558,0.386223225593423
+"Load","Suspended sediment","Pre-growing season","Seven-day antecedent precipitation",607,0.00883657833177487,0.828001415192537,0.93005090498126
+"Load","Suspended sediment","Pre-growing season","Mean slope",607,0.00357026030580972,0.93005090498126,0.93005090498126
+"Load","Suspended sediment","Pre-growing season","Perennial crop fraction",602,0.0306577631501517,0.452759530616738,0.905519061233476
+"Load","Suspended sediment","Pre-growing season","Tillage passes",571,0.0203396572159515,0.62766672782014,0.93005090498126
+"Load","Suspended sediment","Pre-growing season","Frozen soil",607,-0.0489779384961851,0.228232834577037,0.608620892205432
+"Load","Suspended sediment","Growing season","Runoff depth",354,-0.0565918381838705,0.288301807542091,0.480394806840719
+"Load","Suspended sediment","Growing season","Precipitation depth",354,-0.0263534723045846,0.621186287337399,0.724717335226966
+"Load","Suspended sediment","Growing season","Maximum 30-minute intensity",352,-0.0506753341084771,0.343139147743371,0.480394806840719
+"Load","Suspended sediment","Growing season","Seven-day antecedent precipitation",354,0.00986078019695416,0.853324897821431,0.853324897821431
+"Load","Suspended sediment","Growing season","Mean slope",354,-0.0958491540671637,0.0716773876082457,0.25087085662886
+"Load","Suspended sediment","Growing season","Perennial crop fraction",352,-0.0783941244444787,0.142149767761528,0.331682791443565
+"Load","Suspended sediment","Growing season","Tillage passes",331,0.130196060353152,0.0177955764076468,0.124569034853528
+"Load","Suspended sediment","Growing season","Frozen soil",354,,,
+"Load","Suspended sediment","Post-growing season","Runoff depth",89,-0.0714349556356245,0.505897128934162,0.67452950524555
+"Load","Suspended sediment","Post-growing season","Precipitation depth",89,0.116953488938324,0.275057153552291,0.67452950524555
+"Load","Suspended sediment","Post-growing season","Maximum 30-minute intensity",86,0.174843557216643,0.107368361507975,0.67452950524555
+"Load","Suspended sediment","Post-growing season","Seven-day antecedent precipitation",89,0.081686484454896,0.446652430870292,0.67452950524555
+"Load","Suspended sediment","Post-growing season","Mean slope",89,0.0457865072436954,0.670059503868556,0.765782290135492
+"Load","Suspended sediment","Post-growing season","Perennial crop fraction",86,0.00191342676013228,0.986049900499192,0.986049900499192
+"Load","Suspended sediment","Post-growing season","Tillage passes",67,0.0914081241510334,0.461931898456518,0.67452950524555
+"Load","Suspended sediment","Post-growing season","Frozen soil",89,-0.107423580751349,0.316339374876295,0.67452950524555
+"Load","Total dissolved solids","Pre-growing season","Runoff depth",414,-0.168033162197055,0.000596782220407105,0.00477425776325684
+"Load","Total dissolved solids","Pre-growing season","Precipitation depth",414,-0.0408125498557085,0.407530688399272,0.652049101438836
+"Load","Total dissolved solids","Pre-growing season","Maximum 30-minute intensity",273,0.0337114328624244,0.579164061652487,0.661901784745699
+"Load","Total dissolved solids","Pre-growing season","Seven-day antecedent precipitation",414,-0.147658198085226,0.00259667956275005,0.0103867182510002
+"Load","Total dissolved solids","Pre-growing season","Mean slope",414,-0.0835246950248679,0.0896390838767099,0.17927816775342
+"Load","Total dissolved solids","Pre-growing season","Perennial crop fraction",414,-0.0166593968656253,0.735387938794566,0.735387938794566
+"Load","Total dissolved solids","Pre-growing season","Tillage passes",383,-0.0291027661157151,0.570163312648651,0.661901784745699
+"Load","Total dissolved solids","Pre-growing season","Frozen soil",414,0.0870314527426124,0.0769219902678321,0.17927816775342
+"Load","Total dissolved solids","Growing season","Runoff depth",241,-0.172629665788235,0.00722705984018167,0.0505894188812717
+"Load","Total dissolved solids","Growing season","Precipitation depth",241,0.089007868240589,0.168411831875584,0.589441411564543
+"Load","Total dissolved solids","Growing season","Maximum 30-minute intensity",239,0.044712344583923,0.491480334303572,0.688072468025001
+"Load","Total dissolved solids","Growing season","Seven-day antecedent precipitation",241,-0.0022779590116642,0.971936513455326,0.971936513455326
+"Load","Total dissolved solids","Growing season","Mean slope",241,-0.0584982951752173,0.365894237784993,0.688072468025001
+"Load","Total dissolved solids","Growing season","Perennial crop fraction",241,-0.0069727850052588,0.914245369549254,0.971936513455326
+"Load","Total dissolved solids","Growing season","Tillage passes",220,0.0548326810237064,0.418356408669803,0.688072468025001
+"Load","Total dissolved solids","Growing season","Frozen soil",241,,,
+"Load","Total dissolved solids","Post-growing season","Runoff depth",39,-0.377322201262991,0.0178852263353976,0.14308181068318
+"Load","Total dissolved solids","Post-growing season","Precipitation depth",39,-0.143486405935516,0.383513968773135,0.685426785388017
+"Load","Total dissolved solids","Post-growing season","Maximum 30-minute intensity",37,0.216110596233204,0.198905877397908,0.587533057425502
+"Load","Total dissolved solids","Post-growing season","Seven-day antecedent precipitation",39,0.0474911069913213,0.774040021834114,0.872268673230833
+"Load","Total dissolved solids","Post-growing season","Mean slope",39,0.0266061067391159,0.872268673230833,0.872268673230833
+"Load","Total dissolved solids","Post-growing season","Perennial crop fraction",36,-0.0705883203316755,0.682470830997495,0.872268673230833
+"Load","Total dissolved solids","Post-growing season","Tillage passes",25,-0.254093711751688,0.220324896534563,0.587533057425502
+"Load","Total dissolved solids","Post-growing season","Frozen soil",39,0.130515525019977,0.428391740867511,0.685426785388017
+"Load","Orthophosphate","Pre-growing season","Runoff depth",607,0.0150953208656965,0.710515718661782,0.83342625739003
+"Load","Orthophosphate","Pre-growing season","Precipitation depth",607,-0.00855366738448716,0.83342625739003,0.83342625739003
+"Load","Orthophosphate","Pre-growing season","Maximum 30-minute intensity",422,-0.0961048131575268,0.048500183673039,0.129333823128104
+"Load","Orthophosphate","Pre-growing season","Seven-day antecedent precipitation",607,-0.085471805317175,0.0352640107152712,0.129333823128104
+"Load","Orthophosphate","Pre-growing season","Mean slope",607,-0.0163080404173583,0.688430649842039,0.83342625739003
+"Load","Orthophosphate","Pre-growing season","Perennial crop fraction",602,0.0132761228183385,0.74512345954789,0.83342625739003
+"Load","Orthophosphate","Pre-growing season","Tillage passes",571,-0.154056739658149,0.000219631851801781,0.00175705481441425
+"Load","Orthophosphate","Pre-growing season","Frozen soil",607,0.0463593216386906,0.254106924281518,0.508213848563037
+"Load","Orthophosphate","Growing season","Runoff depth",354,-0.0342222762030374,0.521003708449724,0.911756489787017
+"Load","Orthophosphate","Growing season","Precipitation depth",354,0.0825412674021555,0.12110355095952,0.423862428358321
+"Load","Orthophosphate","Growing season","Maximum 30-minute intensity",352,0.00427522340984542,0.936296618427821,0.936296618427821
+"Load","Orthophosphate","Growing season","Seven-day antecedent precipitation",354,0.0612948892390013,0.250037033490342,0.583419744810799
+"Load","Orthophosphate","Growing season","Mean slope",354,0.0233230904727674,0.661872918602004,0.926622086042805
+"Load","Orthophosphate","Growing season","Perennial crop fraction",352,-0.00701847472459248,0.895607998505188,0.936296618427821
+"Load","Orthophosphate","Growing season","Tillage passes",331,-0.0944494949051515,0.086217943801602,0.423862428358321
+"Load","Orthophosphate","Growing season","Frozen soil",354,,,
+"Load","Orthophosphate","Post-growing season","Runoff depth",89,0.279896832625405,0.00789482285391803,0.0631585828313442
+"Load","Orthophosphate","Post-growing season","Precipitation depth",89,0.128793619305358,0.229023785165693,0.610730093775182
+"Load","Orthophosphate","Post-growing season","Maximum 30-minute intensity",86,0.0368071584721423,0.736527922403575,0.841057304866136
+"Load","Orthophosphate","Post-growing season","Seven-day antecedent precipitation",89,-0.0799976904999722,0.456136669151615,0.664136913565437
+"Load","Orthophosphate","Post-growing season","Mean slope",89,0.0215596396913001,0.841057304866136,0.841057304866136
+"Load","Orthophosphate","Post-growing season","Perennial crop fraction",86,0.074037372254799,0.498102685174078,0.664136913565437
+"Load","Orthophosphate","Post-growing season","Tillage passes",67,0.0896904666715278,0.470424328568336,0.664136913565437
+"Load","Orthophosphate","Post-growing season","Frozen soil",89,-0.147828728164119,0.166816003036664,0.610730093775182
+"Load","Total phosphorus","Pre-growing season","Runoff depth",607,-0.0975068971165103,0.016257171775227,0.130057374201816
+"Load","Total phosphorus","Pre-growing season","Precipitation depth",607,-0.0279351224753049,0.492105818371979,0.625002899649127
+"Load","Total phosphorus","Pre-growing season","Maximum 30-minute intensity",422,-0.0238604495788964,0.625002899649127,0.625002899649127
+"Load","Total phosphorus","Pre-growing season","Seven-day antecedent precipitation",607,-0.0564356775292908,0.16493386999175,0.439823653311332
+"Load","Total phosphorus","Pre-growing season","Mean slope",607,0.0206092673081008,0.612319473804878,0.625002899649127
+"Load","Total phosphorus","Pre-growing season","Perennial crop fraction",602,-0.0430036828849119,0.292148841609986,0.561562701873857
+"Load","Total phosphorus","Pre-growing season","Tillage passes",571,-0.0760928817709813,0.069226920067403,0.276907680269612
+"Load","Total phosphorus","Pre-growing season","Frozen soil",607,-0.0379215320695567,0.350976688671161,0.561562701873857
+"Load","Total phosphorus","Growing season","Runoff depth",354,-0.171860251134271,0.00116923392404554,0.00818463746831875
+"Load","Total phosphorus","Growing season","Precipitation depth",354,0.0116208579800449,0.827523244541334,0.827523244541334
+"Load","Total phosphorus","Growing season","Maximum 30-minute intensity",352,-0.0408262798893509,0.445127828067677,0.51931579941229
+"Load","Total phosphorus","Growing season","Seven-day antecedent precipitation",354,0.0793082192336943,0.136423048423554,0.308289934252305
+"Load","Total phosphorus","Growing season","Mean slope",354,-0.0946972759103957,0.0751713095099951,0.263099583284983
+"Load","Total phosphorus","Growing season","Perennial crop fraction",352,-0.0560161839954102,0.294619416432713,0.412467183005798
+"Load","Total phosphorus","Growing season","Tillage passes",331,0.0745271813711561,0.176165676715603,0.308289934252305
+"Load","Total phosphorus","Growing season","Frozen soil",354,,,
+"Load","Total phosphorus","Post-growing season","Runoff depth",89,0.159307779418202,0.13590851147256,0.184636505583205
+"Load","Total phosphorus","Post-growing season","Precipitation depth",89,0.310126421759741,0.00309986685629998,0.0192020602058361
+"Load","Total phosphorus","Post-growing season","Maximum 30-minute intensity",86,0.301406187956576,0.00480051505145903,0.0192020602058361
+"Load","Total phosphorus","Post-growing season","Seven-day antecedent precipitation",89,-0.0311258966423242,0.772152710440623,0.772152710440623
+"Load","Total phosphorus","Post-growing season","Mean slope",89,0.158526947468402,0.137862327884196,0.184636505583205
+"Load","Total phosphorus","Post-growing season","Perennial crop fraction",86,0.16106447511872,0.138477379187403,0.184636505583205
+"Load","Total phosphorus","Post-growing season","Tillage passes",67,0.114057570841627,0.358076768813165,0.409230592929332
+"Load","Total phosphorus","Post-growing season","Frozen soil",89,-0.174440868995982,0.102055422707432,0.184636505583205
