@@ -1,0 +1,13 @@
+"Constituent","Metric","Available_Events","Total_Events","Availability_Percent","Sites_with_Data"
+"Suspended sediment","Concentration",1050,1050,100,28
+"Suspended sediment","Load",1050,1050,100,28
+"Suspended sediment","Yield",1050,1050,100,28
+"Total dissolved solids","Concentration",694,1050,66.0952380952381,20
+"Total dissolved solids","Load",694,1050,66.0952380952381,20
+"Total dissolved solids","Yield",694,1050,66.0952380952381,20
+"Orthophosphate","Concentration",1050,1050,100,28
+"Orthophosphate","Load",1050,1050,100,28
+"Orthophosphate","Yield",1050,1050,100,28
+"Total phosphorus","Concentration",1050,1050,100,28
+"Total phosphorus","Load",1050,1050,100,28
+"Total phosphorus","Yield",1050,1050,100,28

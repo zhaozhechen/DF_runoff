@@ -1,0 +1,13 @@
+"Constituent","Metric","Unit","Events","Mean","Standard_Deviation","Median","Minimum","Maximum"
+"Suspended sediment","Concentration","mg/L",1050,1176.04923809524,4524.36438900789,101,1,70100
+"Suspended sediment","Load","lb",1050,1063.36133885714,4886.52976749926,36.15,0.0169,103000
+"Suspended sediment","Yield","lb/acre",1050,97.2255620857143,677.823325076194,2.755,0.00111,14500
+"Total dissolved solids","Concentration","mg/L",694,189.26916426513,174.647824650893,132,2,1860
+"Total dissolved solids","Load","lb",694,181.773989481268,352.76248317702,54.3,0.0132,3670
+"Total dissolved solids","Yield","lb/acre",694,12.2112124553314,24.0702356037474,3.805,0.000334,337
+"Orthophosphate","Concentration","mg/L",1050,1.34672666666667,1.95278371972139,0.716,0.002,21.5
+"Orthophosphate","Load","lb",1050,1.53054282571429,4.79748456240829,0.2115,0.000278,80.1
+"Orthophosphate","Yield","lb/acre",1050,0.0971638484761905,0.251799581802709,0.0177,1.76e-05,2.39
+"Total phosphorus","Concentration","mg/L",1050,3.08435428571429,4.8117178176537,1.685,0.011,75
+"Total phosphorus","Load","lb",1050,3.18104086666667,8.06012165997966,0.602,0.00109,115
+"Total phosphorus","Yield","lb/acre",1050,0.206840994285714,0.44964873651576,0.045,6.43e-05,4.99

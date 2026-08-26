@@ -1,0 +1,37 @@
+"Season","Constituent","Metric","Events","Mean","Standard_Deviation","Median"
+"Pre-growing season","Suspended sediment","Concentration",607,1137.30313014827,4886.31959791928,44
+"Pre-growing season","Suspended sediment","Load",607,891.758131630972,3929.31756456644,23.5
+"Pre-growing season","Suspended sediment","Yield",607,115.166103130148,860.596687035581,1.77
+"Pre-growing season","Total dissolved solids","Concentration",414,219.947826086957,199.169504707503,152
+"Pre-growing season","Total dissolved solids","Load",414,218.173637681159,413.188485819692,64.65
+"Pre-growing season","Total dissolved solids","Yield",414,13.6785392028986,26.1496361397641,4.555
+"Pre-growing season","Orthophosphate","Concentration",607,1.60027347611203,2.28732800165031,0.799
+"Pre-growing season","Orthophosphate","Load",607,2.0511483509061,5.93430924693696,0.258
+"Pre-growing season","Orthophosphate","Yield",607,0.122665890939044,0.283405274767101,0.0223
+"Pre-growing season","Total phosphorus","Concentration",607,3.27802141680395,5.18995970540861,1.62
+"Pre-growing season","Total phosphorus","Load",607,3.6071744645799,8.85263172412629,0.671
+"Pre-growing season","Total phosphorus","Yield",607,0.237834074135091,0.503579310511561,0.0557
+"Growing season","Suspended sediment","Concentration",354,1316.55734463277,4369.82541658834,264
+"Growing season","Suspended sediment","Load",354,1420.09983305085,6542.6668798313,82.45
+"Growing season","Suspended sediment","Yield",354,72.3190183333333,284.730366227796,5.89
+"Growing season","Total dissolved solids","Concentration",241,139.698755186722,116.265114960496,108
+"Growing season","Total dissolved solids","Load",241,125.11001120332,227.057391360271,40.1
+"Growing season","Total dissolved solids","Yield",241,9.58199794190871,19.4368887766942,2.32
+"Growing season","Orthophosphate","Concentration",354,0.936251412429378,1.06146294714927,0.635
+"Growing season","Orthophosphate","Load",354,0.822351011299435,2.46867748319472,0.1875
+"Growing season","Orthophosphate","Yield",354,0.0648784014124294,0.210439156129132,0.01235
+"Growing season","Total phosphorus","Concentration",354,2.83537853107345,4.56334237790767,1.7
+"Growing season","Total phosphorus","Load",354,2.70706358757062,7.30645784181456,0.5665
+"Growing season","Total phosphorus","Yield",354,0.164511211864407,0.380850537790022,0.04145
+"Post-growing season","Suspended sediment","Concentration",89,881.431460674157,1677.64815851587,304
+"Post-growing season","Suspended sediment","Load",89,814.796393258427,2413.80772263991,48.6
+"Post-growing season","Suspended sediment","Yield",89,73.9335179775281,214.688789897115,3.63
+"Post-growing season","Total dissolved solids","Concentration",39,169.923076923077,116.308207751145,120
+"Post-growing season","Total dissolved solids","Load",39,145.532051282051,228.368974006281,57.3
+"Post-growing season","Total dissolved solids","Yield",39,12.8821720512821,26.082748506993,1.57
+"Post-growing season","Orthophosphate","Concentration",89,1.25015730337079,1.94376297948824,0.608
+"Post-growing season","Orthophosphate","Load",89,0.796748988764045,1.72359936163201,0.118
+"Post-growing season","Orthophosphate","Yield",89,0.0516504606741573,0.119475259149699,0.01
+"Post-growing season","Total phosphorus","Concentration",89,2.75380898876405,2.51979433628838,1.87
+"Post-growing season","Total phosphorus","Load",89,2.15997191011236,4.16969100749108,0.299
+"Post-growing season","Total phosphorus","Yield",89,0.163829123595506,0.257402202059911,0.0397
