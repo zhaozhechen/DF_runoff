@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.7.31
+# Update Date: 2026.8.26
 
 # This code makes exploratory figures and summary statistics
 # for the Discovery Farms surface-runoff monitoring sites
@@ -592,6 +592,52 @@ US_counties <- sf::st_read(County_path,quiet=TRUE)
 WI_counties <- US_counties %>%
   filter(STATEFP == "55")
 WI_outline <- sf::st_union(WI_counties)
+
+# Statewide overview map with one point per surface monitoring site
+Wisconsin_overview_sites <- Site_summary %>%
+  filter(
+    is.finite(LONG_approx),
+    is.finite(LAT_approx)
+  ) %>%
+  distinct(Field_Name,.keep_all=TRUE)
+
+if(nrow(Wisconsin_overview_sites) != 28){
+  stop(
+    "The Wisconsin overview map expected 28 surface monitoring sites, but found ",
+    nrow(Wisconsin_overview_sites),
+    "."
+  )
+}
+
+Figure_wisconsin_overview <- ggplot() +
+  geom_sf(
+    data=WI_outline,
+    fill="white",
+    color="black",
+    linewidth=0.8
+  ) +
+  geom_point(
+    data=Wisconsin_overview_sites,
+    aes(x=LONG_approx,y=LAT_approx),
+    color="black",
+    size=4
+  ) +
+  coord_sf(expand=FALSE,datum=NA) +
+  labs(title="Discovery Farms surface-runoff monitoring sites") +
+  DF_map_theme +
+  theme(
+    panel.background=element_rect(fill="white",color=NA),
+    plot.background=element_rect(fill="white",color=NA),
+    plot.title=element_text(size=18,face="bold",hjust=0.5),
+    plot.margin=margin(12,12,12,12)
+  )
+
+save_figure_pair(
+  Figure_wisconsin_overview,
+  file.path(Figure_path,"01C_Wisconsin_surface_monitoring_sites"),
+  width=8,
+  height=9
+)
 
 # Base map
 Map_base <- ggplot() +
