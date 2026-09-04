@@ -1,0 +1,29 @@
+"Site_ID","Updated_Land_Cover","Crop_Rotation","Mean_Tillage_Passes","Mean_Slope_Percent","Dominant_Soil_Series","Soil_Infiltration_Group","Soil_Drainage_Class","Tile_Drainage","Basin_Area_Acres","Mean_Current_Perennial_Fraction"
+"AO1","Cultivated Crops","Potato-Alfalfa",1.6,1.9,"Antigo silt loam","High-infiltration","Well drained","No",22.2,0.6
+"AO3","Cultivated Crops","Potato-Alfalfa-Green Bean-Corn",2.5,2.5,"Antigo silt loam","High-infiltration","Well drained","No",22.4,0.5
+"AR1","Cultivated Crops","Corn-Alfalfa",1,1.9,"Warsaw silt loam","High-infiltration","Well drained","No",18.5,0.8
+"AR2","Cultivated Crops","Corn-Seed Corn-Vegetables-Mint",2.4,3.4,"Oshtemo sandy loam","High-infiltration","Well drained","No",5.8,0
+"H3","Cultivated Crops","Corn-Barely-Alfalfa/Brome (Organic)",2,6,"Dodgevill silt loam","Moderate-infiltration","Well drained","No",15.8,0.6
+"JF2","Pasture/Hay","Grass Pasture",0,8.6,"Pepin silt loam","High-infiltration","Well drained","No",16,1
+"JF4","Cultivated Crops","Corn-Alfalfa",0.2,5.2,"NewGlarus silt loam","Moderate-infiltration","Well drained","No",14,0.564285714285714
+"JF5","Cultivated Crops","Corn-Alfalfa",0.392857142857143,6.3,"Brinkman silt loam","High-infiltration","Moderately well drained","No",33.4,0.464285714285714
+"K5","Pasture/Hay","Grass Pasture",0.372,3,"Kewaunee loam","Slow-infiltration","Well drained","Yes",15.2,1
+"K7","Pasture/Hay","Grass Pasture",0.4,3,"Kewaunee loam","Slow-infiltration","Well drained","Yes",12,1
+"K8","Pasture/Hay","Grass Pasture",0,6,"Kewaunee loam","Moderate-infiltration","Well drained","No",5,1
+"KD1","Cultivated Crops","Corn",0,3.92,"Waymor silt loam","Moderate-infiltration","Well drained","No",2.63,0
+"KD2","Cultivated Crops","Corn",0.36,3.96,"Hortonville silt loam","Moderate-infiltration","Well drained","No",19.8,0.06
+"KP3","Cultivated Crops","Corn-Soybean-Alfalfa",0,2,"Brookston silt loam","Slow-infiltration","Poorly drained","Yes",6.1,0
+"MT1","Cultivated Crops","Corn-Alfalfa",0.5,4.1,"Loyal silt loam","Slow-infiltration","Moderately well drained","No",7.7,0.5
+"MT2","Pasture/Hay","Grass Pasture",0,2.4,"Loyal silt loam","Slow-infiltration","Moderately well drained","No",5.6,1
+"P1","Cultivated Crops","Corn-Alfalfa",2.09,4,"Hortonville silt loam","Moderate-infiltration","Well drained","Yes",20.5,0.19
+"P2","Cultivated Crops","Corn-Alfalfa",1.88,4,"Hortonville silt loam","Moderate-infiltration","Well drained","Yes",22.1,0.313333333333333
+"P3","Cultivated Crops","Corn-Alfalfa",2,4,"Hortonville silt loam","Moderate-infiltration","Well drained","Yes",13.2,0.2
+"R1","Cultivated Crops","Corn-Soybean",0,5,"Tama silt loam","High-infiltration","Well drained","No",16.9,0
+"R2","Cultivated Crops","Corn-Soybean",0,5,"Tama silt loam","High-infiltration","Well drained","No",17.2,0
+"R3","Cultivated Crops","Corn-Soybean",0.222857142857143,5,"Tama silt loam","High-infiltration","Well drained","No",39.5,0
+"RE1","Cultivated Crops","Corn-Soybean",0.833333333333333,3,"Winnebago silt loam","High-infiltration","Well drained","No",9.4,0
+"RE5","Cultivated Crops","Corn-Soybean",0.666666666666667,3,"Kidder silt loam","High-infiltration","Well drained","No",9.7,0
+"RS1","Cultivated Crops","Corn-Alfalfa",0.2,11,"Norden silt loam","Moderate-infiltration","Well drained","No",2.1,0.8
+"RS2","Cultivated Crops","Corn-Alfalfa",0.4,7,"La Farge silt loam","Moderate-infiltration","Well drained","No",1.9,0.4
+"WF1","Cultivated Crops","Corn-Soybean",1,4.4,"Santiago silt loam","High-infiltration","Well drained","No",42.1,0
+"WF2","Cultivated Crops","Corn-Alfalfa",1.28571428571429,5.3,"Freeon silt loam heavy substratum","Slow-infiltration","Moderately well drained","No",6.7,0.428571428571429

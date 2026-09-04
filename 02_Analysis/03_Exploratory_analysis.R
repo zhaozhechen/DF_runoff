@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.8.26
+# Update Date: 2026.9.4
 
 # This code makes exploratory figures and summary statistics
 # for the Discovery Farms surface-runoff monitoring sites
@@ -348,6 +348,145 @@ Site_summary <- Site_summary %>%
     )
   )
 
+# Summaries of physical site properties and agricultural land use
+Site_characteristics_overview <- data.frame(
+  Characteristic=c(
+    "Surface monitoring sites",
+    "Updated land-cover classes",
+    "Cultivated-crop sites",
+    "Pasture/hay sites",
+    "Crop-rotation categories",
+    "Detailed soil series",
+    "Soil infiltration groups",
+    "Soil drainage classes",
+    "Sites with tile drainage"
+  ),
+  Count=c(
+    n_distinct(Site_summary$Field_Name),
+    n_distinct(Site_summary$LandCover_Updated,na.rm=TRUE),
+    sum(Site_summary$LandCover_Updated == "Cultivated Crops",na.rm=TRUE),
+    sum(Site_summary$LandCover_Updated == "Pasture/Hay",na.rm=TRUE),
+    n_distinct(Site_summary$CropRotation,na.rm=TRUE),
+    n_distinct(Site_summary$SoilType,na.rm=TRUE),
+    n_distinct(Site_summary$Hydrologic_Group,na.rm=TRUE),
+    n_distinct(Site_summary$DrainageClass,na.rm=TRUE),
+    sum(Site_summary$Tile == "Yes",na.rm=TRUE)
+  ),
+  Definition=c(
+    "Unique surface-runoff monitoring Site IDs",
+    "Number of categories in the updated site-level land-cover classification",
+    "Sites classified as Cultivated Crops",
+    "Sites classified as Pasture/Hay",
+    "Distinct site-level crop-rotation descriptions",
+    "Distinct dominant soil-series descriptions",
+    "Grouped soil-infiltration categories used in the analysis",
+    "Distinct site-level soil-drainage classes",
+    "Sites with site-level tile drainage"
+  ),
+  stringsAsFactors=FALSE
+)
+
+summarize_site_continuous <- function(x,variable_name,unit_name){
+  x <- x[is.finite(x)]
+  data.frame(
+    Variable=variable_name,
+    Unit=unit_name,
+    Observations=length(x),
+    Mean=mean(x),
+    Standard_Deviation=sd_or_zero(x),
+    Median=median(x),
+    Minimum=min(x),
+    Maximum=max(x),
+    stringsAsFactors=FALSE
+  )
+}
+
+Site_continuous_summary <- bind_rows(
+  summarize_site_continuous(
+    Site_summary$MeanSlope_per,
+    "Mean basin slope across sites",
+    "%"
+  ),
+  summarize_site_continuous(
+    Site_summary$BasinArea_ac,
+    "Monitored basin area across sites",
+    "acres"
+  ),
+  summarize_site_continuous(
+    Site_summary$Mean_Total_Tillage_Passes,
+    "Site-average total tillage passes",
+    "passes per site-water-year"
+  ),
+  summarize_site_continuous(
+    Management_df$Tillage_Total,
+    "Total tillage passes across site-water-years",
+    "passes per site-water-year"
+  ),
+  summarize_site_continuous(
+    Site_summary$Mean_Current_Perennial_Fraction,
+    "Site-average current-crop perennial fraction",
+    "fraction"
+  )
+)
+
+summarize_site_categories <- function(df,column_name,characteristic_name){
+  df %>%
+    transmute(
+      Category=if_else(
+        is.na(.data[[column_name]]) |
+          trimws(as.character(.data[[column_name]])) == "",
+        "Missing",
+        as.character(.data[[column_name]])
+      )
+    ) %>%
+    count(Category,name="Sites") %>%
+    mutate(
+      Characteristic=characteristic_name,
+      Percent_of_Sites=100*Sites/nrow(df)
+    ) %>%
+    select(Characteristic,Category,Sites,Percent_of_Sites)
+}
+
+Site_categorical_summary <- bind_rows(
+  summarize_site_categories(
+    Site_summary,"LandCover_Updated","Updated land cover"
+  ),
+  summarize_site_categories(
+    Site_summary,"CropRotation","Crop rotation"
+  ),
+  summarize_site_categories(
+    Site_summary,"SoilType","Dominant soil series"
+  ),
+  summarize_site_categories(
+    Site_summary,"Hydrologic_Group","Soil infiltration group"
+  ),
+  summarize_site_categories(
+    Site_summary,"DrainageClass","Soil drainage class"
+  ),
+  summarize_site_categories(
+    Site_summary,"FarmEnterprise","Farm enterprise"
+  ),
+  summarize_site_categories(
+    Site_summary,"Tile","Site-level tile drainage"
+  )
+)
+
+Site_characteristics_by_site <- Site_summary %>%
+  transmute(
+    Site_ID=Field_Name,
+    Updated_Land_Cover=LandCover_Updated,
+    Crop_Rotation=CropRotation,
+    Mean_Tillage_Passes=Mean_Total_Tillage_Passes,
+    Mean_Slope_Percent=MeanSlope_per,
+    Dominant_Soil_Series=SoilType,
+    Soil_Infiltration_Group=as.character(Hydrologic_Group),
+    Soil_Drainage_Class=DrainageClass,
+    Tile_Drainage=Tile,
+    Basin_Area_Acres=BasinArea_ac,
+    Mean_Current_Perennial_Fraction=Mean_Current_Perennial_Fraction
+  ) %>%
+  arrange(Site_ID)
+
 # Step 3. Monthly means and uncertainty across years across all sites ==========
 # First average across monitored sites within each calendar year-month
 # Then get statistics across years
@@ -528,6 +667,34 @@ Site_summary_output <- Site_summary %>%
 write.csv(
   Site_summary_output,
   file.path(Table_path,"Site_exploratory_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Site_characteristics_overview,
+  file.path(Table_path,"Site_characteristics_overview.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Site_continuous_summary,
+  file.path(Table_path,"Site_continuous_characteristics.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Site_categorical_summary,
+  file.path(Table_path,"Site_categorical_characteristics.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Site_characteristics_by_site,
+  file.path(Table_path,"Site_characteristics_by_site.csv"),
   row.names=FALSE,
   na=""
 )
@@ -2203,12 +2370,48 @@ Monthly_report_table <- Monthly_climatology %>%
 RC_report_table <- RC_group_summary %>%
   arrange(Grouping,desc(Median_RC))
 
+Site_continuous_report <- Site_continuous_summary %>%
+  rename(
+    `Standard deviation`=Standard_Deviation
+  )
+
+Site_categorical_report <- Site_categorical_summary %>%
+  rename(
+    `Percent of sites`=Percent_of_Sites
+  )
+
+Site_details_report <- Site_characteristics_by_site
+names(Site_details_report) <- c(
+  "Site ID",
+  "Updated land cover",
+  "Crop rotation",
+  "Mean tillage passes",
+  "Mean slope (%)",
+  "Dominant soil series",
+  "Soil infiltration group",
+  "Soil drainage class",
+  "Tile drainage",
+  "Basin area (acres)",
+  "Mean current perennial fraction"
+)
+
 Report_body <- c(
   "<div class=\"callout\"><strong>Processing review:</strong> all seasonal management definitions passed validation. Hydrologic depths and intensities in the analysis-ready data and figures are in millimetres.</div>",
   "<h2>Data summary</h2>",
   "<p>Non-frozen events contributions are calculated within each complete calendar year and then averaged across years. Event-depth use millimetres.</p>",
   data_frame_to_html(Data_summary_table,digits=2),
   Key_findings,
+  "<h2>Site characteristics summary</h2>",
+  "<p>Fixed site properties are summarized across the 28 surface-runoff monitoring sites. Site-average tillage passes and perennial fractions are means across available site-water-years; they are management summaries rather than fixed physical properties.</p>",
+  "<h3>Site and land-use counts</h3>",
+  data_frame_to_html(Site_characteristics_overview,digits=0),
+  "<h3>Continuous site and management characteristics</h3>",
+  data_frame_to_html(Site_continuous_report,digits=2),
+  "<h3>Land-cover, crop, and soil categories</h3>",
+  "<p>Counts and percentages use one record per monitoring site. Detailed soil series and crop-rotation descriptions are retained rather than collapsed into broader classes; the grouped soil-infiltration variable is also shown because it is used in subsequent analyses.</p>",
+  data_frame_to_html(Site_categorical_report,digits=1),
+  "<h3>Characteristics of individual monitoring sites</h3>",
+  data_frame_to_html(Site_details_report,digits=2),
   "<h2>Management-variable quality check</h2>",
   "<p>Tillage values remain basin-weighted pass totals. Rows with supplied basin coverage below 100% are not renormalized, so uncovered portions do not receive an assumed management value.</p>",
   data_frame_to_html(Management_audit_table,digits=2),
