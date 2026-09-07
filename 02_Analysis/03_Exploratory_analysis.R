@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.9.4
+# Update Date: 2026.9.7
 
 # This code makes exploratory figures and summary statistics
 # for the Discovery Farms surface-runoff monitoring sites
@@ -2190,6 +2190,128 @@ save_figure_pair(
   height=10
 )
 
+# Alternative depth-only view with frozen and non-frozen contributions stacked
+summarize_total_freeze_depth <- function(event_df){
+  Freeze_grid %>%
+    left_join(
+      event_df,
+      by=c(
+        "Calendar_Year",
+        "Month_Number",
+        "Month",
+        "Frozen_Status"
+      )
+    ) %>%
+    mutate(Depth_mm=replace_na(Depth_mm,0)) %>%
+    group_by(
+      Calendar_Year,
+      Month_Number,
+      Month,
+      Monitored_Sites
+    ) %>%
+    summarise(
+      Total_Depth_per_Site_mm=sum(Depth_mm)/first(Monitored_Sites),
+      .groups="drop"
+    ) %>%
+    group_by(Month_Number,Month) %>%
+    summarise(
+      Mean_Total_Depth_mm=mean(Total_Depth_per_Site_mm),
+      SD_Total_Depth_mm=sd_or_zero(Total_Depth_per_Site_mm),
+      .groups="drop"
+    ) %>%
+    mutate(
+      Total_Depth_Lower=pmax(
+        0,
+        Mean_Total_Depth_mm-SD_Total_Depth_mm
+      ),
+      Total_Depth_Upper=
+        Mean_Total_Depth_mm+SD_Total_Depth_mm
+    )
+}
+
+P_freeze_total_depth <- summarize_total_freeze_depth(P_freeze_event)
+Q_freeze_total_depth <- summarize_total_freeze_depth(Q_freeze_event)
+
+Freeze_stacked_depth_ymax <- 1.05*max(
+  P_freeze_total_depth$Total_Depth_Upper,
+  Q_freeze_total_depth$Total_Depth_Upper,
+  na.rm=TRUE
+)
+
+Freeze_stacked_depth_bar <- function(
+    component_df,
+    total_df,
+    title,
+    y_limit){
+  ggplot(
+    component_df %>%
+      mutate(
+        Frozen_Status=factor(
+          Frozen_Status,
+          levels=c("Non-Frozen","Frozen")
+        )
+      ),
+    aes(
+      Month,
+      Mean_Depth_mm,
+      fill=Frozen_Status
+    )
+  ) +
+    geom_col(
+      position="stack",
+      width=0.72,
+      color="black"
+    ) +
+    geom_errorbar(
+      data=total_df,
+      aes(
+        x=Month,
+        ymin=Total_Depth_Lower,
+        ymax=Total_Depth_Upper
+      ),
+      inherit.aes=FALSE,
+      width=0.18,
+      linewidth=0.5
+    ) +
+    scale_fill_manual(values=DF_frozen_colors) +
+    scale_y_continuous(limits=c(0,y_limit)) +
+    labs(
+      title=title,
+      x=NULL,
+      y="Mean monthly total per site (mm)",
+      fill=NULL
+    ) +
+    DF_plot_theme +
+    theme(legend.position="top")
+}
+
+Figure_frozen_stacked_depth <- (
+  Freeze_stacked_depth_bar(
+    P_freeze_monthly,
+    P_freeze_total_depth,
+    "A. Precipitation depth",
+    Freeze_stacked_depth_ymax
+  ) +
+    Freeze_stacked_depth_bar(
+      Q_freeze_monthly,
+      Q_freeze_total_depth,
+      "B. Runoff depth",
+      Freeze_stacked_depth_ymax
+    )
+) +
+  plot_layout(ncol=2,guides="collect") &
+  theme(legend.position="top")
+
+save_figure_pair(
+  Figure_frozen_stacked_depth,
+  file.path(
+    Figure_path,
+    "07B_Frozen_nonfrozen_monthly_depth_stacked"
+  ),
+  width=15,
+  height=5.8
+)
+
 # Step 13. Generate exploratory HTML report ===================
 Complete_site_years <- Site_year_summary %>%
   filter(Complete_Monitoring_Year) %>%
@@ -2446,7 +2568,14 @@ Report_body <- c(
   ),
   embedded_figure_html(
     file.path(Figure_path,"07_Frozen_nonfrozen_monthly_patterns.png"),
-    "Figure 5. Average monthly event numbers and depths grouped by frozen and non-frozen soil conditions, with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
+    "Figure 5A. Average monthly event numbers and depths grouped by frozen and non-frozen soil conditions, with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
+  ),
+  embedded_figure_html(
+    file.path(
+      Figure_path,
+      "07B_Frozen_nonfrozen_monthly_depth_stacked.png"
+    ),
+    "Figure 5B. Average monthly precipitation and runoff depths partitioned into stacked frozen and non-frozen contributions. Error bars show one standard deviation of total monthly depth across years. Precipitation and runoff panels use a common y-axis scale."
   ),
   "<h3>Monthly summary statistics</h3>",
   data_frame_to_html(Monthly_report_table,digits=2),
