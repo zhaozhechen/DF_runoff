@@ -806,9 +806,66 @@ save_figure_pair(
   height=9
 )
 
+# TerraClimate mean annual precipitation, 2003-2023 ======
+# Combine monthly files; verify overlapping months before retaining one copy
+PPT_files <- file.path(Project_path,"00_Data","Raw",c(
+  "agg_terraclimate_ppt_2003_2013_GLOBE.nc",
+  "agg_terraclimate_ppt_2013_2023_GLOBE.nc"
+))
+stopifnot(all(file.exists(PPT_files)))
+PPT_parts <- lapply(PPT_files,function(f) terra::rast(f,subds="ppt"))
+stopifnot(terra::compareGeom(PPT_parts[[1]],PPT_parts[[2]]))
+PPT_all <- c(PPT_parts[[1]],PPT_parts[[2]])
+PPT_dates <- as.Date(terra::time(PPT_all))
+stopifnot(!anyNA(PPT_dates))
+for(duplicate_date in unique(PPT_dates[duplicated(PPT_dates)])){
+  idx <- which(PPT_dates == duplicate_date)
+  stopifnot(isTRUE(all.equal(terra::values(PPT_all[[idx[1]]]),
+                            terra::values(PPT_all[[idx[2]]]),
+                            check.attributes=FALSE)))
+}
+PPT_keep <- which(!duplicated(PPT_dates) &
+                   PPT_dates >= as.Date("2003-01-01") &
+                   PPT_dates <= as.Date("2023-12-01"))
+PPT_keep <- PPT_keep[order(PPT_dates[PPT_keep])]
+PPT_dates <- PPT_dates[PPT_keep]
+stopifnot(identical(format(PPT_dates,"%Y-%m"),
+                    format(seq(as.Date("2003-01-01"),as.Date("2023-12-01"),by="month"),"%Y-%m")))
+PPT_boundary <- terra::vect(sf::st_transform(WI_outline,4326))
+PPT_WI <- terra::mask(terra::crop(PPT_all[[PPT_keep]],PPT_boundary),
+                      PPT_boundary,touches=FALSE)
+names(PPT_WI) <- paste0("PPT_",format(PPT_dates,"%Y_%m"))
+PPT_annual <- terra::tapp(PPT_WI,as.integer(format(PPT_dates,"%Y")),sum,na.rm=FALSE)
+PPT_mean_annual <- terra::app(PPT_annual,mean,na.rm=FALSE)
+names(PPT_mean_annual) <- "Precipitation_mm"
+PPT_output_path <- file.path(Processed_path,"TerraClimate")
+dir.create(PPT_output_path,recursive=TRUE,showWarnings=FALSE)
+terra::writeRaster(PPT_WI,file.path(PPT_output_path,"Wisconsin_PPT_monthly_2003_2023_mm.tif"),overwrite=TRUE)
+terra::writeRaster(PPT_mean_annual,file.path(PPT_output_path,"Wisconsin_PPT_mean_annual_2003_2023_mm.tif"),overwrite=TRUE)
+PPT_map_df <- as.data.frame(PPT_mean_annual,xy=TRUE,na.rm=TRUE)
+# Yellow indicates lower precipitation; blue indicates higher precipitation
+PPT_map_colors <- c("#ffff33","#b8e0b3","#41b6c4","#225ea8","#082567")
+PPT_map_limits <- range(PPT_map_df$Precipitation_mm)
+PPT_legend_plot <- ggplot(PPT_map_df,aes(x,y,fill=Precipitation_mm)) +
+  geom_tile() +
+  scale_fill_gradientn(colors=PPT_map_colors,limits=PPT_map_limits,
+    name="Mean annual precipitation, 2003-2023 (mm)",
+    guide=guide_colorbar(title.position="top",barwidth=grid::unit(12,"cm"),
+      barheight=grid::unit(0.4,"cm"),frame.colour="black",frame.linewidth=0.4)) +
+  theme_void() + theme(legend.position="bottom",legend.title=element_text(size=16),
+                      legend.text=element_text(size=14))
+PPT_legend_layout <- ggplotGrob(PPT_legend_plot)
+PPT_legend_grob <- PPT_legend_layout$grobs[[
+  which(PPT_legend_layout$layout$name == "guide-box-bottom")
+]]
+
 # Base map
 Map_base <- ggplot() +
-  geom_sf(data=WI_counties,fill="#aec8df",alpha=0.8,color="grey70") +
+  geom_tile(data=PPT_map_df,aes(x=x,y=y,fill=Precipitation_mm),
+            width=terra::res(PPT_mean_annual)[1],height=terra::res(PPT_mean_annual)[2]) +
+  scale_fill_gradientn(colors=PPT_map_colors,limits=PPT_map_limits,guide="none") +
+  ggnewscale::new_scale_fill() +
+  geom_sf(data=WI_counties,fill=NA,color="grey75",linewidth=0.15) +
   geom_sf(data=WI_outline,fill=NA,color="black",linewidth=0.5) +
   coord_sf(
     xlim=range(Site_summary$LONG_approx,na.rm=TRUE)+c(-0.6,0.6),
@@ -1036,8 +1093,9 @@ make_map_figure <- function(size_var,size_title){
   cowplot::plot_grid(
     map_grid,
     size_legend,
+    PPT_legend_grob,
     ncol=1,
-    rel_heights=c(1,0.08)
+    rel_heights=c(1,0.08,0.08)
   )
 }
 
@@ -2298,9 +2356,44 @@ summarize_total_freeze_depth <- function(event_df){
 P_freeze_total_depth <- summarize_total_freeze_depth(P_freeze_event)
 Q_freeze_total_depth <- summarize_total_freeze_depth(Q_freeze_event)
 
+# Wisconsin-average monthly ET climatology, 2003-2023 ======
+# Weight geographic grid cells by their area, then average each month across years
+ET_source <- terra::rast(file.path(Project_path,"00_Data","Raw",
+  "agg_terraclimate_aet_1950_CurrentYear_GLOBE.nc"),subds="aet")
+ET_dates <- as.Date(terra::time(ET_source))
+ET_keep <- which(ET_dates >= as.Date("2003-01-01") &
+                   ET_dates <= as.Date("2023-12-01"))
+ET_keep <- ET_keep[order(ET_dates[ET_keep])]
+ET_dates <- ET_dates[ET_keep]
+stopifnot(identical(format(ET_dates,"%Y-%m"),
+  format(seq(as.Date("2003-01-01"),as.Date("2023-12-01"),by="month"),"%Y-%m")))
+ET_boundary <- terra::vect(sf::st_transform(WI_outline,4326))
+ET_WI <- terra::mask(terra::crop(ET_source[[ET_keep]],ET_boundary),
+                      ET_boundary,touches=FALSE)
+ET_values <- terra::values(ET_WI)
+ET_area <- as.vector(terra::values(terra::cellSize(ET_WI[[1]],unit="km")))
+ET_valid <- rowSums(is.finite(ET_values)) == ncol(ET_values)
+stopifnot(any(ET_valid))
+ET_state_monthly <- data.frame(
+  Date=ET_dates,
+  ET_mm=colSums(ET_values[ET_valid,,drop=FALSE]*ET_area[ET_valid]) /
+    sum(ET_area[ET_valid])
+)
+ET_climatology <- ET_state_monthly %>%
+  mutate(Month_Number=as.integer(format(Date,"%m"))) %>%
+  group_by(Month_Number) %>%
+  summarise(Mean_ET_mm=mean(ET_mm),SD_ET_mm=sd(ET_mm),Years=n(),.groups="drop") %>%
+  mutate(Month=factor(month.abb[Month_Number],levels=month.abb),
+         ET_Lower=Mean_ET_mm-SD_ET_mm,
+         ET_Upper=Mean_ET_mm+SD_ET_mm)
+ET_curve_color <- RColorBrewer::brewer.pal(9,"Set1")[3]
+stopifnot(all(ET_climatology$Years == 21))
+write.csv(ET_climatology,file.path(Table_path,"Wisconsin_monthly_ET_climatology_2003_2023.csv"),row.names=FALSE)
+
 Freeze_stacked_depth_ymax <- 1.05*max(
   P_freeze_total_depth$Total_Depth_Upper,
   Q_freeze_total_depth$Total_Depth_Upper,
+  ET_climatology$ET_Upper,
   na.rm=TRUE
 )
 
@@ -2340,7 +2433,7 @@ Freeze_stacked_depth_bar <- function(
       linewidth=0.5
     ) +
     scale_fill_manual(values=DF_frozen_colors) +
-    scale_y_continuous(limits=c(0,y_limit)) +
+    scale_y_continuous(limits=c(min(0,ET_climatology$ET_Lower),y_limit)) +
     labs(
       title=title,
       x=NULL,
@@ -2358,12 +2451,23 @@ Figure_frozen_stacked_depth <- (
     "A. Precipitation depth",
     Freeze_stacked_depth_ymax
   ) +
-    Freeze_stacked_depth_bar(
+    (Freeze_stacked_depth_bar(
       Q_freeze_monthly,
       Q_freeze_total_depth,
       "B. Runoff depth",
       Freeze_stacked_depth_ymax
-    )
+    ) +
+      geom_errorbar(data=ET_climatology,
+        aes(x=Month,ymin=ET_Lower,ymax=ET_Upper),
+        inherit.aes=FALSE,color=ET_curve_color,width=0.18,linewidth=0.7) +
+      geom_line(data=ET_climatology,
+        aes(x=Month,y=Mean_ET_mm,group=1,color="WI mean ET (2003-2023)"),
+        inherit.aes=FALSE,linewidth=1.2) +
+      geom_point(data=ET_climatology,
+        aes(x=Month,y=Mean_ET_mm,color="WI mean ET (2003-2023)"),
+        inherit.aes=FALSE,size=2.5) +
+      scale_color_manual(values=setNames(ET_curve_color,"WI mean ET (2003-2023)"),name=NULL) +
+      labs(y="Mean monthly depth (mm)"))
 ) +
   plot_layout(ncol=2,guides="collect") &
   theme(legend.position="top")
@@ -2377,6 +2481,94 @@ save_figure_pair(
   width=15,
   height=5.8
 )
+
+# TerraClimate actual evapotranspiration over Wisconsin =======
+# Monthly totals in mm; terra applies the NetCDF scale factor automatically
+TerraClimate_path <- file.path(
+  Project_path,"00_Data","Raw",
+  "agg_terraclimate_aet_1950_CurrentYear_GLOBE.nc"
+)
+if(file.exists(TerraClimate_path)){
+  AET_raw <- terra::rast(TerraClimate_path,subds="aet")
+  AET_dates <- as.Date(terra::time(AET_raw))
+  stopifnot(
+    length(AET_dates) == terra::nlyr(AET_raw),
+    !anyNA(AET_dates),
+    !anyDuplicated(format(AET_dates,"%Y-%m"))
+  )
+  AET_boundary <- terra::vect(sf::st_transform(WI_outline,4326))
+  AET_WI <- terra::mask(
+    terra::crop(AET_raw,AET_boundary),
+    AET_boundary,touches=FALSE
+  )
+  AET_output_path <- file.path(Processed_path,"TerraClimate")
+  dir.create(AET_output_path,recursive=TRUE,showWarnings=FALSE)
+  names(AET_WI) <- paste0("AET_",format(AET_dates,"%Y_%m"))
+  terra::writeRaster(
+    AET_WI,file.path(AET_output_path,"Wisconsin_AET_monthly_mm.tif"),
+    overwrite=TRUE
+  )
+
+  # Annual totals require all twelve months; averages use complete years
+  AET_year <- as.integer(format(AET_dates,"%Y"))
+  AET_complete_years <- as.integer(names(which(table(AET_year) == 12)))
+  stopifnot(length(AET_complete_years) > 0)
+  AET_keep <- AET_year %in% AET_complete_years
+  AET_annual <- terra::tapp(
+    AET_WI[[which(AET_keep)]],AET_year[AET_keep],sum,na.rm=FALSE
+  )
+  AET_mean_annual <- terra::app(AET_annual,mean,na.rm=FALSE)
+  names(AET_mean_annual) <- "AET_mm"
+  AET_monthly_mean <- terra::tapp(
+    AET_WI,as.integer(format(AET_dates,"%m")),mean,na.rm=FALSE
+  )
+  names(AET_monthly_mean) <- month.abb
+  terra::writeRaster(
+    AET_mean_annual,
+    file.path(AET_output_path,"Wisconsin_AET_mean_annual_mm.tif"),
+    overwrite=TRUE
+  )
+  AET_annual_plot_df <- as.data.frame(AET_mean_annual,xy=TRUE,na.rm=TRUE)
+  AET_monthly_plot_df <- as.data.frame(AET_monthly_mean,xy=TRUE,na.rm=TRUE) %>%
+    pivot_longer(all_of(month.abb),names_to="Month",values_to="AET_mm") %>%
+    mutate(Month=factor(Month,levels=month.abb))
+  AET_period <- paste(range(AET_complete_years),collapse="-")
+  AET_map <- function(df,legend_title){
+    ggplot(df,aes(x=x,y=y,fill=AET_mm)) +
+      geom_raster() +
+      geom_sf(data=sf::st_transform(WI_outline,4326),
+              inherit.aes=FALSE,fill=NA,color="black",linewidth=0.5) +
+      scale_fill_viridis_c(
+        name=legend_title,option="C",
+        guide=guide_colorbar(
+          barwidth=grid::unit(8,"cm"),barheight=grid::unit(0.45,"cm"),
+          frame.colour="black",frame.linewidth=0.4
+        )
+      ) +
+      coord_sf(crs=sf::st_crs(4326),default_crs=sf::st_crs(4326),
+               xlim=c(-93,-86.7),ylim=c(42.4,47.2),expand=FALSE) +
+      labs(x=NULL,y=NULL) +
+      DF_plot_theme +
+      theme(axis.text=element_blank(),axis.ticks=element_blank(),
+            legend.position="bottom",legend.title=element_text(size=18),
+            legend.text=element_text(size=16),strip.text=element_text(size=18))
+  }
+  Figure_aet_annual <- AET_map(AET_annual_plot_df,"Annual AET (mm)") +
+    labs(title=paste("Mean annual actual evapotranspiration:",AET_period))
+  Figure_aet_monthly <- AET_map(AET_monthly_plot_df,"Monthly AET (mm)") +
+    facet_wrap(~Month,ncol=4) +
+    labs(title=paste("Mean monthly actual evapotranspiration:",AET_period))
+  save_figure_pair(
+    Figure_aet_annual,file.path(Figure_path,"08A_TerraClimate_AET_mean_annual"),
+    width=10,height=9
+  )
+  save_figure_pair(
+    Figure_aet_monthly,file.path(Figure_path,"08B_TerraClimate_AET_monthly_climatology"),
+    width=16,height=13
+  )
+  message("TerraClimate AET: ",length(AET_dates)," months, ",
+          min(AET_dates)," to ",max(AET_dates),"; clipped to Wisconsin.")
+}
 
 # Step 13. Generate exploratory HTML report ===================
 Complete_site_years <- Site_year_summary %>%
@@ -2608,11 +2800,11 @@ Report_body <- c(
   "<p>All points represent surface-runoff monitoring sites. The six panels show perennial crop fraction, tillage intensity, soil infiltration group, site-level tile drainage, updated land cover, and mean slope. </p>",
   embedded_figure_html(
     file.path(Figure_path,"01A_Site_maps_sized_by_runoff_depth.png"),
-    "Figure 1A. Discovery Farms surface-runoff sites. Point size represents mean annual surface-runoff depth calculated from complete 12-month monitoring years."
+    "Figure 1A. Discovery Farms surface-runoff sites. Point size represents mean annual surface-runoff depth calculated from complete 12-month monitoring years. The background shows TerraClimate mean annual precipitation for 2003-2023, calculated by summing monthly precipitation within each year and averaging the 21 annual totals."
   ),
   embedded_figure_html(
     file.path(Figure_path,"01B_Site_maps_sized_by_runoff_events.png"),
-    "Figure 1B. Discovery Farms surface-runoff sites shown with six explanatory-variable color schemes. Point size represents mean annual runoff-event number calculated from complete 12-month monitoring years."
+    "Figure 1B. Discovery Farms surface-runoff sites shown with six explanatory-variable color schemes. Point size represents mean annual runoff-event number calculated from complete 12-month monitoring years. The background shows TerraClimate mean annual precipitation for 2003-2023, calculated by summing monthly precipitation within each year and averaging the 21 annual totals."
   ),
   "<h3>Sites with the largest mean annual runoff depth</h3>",
   data_frame_to_html(Top_runoff_sites,digits=2),
@@ -2645,7 +2837,7 @@ Report_body <- c(
       Figure_path,
       "07B_Frozen_nonfrozen_monthly_depth_stacked.png"
     ),
-    "Figure 5B. Average monthly precipitation and runoff depths partitioned into stacked frozen and non-frozen contributions. Error bars show one standard deviation of total monthly depth across years. Precipitation and runoff panels use a common y-axis scale."
+    "Figure 5B. Average monthly precipitation and runoff depths partitioned into stacked frozen and non-frozen contributions. Black error bars show one standard deviation of total monthly depth across years. The green curve in the runoff panel shows Wisconsin-wide monthly actual evapotranspiration (ET) from TerraClimate: grid-cell-area-weighted means within Wisconsin, averaged for each calendar month over 2003-2023. Green error bars show plus or minus one standard deviation across the 21 annual values for each calendar month, not spatial variation among grid cells. ET represents the statewide climatology, whereas the bars represent monitored-site averages. Precipitation and runoff panels use a common y-axis scale, with ET shown on the same depth scale."
   ),
   "<h3>Monthly summary statistics</h3>",
   data_frame_to_html(Monthly_report_table,digits=2),
