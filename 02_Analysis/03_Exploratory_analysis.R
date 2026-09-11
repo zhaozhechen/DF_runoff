@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.9.7
+# Update Date: 2026.9.11
 
 # This code makes exploratory figures and summary statistics
 # for the Discovery Farms surface-runoff monitoring sites
@@ -1206,6 +1206,72 @@ save_figure_pair(
   file.path(Figure_path,"02_Site_event_and_depth_bars"),
   width=16,
   height=10
+)
+
+# Annual precipitation and runoff depth across the 28 sites
+# Use the same complete-year means and standard deviations as Figure 2
+stopifnot(
+  nrow(Site_plot_df) == 28L,
+  dplyr::n_distinct(Site_plot_df$Field_Name) == 28L,
+  all(is.finite(Site_plot_df$Mean_Annual_Precipitation_mm)),
+  all(is.finite(Site_plot_df$Mean_Annual_Runoff_mm))
+)
+
+Figure_annual_depth_scatter <- ggplot(
+  Site_plot_df,
+  aes(
+    x=Mean_Annual_Precipitation_mm,
+    y=Mean_Annual_Runoff_mm
+  )
+) +
+  geom_errorbar(
+    aes(ymin=Annual_Runoff_Lower,ymax=Annual_Runoff_Upper,
+        color=Hydrologic_Group),
+    width=10,
+    linewidth=0.6,
+    alpha=0.25
+  ) +
+  geom_errorbar(
+    aes(
+      xmin=Annual_Precipitation_Lower,
+      xmax=Annual_Precipitation_Upper,
+      color=Hydrologic_Group
+    ),
+    orientation="y",
+    width=8,
+    linewidth=0.6,
+    alpha=0.25
+  ) +
+  geom_point(
+    aes(fill=Hydrologic_Group),
+    shape=21,
+    size=5,
+    stroke=0.85,
+    color="black"
+  ) +
+  scale_fill_manual(values=DF_infiltration_colors) +
+  scale_y_continuous(limits=c(0,NA),expand=expansion(mult=c(0.02,0.06))) +
+  scale_color_manual(values=DF_infiltration_colors,guide="none") +
+  labs(
+    x="Annual precipitation depth (mm)",
+    y="Annual runoff depth (mm)",
+    fill="Soil infiltration group"
+  ) +
+  DF_plot_theme +
+  theme(
+    legend.position="bottom",
+    axis.title=element_text(size=21),
+    axis.text=element_text(size=18),
+    legend.title=element_text(size=19),
+    legend.text=element_text(size=17)
+  ) +
+  guides(fill=guide_legend(nrow=1,title.position="top"))
+
+save_figure_pair(
+  Figure_annual_depth_scatter,
+  file.path(Figure_path,"02B_Annual_precipitation_runoff_depth_scatter"),
+  width=12,
+  height=9
 )
 
 # Step 8. Monthly bar plots with uncertainty ==================
@@ -2555,6 +2621,10 @@ Report_body <- c(
   embedded_figure_html(
     file.path(Figure_path,"02_Site_event_and_depth_bars.png"),
     "Figure 2. Mean annual precipitation-event number, runoff-event number, precipitation depth, and surface-runoff depth by site. Error bars show one standard deviation across complete monitoring years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
+  ),
+  embedded_figure_html(
+    file.path(Figure_path,"02B_Annual_precipitation_runoff_depth_scatter.png"),
+    "Figure 2B. Mean annual runoff depth versus mean annual precipitation depth across the 28 monitoring sites. Each point represents one site and is filled by soil infiltration group. Horizontal and vertical error bars show one standard deviation across complete monitoring years for precipitation and runoff depth, respectively; lower bounds are truncated at zero, consistent with Figure 2."
   ),
   "<h2>Monthly climatology and variation among years</h2>",
   "<p>Monthly totals are first calculated for each monitored site-month. They are then averaged within calendar year and summarized across years.</p>",
