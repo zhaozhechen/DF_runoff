@@ -162,6 +162,71 @@ Q_nonfrozen <- Q_df %>%
     Runoff_Coefficient >= 0
   )
 
+# Proportion of precipitation events that generated surface runoff
+# Associated_Q is the event-level flag linking a precipitation event to runoff.
+Runoff_generation_by_site <- DF_site_info %>%
+  distinct(Field_Name) %>%
+  left_join(
+    P_df %>%
+      group_by(Field_Name) %>%
+      summarise(
+        Total_Precipitation_Events=n(),
+        Precipitation_Events_Generating_Runoff=sum(
+          Associated_Q %in% TRUE
+        ),
+        .groups="drop"
+      ),
+    by="Field_Name"
+  ) %>%
+  mutate(
+    Proportion_Generating_Runoff_Percent=if_else(
+      Total_Precipitation_Events > 0,
+      100*Precipitation_Events_Generating_Runoff/
+        Total_Precipitation_Events,
+      NA_real_
+    )
+  ) %>%
+  arrange(Field_Name)
+
+stopifnot(
+  nrow(Runoff_generation_by_site) == 28,
+  !anyDuplicated(Runoff_generation_by_site$Field_Name),
+  all(Runoff_generation_by_site$Total_Precipitation_Events > 0)
+)
+
+Runoff_generation_across_sites <- data.frame(
+  Statistic=c("Mean","Minimum","Maximum"),
+  Proportion_Generating_Runoff_Percent=c(
+    mean(
+      Runoff_generation_by_site$Proportion_Generating_Runoff_Percent,
+      na.rm=TRUE
+    ),
+    min(
+      Runoff_generation_by_site$Proportion_Generating_Runoff_Percent,
+      na.rm=TRUE
+    ),
+    max(
+      Runoff_generation_by_site$Proportion_Generating_Runoff_Percent,
+      na.rm=TRUE
+    )
+  ),
+  Sites=28
+)
+
+write.csv(
+  Runoff_generation_by_site,
+  file.path(Table_path,"Runoff_generation_proportion_by_site.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Runoff_generation_across_sites,
+  file.path(Table_path,"Runoff_generation_proportion_across_sites.csv"),
+  row.names=FALSE,
+  na=""
+)
+
 # ------- Main ---------
 # Step 1. Monitoring calendar and site-year summaries =========
 # Find the last date in all data record
@@ -300,6 +365,113 @@ Site_summary <- Site_year_summary %>%
       Mean_Annual_Runoff_mm+SD_Annual_Runoff_mm
   ) %>%
   left_join(DF_site_info,by="Field_Name")
+
+# Mean annual precipitation depth across sites and complete field-years
+Mean_annual_precipitation_by_site <- Site_summary %>%
+  transmute(
+    Field_Name,
+    Complete_Field_Years=Monitoring_Years,
+    Mean_Annual_Precipitation_mm
+  ) %>%
+  arrange(Field_Name)
+
+Complete_field_year_precipitation <- Site_year_summary %>%
+  filter(Complete_Monitoring_Year) %>%
+  select(Field_Name,Calendar_Year,Precipitation_mm)
+
+stopifnot(
+  nrow(Mean_annual_precipitation_by_site) == 28,
+  nrow(Complete_field_year_precipitation) == 117,
+  all(is.finite(
+    Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+  )),
+  all(is.finite(Complete_field_year_precipitation$Precipitation_mm))
+)
+
+Annual_precipitation_depth_summary <- bind_rows(
+  data.frame(
+    Distribution="Site-level mean annual precipitation",
+    Observations=28,
+    Mean_mm=mean(
+      Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+    ),
+    Minimum_mm=min(
+      Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+    ),
+    Maximum_mm=max(
+      Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+    )
+  ),
+  data.frame(
+    Distribution="Complete field-year annual precipitation",
+    Observations=117,
+    Mean_mm=mean(Complete_field_year_precipitation$Precipitation_mm),
+    Minimum_mm=min(Complete_field_year_precipitation$Precipitation_mm),
+    Maximum_mm=max(Complete_field_year_precipitation$Precipitation_mm)
+  )
+)
+
+write.csv(
+  Mean_annual_precipitation_by_site,
+  file.path(Table_path,"Mean_annual_precipitation_by_site.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Annual_precipitation_depth_summary,
+  file.path(Table_path,"Annual_precipitation_depth_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+# Mean annual precipitation-event numbers used in Figure 2A
+Mean_annual_precipitation_events_by_site <- Site_summary %>%
+  transmute(
+    Field_Name,
+    Complete_Field_Years=Monitoring_Years,
+    Mean_Annual_Precipitation_Events=Mean_Annual_P_Events,
+    SD_Annual_Precipitation_Events=SD_Annual_P_Events
+  ) %>%
+  arrange(Field_Name)
+
+stopifnot(
+  nrow(Mean_annual_precipitation_events_by_site) == 28,
+  all(is.finite(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  ))
+)
+
+Annual_precipitation_event_summary <- data.frame(
+  Sites=28,
+  Mean_Events_per_Year=mean(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  ),
+  Minimum_Events_per_Year=min(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  ),
+  Maximum_Events_per_Year=max(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  )
+)
+
+write.csv(
+  Mean_annual_precipitation_events_by_site,
+  file.path(Table_path,"Mean_annual_precipitation_events_by_site.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Annual_precipitation_event_summary,
+  file.path(Table_path,"Annual_precipitation_event_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
 
 # Step 2. Site-level management summaries ====================
 # Summarize management data
@@ -2781,6 +2953,71 @@ Report_body <- c(
   "<p>Non-frozen events contributions are calculated within each complete calendar year and then averaged across years. Event-depth use millimetres.</p>",
   data_frame_to_html(Data_summary_table,digits=2),
   Key_findings,
+  "<h2>Precipitation events generating runoff</h2>",
+  "<p>For each site, the proportion is the number of precipitation events with <code>Associated_Q = TRUE</code> divided by all precipitation events in that site's complete processed record. The across-site mean, minimum, and maximum below summarize the 28 site-level percentages; the mean is not a pooled event-level percentage.</p>",
+  "<h3>Summary across the 28 sites</h3>",
+  data_frame_to_html(Runoff_generation_across_sites,digits=2),
+  "<h3>Proportion by site</h3>",
+  data_frame_to_html(
+    Runoff_generation_by_site %>%
+      rename(
+        `Site ID`=Field_Name,
+        `Total precipitation events`=Total_Precipitation_Events,
+        `Events generating runoff`=
+          Precipitation_Events_Generating_Runoff,
+        `Proportion generating runoff (%)`=
+          Proportion_Generating_Runoff_Percent
+      ),
+    digits=2
+  ),
+  "<h2>Annual precipitation depth</h2>",
+  "<p>Annual precipitation depths use complete 12-month field-years only. The site-level distribution gives each of the 28 site means equal weight, regardless of monitoring duration. The field-year distribution gives each of the 117 complete field-years equal weight.</p>",
+  "<h3>Summary across sites and field-years</h3>",
+  data_frame_to_html(
+    Annual_precipitation_depth_summary %>%
+      rename(
+        `Number of observations`=Observations,
+        `Mean (mm)`=Mean_mm,
+        `Minimum (mm)`=Minimum_mm,
+        `Maximum (mm)`=Maximum_mm
+      ),
+    digits=2
+  ),
+  "<h3>Mean annual precipitation depth by site</h3>",
+  data_frame_to_html(
+    Mean_annual_precipitation_by_site %>%
+      rename(
+        `Site ID`=Field_Name,
+        `Complete field-years`=Complete_Field_Years,
+        `Mean annual precipitation (mm)`=
+          Mean_Annual_Precipitation_mm
+      ),
+    digits=2
+  ),
+  "<h2>Annual precipitation-event numbers</h2>",
+  "<p>These are the site-level mean annual precipitation-event numbers shown in Figure 2A. Each site mean uses complete 12-month monitoring years; the standard deviation is the among-year error bar displayed in the figure.</p>",
+  "<h3>Summary across the 28 sites</h3>",
+  data_frame_to_html(
+    Annual_precipitation_event_summary %>%
+      rename(
+        `Mean events per year`=Mean_Events_per_Year,
+        `Minimum events per year`=Minimum_Events_per_Year,
+        `Maximum events per year`=Maximum_Events_per_Year
+      ),
+    digits=2
+  ),
+  "<h3>Mean annual precipitation-event number by site</h3>",
+  data_frame_to_html(
+    Mean_annual_precipitation_events_by_site %>%
+      rename(
+        `Site ID`=Field_Name,
+        `Complete field-years`=Complete_Field_Years,
+        `Mean events per year`=Mean_Annual_Precipitation_Events,
+        `Among-year standard deviation`=
+          SD_Annual_Precipitation_Events
+      ),
+    digits=2
+  ),
   "<h2>Site characteristics summary</h2>",
   "<p>Fixed site properties are summarized across the 28 surface-runoff monitoring sites. Site-average tillage passes and perennial fractions are means across available site-water-years; they are management summaries rather than fixed physical properties.</p>",
   "<h3>Site and land-use counts</h3>",
