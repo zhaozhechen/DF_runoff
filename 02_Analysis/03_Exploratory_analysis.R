@@ -366,12 +366,13 @@ Site_summary <- Site_year_summary %>%
   ) %>%
   left_join(DF_site_info,by="Field_Name")
 
-# Mean annual precipitation depth across sites and complete field-years
+# Mean annual precipitation and runoff depth across sites
 Mean_annual_precipitation_by_site <- Site_summary %>%
   transmute(
     Field_Name,
     Complete_Field_Years=Monitoring_Years,
-    Mean_Annual_Precipitation_mm
+    Mean_Annual_Precipitation_mm,
+    Mean_Annual_Runoff_mm
   ) %>%
   arrange(Field_Name)
 
@@ -384,6 +385,9 @@ stopifnot(
   nrow(Complete_field_year_precipitation) == 117,
   all(is.finite(
     Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+  )),
+  all(is.finite(
+    Mean_annual_precipitation_by_site$Mean_Annual_Runoff_mm
   )),
   all(is.finite(Complete_field_year_precipitation$Precipitation_mm))
 )
@@ -2983,14 +2987,15 @@ Report_body <- c(
       ),
     digits=2
   ),
-  "<h3>Mean annual precipitation depth by site</h3>",
+  "<h3>Mean annual precipitation and runoff depth by site</h3>",
   data_frame_to_html(
     Mean_annual_precipitation_by_site %>%
       rename(
         `Site ID`=Field_Name,
         `Complete field-years`=Complete_Field_Years,
         `Mean annual precipitation (mm)`=
-          Mean_Annual_Precipitation_mm
+          Mean_Annual_Precipitation_mm,
+        `Mean annual runoff (mm)`=Mean_Annual_Runoff_mm
       ),
     digits=2
   ),
