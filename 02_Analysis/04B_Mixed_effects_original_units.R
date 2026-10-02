@@ -186,7 +186,8 @@ original_unit_predictions <- function(model_path,raw_df,response_type){
   dplyr::bind_rows(prediction_rows)
 }
 
-plot_original_unit_panel <- function(predictions,variable,response_type){
+plot_original_unit_panel <- function(
+    predictions,variable,response_type,x_scale="log"){
   plot_df <- predictions[predictions$Variable == variable,,drop=FALSE]
   if(nrow(plot_df) == 0) return(ggplot()+theme_void())
   plot_df$Season <- factor(plot_df$Season,levels=Season_levels)
@@ -201,11 +202,11 @@ plot_original_unit_panel <- function(predictions,variable,response_type){
         alpha=0.22,color=NA
       ) +
       geom_line(aes(group=Season),linewidth=1)
-    if(variable == "log_I30"){
+    if(x_scale == "log" && variable == "log_I30"){
       p <- p+scale_x_log10(
         breaks=c(0.3,1,3,10,30,100,300)
       )
-    }else if(variable == "log_ARFdays7"){
+    }else if(x_scale == "log" && variable == "log_ARFdays7"){
       # The model uses log(rainfall + 0.1); the offset retains zero rainfall.
       p <- p+scale_x_continuous(
         trans=scales::trans_new(
@@ -232,7 +233,11 @@ plot_original_unit_panel <- function(predictions,variable,response_type){
     scale_color_manual(values=Season_colors,drop=FALSE)+
     scale_fill_manual(values=Season_colors,drop=FALSE,guide="none")+
     labs(
-      x=Original_labels[[variable]],
+      x=if(x_scale == "linear"){
+        sub("; log scale","",Original_labels[[variable]],fixed=TRUE)
+      }else{
+        Original_labels[[variable]]
+      },
       y=if(response_type == "occurrence"){
         "Runoff probability"
       }else{
@@ -250,7 +255,8 @@ plot_original_unit_panel <- function(predictions,variable,response_type){
     )
 }
 
-plot_original_unit_figure <- function(predictions,response_type){
+plot_original_unit_figure <- function(
+    predictions,response_type,x_scale="log"){
   variables <- if("log_Dur" %in% predictions$Variable){
     replace(Variable_order,3,"log_Dur")
   }else{
@@ -259,7 +265,9 @@ plot_original_unit_figure <- function(predictions,response_type){
   panels <- lapply(
     variables,
     function(variable){
-      plot_original_unit_panel(predictions,variable,response_type)
+      plot_original_unit_panel(
+        predictions,variable,response_type,x_scale=x_scale
+      )
     }
   )
   legend_data <- data.frame(
@@ -289,12 +297,43 @@ insert_original_unit_figures <- function(report_file,figure_path){
     list(
       number="4",
       stem="04B_Occurrence_marginal_effects_original_units",
-      caption="Figure 4B. The Figure 4 runoff-occurrence marginal effects with continuous predictors shown in their original units. Model predictions and confidence intervals use the same final seasonal models."
+      caption="Figure 4B. The Figure 4 runoff-occurrence marginal effects with continuous predictors shown in their original units. Model predictions and confidence intervals use the same final seasonal models.",
+      description=paste0(
+        "<p>The two log-transformed model inputs are shown as physical ",
+        "30-minute precipitation intensity (mm/hour) and 7-day antecedent ",
+        "rainfall (mm), both on logarithmic x axes. The rainfall axis uses ",
+        "log(rainfall + 0.1), matching the model and retaining zero rainfall. ",
+        "Where applicable, event duration is shown in hours. ",
+        "The other continuous inputs use their recorded units. Conversion ",
+        "uses the mean and standard deviation from each season's complete ",
+        "model data.</p>"
+      )
+    ),
+    list(
+      number="4B",
+      stem="04C_Occurrence_marginal_effects_linear_original_units",
+      caption="Figure 4C. The Figure 4 runoff-occurrence marginal effects with 30-minute precipitation intensity and 7-day antecedent rainfall on linear axes in their original units. Predictions and confidence intervals are identical to Figure 4B.",
+      description=paste0(
+        "<p>Figure 4C retains the physical units of Figure 4B, but shows ",
+        "intensity (mm/hour) and antecedent rainfall (mm) on linear x axes. ",
+        "The model still uses the same log-transformed predictors; only ",
+        "the display scale differs.</p>"
+      )
     ),
     list(
       number="8",
       stem="08B_RC_marginal_effects_original_units",
-      caption="Figure 8B. The Figure 8 runoff-magnitude marginal effects with continuous predictors shown in their original units. Model predictions and confidence intervals use the same final seasonal models."
+      caption="Figure 8B. The Figure 8 runoff-magnitude marginal effects with continuous predictors shown in their original units. Model predictions and confidence intervals use the same final seasonal models.",
+      description=paste0(
+        "<p>The two log-transformed model inputs are shown as physical ",
+        "30-minute precipitation intensity (mm/hour) and 7-day antecedent ",
+        "rainfall (mm), both on logarithmic x axes. The rainfall axis uses ",
+        "log(rainfall + 0.1), matching the model and retaining zero rainfall. ",
+        "Where applicable, event duration is shown in hours. ",
+        "The other continuous inputs use their recorded units. Conversion ",
+        "uses the mean and standard deviation from each season's complete ",
+        "model data.</p>"
+      )
     )
   )
   for(figure in figures){
@@ -314,21 +353,15 @@ insert_original_unit_figures <- function(report_file,figure_path){
       report,perl=TRUE
     )
     if(anchor_match[1] < 0){
-      stop("Could not find the Figure 4 or 8 report insertion point.")
+      stop("Could not find the report insertion point for ",
+           figure$stem,".")
     }
     anchor <- regmatches(report,anchor_match)
     report <- sub(
       anchor,
       paste0(
         anchor,"\n",begin,
-        "<p>The two log-transformed model inputs are shown as physical ",
-        "30-minute precipitation intensity (mm/hour) and 7-day antecedent ",
-        "rainfall (mm), both on logarithmic x axes. The rainfall axis uses ",
-        "log(rainfall + 0.1), matching the model and retaining zero rainfall. ",
-        "Where applicable, event duration is shown in hours. ",
-        "The other continuous inputs use their recorded ",
-        "units. Conversion uses the mean and standard deviation from each ",
-        "season's complete model data.</p>",
+        figure$description,
         caption_html,end
       ),
       report,fixed=TRUE
@@ -376,6 +409,15 @@ run_original_unit_marginal_effects <- function(
       plot_original_unit_figure(occurrence_predictions,"occurrence"),
       file.path(
         figure_path,"04B_Occurrence_marginal_effects_original_units"
+      ),
+      width=18,height=15
+    )
+    save_figure_pair(
+      plot_original_unit_figure(
+        occurrence_predictions,"occurrence",x_scale="linear"
+      ),
+      file.path(
+        figure_path,"04C_Occurrence_marginal_effects_linear_original_units"
       ),
       width=18,height=15
     )
