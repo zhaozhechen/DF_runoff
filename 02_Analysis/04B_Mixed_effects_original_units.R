@@ -290,7 +290,76 @@ plot_original_unit_figure <- function(
     patchwork::plot_layout(heights=c(1,0.055))
 }
 
-insert_original_unit_figures <- function(report_file,figure_path){
+i30_probability_thresholds <- function(predictions){
+  rows <- lapply(Season_levels,function(season){
+    curve <- predictions[
+      predictions$Response == "occurrence" &
+        predictions$Variable == "log_I30" &
+        predictions$Season == season,
+      ,drop=FALSE
+    ]
+    if(nrow(curve) < 2){
+      stop("Insufficient I30 predictions for ",season,".")
+    }
+    intensity <- as.numeric(curve$Original_x)
+    order_x <- order(intensity)
+    intensity <- intensity[order_x]
+    probability <- curve$Predicted[order_x]
+    if(!all(is.finite(intensity)) ||
+       !all(is.finite(probability)) ||
+       !(all(diff(probability) > 0) ||
+         all(diff(probability) < 0))){
+      stop("I30 prediction curve is not strictly monotonic for ",season,".")
+    }
+    crossings <- stats::approx(
+      x=probability,y=intensity,xout=c(0.5,0.7),rule=1
+    )$y
+    data.frame(
+      Season=season,
+      I30_at_P0_50_mm_hr=round(crossings[1],2),
+      I30_at_P0_70_mm_hr=round(crossings[2],2),
+      stringsAsFactors=FALSE
+    )
+  })
+  dplyr::bind_rows(rows)
+}
+
+arf_runoff_probabilities <- function(predictions){
+  rows <- lapply(Season_levels,function(season){
+    curve <- predictions[
+      predictions$Response == "occurrence" &
+        predictions$Variable == "log_ARFdays7" &
+        predictions$Season == season,
+      ,drop=FALSE
+    ]
+    if(nrow(curve) < 2){
+      stop("Insufficient antecedent-rainfall predictions for ",season,".")
+    }
+    rainfall <- as.numeric(curve$Original_x)
+    order_x <- order(rainfall)
+    rainfall <- rainfall[order_x]
+    probability <- curve$Predicted[order_x]
+    if(!all(is.finite(rainfall)) ||
+       !all(is.finite(probability)) ||
+       any(diff(rainfall) <= 0)){
+      stop("Invalid antecedent-rainfall curve for ",season,".")
+    }
+    values <- stats::approx(
+      x=rainfall,y=probability,xout=c(0,50,100),rule=1
+    )$y
+    data.frame(
+      Season=season,
+      Runoff_probability_at_ARF_0_mm=round(values[1],5),
+      Runoff_probability_at_ARF_50_mm=round(values[2],5),
+      Runoff_probability_at_ARF_100_mm=round(values[3],5),
+      stringsAsFactors=FALSE
+    )
+  })
+  dplyr::bind_rows(rows)
+}
+
+insert_original_unit_figures <- function(
+    report_file,figure_path,i30_thresholds,arf_probabilities){
   report <- paste(readLines(report_file,warn=FALSE,encoding="UTF-8"),
                   collapse="\n")
   figures <- list(
@@ -347,6 +416,39 @@ insert_original_unit_figures <- function(report_file,figure_path){
       file.path(figure_path,paste0(figure$stem,".png")),
       figure$caption
     )
+    threshold_html <- if(figure$stem ==
+                         "04C_Occurrence_marginal_effects_linear_original_units"){
+      display <- i30_thresholds
+      names(display) <- c(
+        "Season",
+        "I30 at runoff probability 0.50 (mm/hour)",
+        "I30 at runoff probability 0.70 (mm/hour)"
+      )
+      paste0(
+        "<h3>30-minute intensity at runoff-probability thresholds</h3>",
+        "<p>Values are linearly interpolated between adjacent prediction ",
+        "points in Figure 4C. NA means the curve did not reach that ",
+        "probability within the plotted I30 range; no extrapolation ",
+        "was used.</p>",
+        data_frame_to_html(display,digits=2),
+        "<h3>Runoff probability at 7-day antecedent rainfall levels</h3>",
+        "<p>Probabilities are read from the seasonal curves in Figure 4C ",
+        "at 0, 50, and 100 mm of 7-day antecedent rainfall. Values between ",
+        "plotted points use linear interpolation on the original rainfall ",
+        "axis; no extrapolation was used.</p>",
+        data_frame_to_html(
+          setNames(
+            arf_probabilities,
+            c("Season","Runoff probability at 0 mm",
+              "Runoff probability at 50 mm",
+              "Runoff probability at 100 mm")
+          ),
+          digits=5
+        )
+      )
+    }else{
+      ""
+    }
     anchor_match <- regexpr(
       paste0("<figcaption>Figure ",figure$number,
              "\\.[^<]+</figcaption></figure>"),
@@ -362,13 +464,50 @@ insert_original_unit_figures <- function(report_file,figure_path){
       paste0(
         anchor,"\n",begin,
         figure$description,
-        caption_html,end
+        caption_html,threshold_html,end
       ),
       report,fixed=TRUE
     )
   }
   writeLines(report,report_file,useBytes=TRUE)
 }
+
+run_figure_4c_tables <- function(dataset_keys=c("All","NonFrozen")){
+  for(dataset_key in dataset_keys){
+    result_path <- file.path(
+      Project_path,"04_Results","Mixed_Effects",dataset_key
+    )
+    table_path <- file.path(result_path,"Tables")
+    prediction_file <- file.path(
+      table_path,"Marginal_effects_original_units_predictions.csv"
+    )
+    report_file <- file.path(
+      Project_path,"03_Reports",
+      paste0("04_Mixed_effects_model_report_",dataset_key,".html")
+    )
+    predictions <- read.csv(prediction_file)
+    thresholds <- i30_probability_thresholds(predictions)
+    arf_probabilities <- arf_runoff_probabilities(predictions)
+    write.csv(
+      thresholds,
+      file.path(table_path,"I30_runoff_probability_thresholds.csv"),
+      row.names=FALSE,na="NA"
+    )
+    write.csv(
+      arf_probabilities,
+      file.path(table_path,"ARF7_runoff_probability_at_0_50_100_mm.csv"),
+      row.names=FALSE,na="NA"
+    )
+    insert_original_unit_figures(
+      report_file,file.path(result_path,"Figures"),
+      thresholds,arf_probabilities
+    )
+    message("Figure 4C tables complete: ",dataset_key)
+  }
+  invisible(TRUE)
+}
+
+run_i30_threshold_report <- run_figure_4c_tables
 
 run_original_unit_marginal_effects <- function(
     dataset_keys=c("All","NonFrozen")){
@@ -426,7 +565,7 @@ run_original_unit_marginal_effects <- function(
       file.path(figure_path,"08B_RC_marginal_effects_original_units"),
       width=18,height=15
     )
-    insert_original_unit_figures(report_file,figure_path)
+    run_figure_4c_tables(dataset_key)
     message("Original-unit marginal effects complete: ",dataset_key)
   }
   invisible(TRUE)
