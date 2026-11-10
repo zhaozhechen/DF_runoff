@@ -187,9 +187,13 @@ original_unit_predictions <- function(model_path,raw_df,response_type){
 }
 
 plot_original_unit_panel <- function(
-    predictions,variable,response_type,x_scale="log"){
+    predictions,variable,response_type,x_scale="log",rc_original=FALSE){
   plot_df <- predictions[predictions$Variable == variable,,drop=FALSE]
   if(nrow(plot_df) == 0) return(ggplot()+theme_void())
+  if(rc_original && response_type == "continuous"){
+    plot_df[c("Predicted","CI_low","CI_high")] <-
+      lapply(plot_df[c("Predicted","CI_low","CI_high")],exp)
+  }
   plot_df$Season <- factor(plot_df$Season,levels=Season_levels)
   if(variable %in% Continuous_variables){
     plot_df$x <- as.numeric(plot_df$Original_x)
@@ -241,7 +245,7 @@ plot_original_unit_panel <- function(
       y=if(response_type == "occurrence"){
         "Runoff probability"
       }else{
-        "Runoff magnitude: log(RC)"
+        if(rc_original) "Runoff coefficient (RC)" else "Runoff magnitude: log(RC)"
       },
       color="Season",fill="Season"
     )+
@@ -256,7 +260,7 @@ plot_original_unit_panel <- function(
 }
 
 plot_original_unit_figure <- function(
-    predictions,response_type,x_scale="log"){
+    predictions,response_type,x_scale="log",rc_original=FALSE){
   variables <- if("log_Dur" %in% predictions$Variable){
     replace(Variable_order,3,"log_Dur")
   }else{
@@ -266,7 +270,7 @@ plot_original_unit_figure <- function(
     variables,
     function(variable){
       plot_original_unit_panel(
-        predictions,variable,response_type,x_scale=x_scale
+        predictions,variable,response_type,x_scale=x_scale,rc_original=rc_original
       )
     }
   )
@@ -405,6 +409,18 @@ insert_original_unit_figures <- function(
       )
     )
   )
+  figures <- append(figures,list(list(
+    number="8B",
+    stem="08C_RC_marginal_effects_linear_original_units",
+    caption="Figure 8C. Runoff-magnitude marginal effects with 30-minute precipitation intensity (mm/hour) and 7-day antecedent rainfall (mm) on linear axes in their original units. Predictions and confidence intervals are identical to Figure 8B; the response remains log(RC).",
+    description="<p>Figure 8C shows I30 and 7-day antecedent rainfall on linear x axes in physical units. The fitted models retain their log-transformed predictors; only the display scale changes.</p>"
+  )))
+  figures <- append(figures,list(list(
+    number="8C",
+    stem="08D_RC_marginal_effects_original_response",
+    caption="Figure 8D. Runoff-coefficient marginal effects on the original RC scale, with I30 and 7-day antecedent rainfall on linear axes in their original units. Predictions and 95% confidence limits from Figure 8C are exponentiated. Curves represent back-transformed fitted log(RC), or conditional medians under the lognormal model, not arithmetic mean RC; no residual-variance correction is applied.",
+    description="<p>Figure 8D retains the fitted models and predictor scales of Figure 8C. Only the response display changes from log(RC) to RC = exp(log(RC)). Confidence intervals are consequently asymmetric. Predictions are not constrained to RC below one.</p>"
+  )))
   for(figure in figures){
     begin <- paste0("<!-- ",figure$stem," START -->")
     end <- paste0("<!-- ",figure$stem," END -->")
@@ -563,6 +579,16 @@ run_original_unit_marginal_effects <- function(
     save_figure_pair(
       plot_original_unit_figure(rc_predictions,"continuous"),
       file.path(figure_path,"08B_RC_marginal_effects_original_units"),
+      width=18,height=15
+    )
+    save_figure_pair(
+      plot_original_unit_figure(rc_predictions,"continuous",x_scale="linear"),
+      file.path(figure_path,"08C_RC_marginal_effects_linear_original_units"),
+      width=18,height=15
+    )
+    save_figure_pair(
+      plot_original_unit_figure(rc_predictions,"continuous",x_scale="linear",rc_original=TRUE),
+      file.path(figure_path,"08D_RC_marginal_effects_original_response"),
       width=18,height=15
     )
     run_figure_4c_tables(dataset_key)
