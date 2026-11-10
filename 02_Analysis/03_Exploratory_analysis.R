@@ -1508,6 +1508,58 @@ save_figure_pair(
   height=9
 )
 
+# Annual precipitation and runoff depth for each complete field-year
+Field_year_plot_df <- Site_year_summary %>%
+  filter(Complete_Monitoring_Year) %>%
+  left_join(
+    Site_summary %>% select(Field_Name,Hydrologic_Group),
+    by="Field_Name"
+  )
+
+stopifnot(
+  nrow(Field_year_plot_df) == 117L,
+  dplyr::n_distinct(Field_year_plot_df$Field_Name) == 28L,
+  !anyNA(Field_year_plot_df$Hydrologic_Group),
+  all(is.finite(Field_year_plot_df$Precipitation_mm)),
+  all(is.finite(Field_year_plot_df$Runoff_mm))
+)
+
+Figure_annual_depth_field_year_scatter <- ggplot(
+  Field_year_plot_df,
+  aes(x=Precipitation_mm,y=Runoff_mm)
+) +
+  geom_point(
+    aes(fill=Hydrologic_Group),
+    shape=21,
+    size=4.2,
+    stroke=0.75,
+    color="black",
+    alpha=0.8
+  ) +
+  scale_fill_manual(values=DF_infiltration_colors) +
+  scale_y_continuous(limits=c(0,NA),expand=expansion(mult=c(0.02,0.06))) +
+  labs(
+    x="Annual precipitation depth (mm)",
+    y="Annual runoff depth (mm)",
+    fill="Soil infiltration group"
+  ) +
+  DF_plot_theme +
+  theme(
+    legend.position="bottom",
+    axis.title=element_text(size=21),
+    axis.text=element_text(size=18),
+    legend.title=element_text(size=19),
+    legend.text=element_text(size=17)
+  ) +
+  guides(fill=guide_legend(nrow=1,title.position="top"))
+
+save_figure_pair(
+  Figure_annual_depth_field_year_scatter,
+  file.path(Figure_path,"02C_Annual_precipitation_runoff_depth_by_field_year"),
+  width=12,
+  height=9
+)
+
 # Step 8. Monthly bar plots with uncertainty ==================
 Monthly_event_ymax <- 1.05*max(
   Monthly_climatology$P_Event_Upper,
@@ -3059,6 +3111,10 @@ Report_body <- c(
   embedded_figure_html(
     file.path(Figure_path,"02B_Annual_precipitation_runoff_depth_scatter.png"),
     "Figure 2B. Mean annual runoff depth versus mean annual precipitation depth across the 28 monitoring sites. Each point represents one site and is filled by soil infiltration group. Horizontal and vertical error bars show one standard deviation across complete monitoring years for precipitation and runoff depth, respectively; lower bounds are truncated at zero, consistent with Figure 2."
+  ),
+  embedded_figure_html(
+    file.path(Figure_path,"02C_Annual_precipitation_runoff_depth_by_field_year.png"),
+    "Figure 2C. Annual runoff depth versus annual precipitation depth for 117 complete 12-month field-years from 28 surface-runoff monitoring sites. Each point represents one field-year and is filled by soil infiltration group. No error bars are shown."
   ),
   "<h2>Monthly climatology and variation among years</h2>",
   "<p>Monthly totals are first calculated for each monitored site-month. They are then averaged within calendar year and summarized across years.</p>",

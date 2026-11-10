@@ -1566,7 +1566,7 @@ Report_body <- c(
   "<p>Positive Delta AIC indicates that removing the variable reduced model support. The table lists the three largest mean values within each response and season.</p>",
   data_frame_to_html(Most_important_variables,digits=2),
   "<h2>Final full-model coefficients</h2>",
-  "<p>Continuous-predictor coefficients are standardized. Mixed-effects logistic model p-values are Wald tests. The Mixed-effects linear regression models report estimates, standard errors, and t statistics; coefficient p-values are unavailable because lme4::lmer does not define denominator degrees of freedom or calculate them by default. Satterthwaite p-values require an explicitly selected method such as lmerTest.</p>",
+    "<p>Continuous-predictor coefficients are standardized. Mixed-effects logistic model p-values are two-sided Wald z tests. Mixed-effects linear regression model p-values are two-sided t tests with Satterthwaite-approximated denominator degrees of freedom, calculated using lmerTest. Coefficient p-values are not adjusted for multiple comparisons.</p>",
   data_frame_to_html(Final_coefficients_report,digits=4),
   "<h2>Output files</h2>",
   "<p>All figures are saved as PNG and PDF files. Bootstrap results, model summaries, specifications, and coefficients are saved as CSV files. Final fitted seasonal models are saved as RDS files.</p>"

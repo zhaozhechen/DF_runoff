@@ -543,15 +543,29 @@ extract_fixed_effects <- function(model,season,response_part){
     return(data.frame())
   }
   
-  coefficient_matrix <- summary(model)$coefficients
+  if(inherits(model,"lmerMod")){
+    if(!requireNamespace("lmerTest",quietly=TRUE)){
+      stop("lmerTest is required for Satterthwaite coefficient p-values.")
+    }
+    # Reconnect the stored model frame when the original fitting session is absent
+    coefficient_data <- stats::model.frame(model)
+    test_source <- model
+    test_source@call$data <- quote(coefficient_data)
+    test_model <- lmerTest::as_lmerModLmerTest(test_source)
+    coefficient_matrix <- summary(test_model,ddf="Satterthwaite")$coefficients
+  }else{
+    coefficient_matrix <- summary(model)$coefficients
+  }
+  statistic_column <- intersect(c("z value","t value"),colnames(coefficient_matrix))[1]
+  p_column <- intersect(c("Pr(>|z|)","Pr(>|t|)"),colnames(coefficient_matrix))
   
   coefficient_table <- data.frame(
     Term=rownames(coefficient_matrix),
     Estimate=as.numeric(coefficient_matrix[,1]),
     Std_Error=as.numeric(coefficient_matrix[,2]),
-    Statistic=as.numeric(coefficient_matrix[,3]),
-    P_Value=if(ncol(coefficient_matrix) >= 4){
-      as.numeric(coefficient_matrix[,4])
+    Statistic=as.numeric(coefficient_matrix[,statistic_column]),
+    P_Value=if(length(p_column) > 0){
+      as.numeric(coefficient_matrix[,p_column[1]])
     }else{
       NA_real_
     },
