@@ -1,0 +1,6 @@
+"Variable","Unit","Observations","Mean","Standard_Deviation","Median","Minimum","Maximum"
+"Mean basin slope across sites","%",28,4.46,2.06221024900739,4,1.9,11
+"Monitored basin area across sites","acres",28,15.1225,10.4413648976523,14.6,1.9,42.1
+"Site-average total tillage passes","passes per site-water-year",28,0.796551020408163,0.830453186564376,0.4,0,2.5
+"Total tillage passes across site-water-years","passes per site-water-year",137,0.775620437956204,1.08824525600908,0,0,5
+"Site-average current-crop perennial fraction","fraction",28,0.407874149659864,0.379932441562828,0.414285714285714,0,1

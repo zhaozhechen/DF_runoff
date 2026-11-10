@@ -1595,6 +1595,20 @@ write_html_report(
   output_path=Mixed_model_report
 )
 
+if(Dataset_key %in% c("All","NonFrozen")){
+  old_skip_original_units <- getOption(
+    "df_runoff.skip_original_unit_marginal_main"
+  )
+  options(df_runoff.skip_original_unit_marginal_main=TRUE)
+  source(file.path(
+    Project_path,"02_Analysis","04B_Mixed_effects_original_units.R"
+  ))
+  options(
+    df_runoff.skip_original_unit_marginal_main=old_skip_original_units
+  )
+  run_original_unit_marginal_effects(Dataset_key)
+}
+
 message("Mixed-effects model analysis complete.")
 message("Figures: ",Figure_path)
 message("Tables: ",Table_path)

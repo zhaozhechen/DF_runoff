@@ -1,5 +1,5 @@
 # Author: Zhaozhe Chen
-# Update Date: 2026.8.26
+# Update Date: 2026.9.11
 
 # This code makes exploratory figures and summary statistics
 # for the Discovery Farms surface-runoff monitoring sites
@@ -162,6 +162,71 @@ Q_nonfrozen <- Q_df %>%
     Runoff_Coefficient >= 0
   )
 
+# Proportion of precipitation events that generated surface runoff
+# Associated_Q is the event-level flag linking a precipitation event to runoff.
+Runoff_generation_by_site <- DF_site_info %>%
+  distinct(Field_Name) %>%
+  left_join(
+    P_df %>%
+      group_by(Field_Name) %>%
+      summarise(
+        Total_Precipitation_Events=n(),
+        Precipitation_Events_Generating_Runoff=sum(
+          Associated_Q %in% TRUE
+        ),
+        .groups="drop"
+      ),
+    by="Field_Name"
+  ) %>%
+  mutate(
+    Proportion_Generating_Runoff_Percent=if_else(
+      Total_Precipitation_Events > 0,
+      100*Precipitation_Events_Generating_Runoff/
+        Total_Precipitation_Events,
+      NA_real_
+    )
+  ) %>%
+  arrange(Field_Name)
+
+stopifnot(
+  nrow(Runoff_generation_by_site) == 28,
+  !anyDuplicated(Runoff_generation_by_site$Field_Name),
+  all(Runoff_generation_by_site$Total_Precipitation_Events > 0)
+)
+
+Runoff_generation_across_sites <- data.frame(
+  Statistic=c("Mean","Minimum","Maximum"),
+  Proportion_Generating_Runoff_Percent=c(
+    mean(
+      Runoff_generation_by_site$Proportion_Generating_Runoff_Percent,
+      na.rm=TRUE
+    ),
+    min(
+      Runoff_generation_by_site$Proportion_Generating_Runoff_Percent,
+      na.rm=TRUE
+    ),
+    max(
+      Runoff_generation_by_site$Proportion_Generating_Runoff_Percent,
+      na.rm=TRUE
+    )
+  ),
+  Sites=28
+)
+
+write.csv(
+  Runoff_generation_by_site,
+  file.path(Table_path,"Runoff_generation_proportion_by_site.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Runoff_generation_across_sites,
+  file.path(Table_path,"Runoff_generation_proportion_across_sites.csv"),
+  row.names=FALSE,
+  na=""
+)
+
 # ------- Main ---------
 # Step 1. Monitoring calendar and site-year summaries =========
 # Find the last date in all data record
@@ -301,6 +366,117 @@ Site_summary <- Site_year_summary %>%
   ) %>%
   left_join(DF_site_info,by="Field_Name")
 
+# Mean annual precipitation and runoff depth across sites
+Mean_annual_precipitation_by_site <- Site_summary %>%
+  transmute(
+    Field_Name,
+    Complete_Field_Years=Monitoring_Years,
+    Mean_Annual_Precipitation_mm,
+    Mean_Annual_Runoff_mm
+  ) %>%
+  arrange(Field_Name)
+
+Complete_field_year_precipitation <- Site_year_summary %>%
+  filter(Complete_Monitoring_Year) %>%
+  select(Field_Name,Calendar_Year,Precipitation_mm)
+
+stopifnot(
+  nrow(Mean_annual_precipitation_by_site) == 28,
+  nrow(Complete_field_year_precipitation) == 117,
+  all(is.finite(
+    Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+  )),
+  all(is.finite(
+    Mean_annual_precipitation_by_site$Mean_Annual_Runoff_mm
+  )),
+  all(is.finite(Complete_field_year_precipitation$Precipitation_mm))
+)
+
+Annual_precipitation_depth_summary <- bind_rows(
+  data.frame(
+    Distribution="Site-level mean annual precipitation",
+    Observations=28,
+    Mean_mm=mean(
+      Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+    ),
+    Minimum_mm=min(
+      Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+    ),
+    Maximum_mm=max(
+      Mean_annual_precipitation_by_site$Mean_Annual_Precipitation_mm
+    )
+  ),
+  data.frame(
+    Distribution="Complete field-year annual precipitation",
+    Observations=117,
+    Mean_mm=mean(Complete_field_year_precipitation$Precipitation_mm),
+    Minimum_mm=min(Complete_field_year_precipitation$Precipitation_mm),
+    Maximum_mm=max(Complete_field_year_precipitation$Precipitation_mm)
+  )
+)
+
+write.csv(
+  Mean_annual_precipitation_by_site,
+  file.path(Table_path,"Mean_annual_precipitation_by_site.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Annual_precipitation_depth_summary,
+  file.path(Table_path,"Annual_precipitation_depth_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+# Mean annual precipitation-event numbers used in Figure 2A
+Mean_annual_precipitation_events_by_site <- Site_summary %>%
+  transmute(
+    Field_Name,
+    Complete_Field_Years=Monitoring_Years,
+    Mean_Annual_Precipitation_Events=Mean_Annual_P_Events,
+    SD_Annual_Precipitation_Events=SD_Annual_P_Events
+  ) %>%
+  arrange(Field_Name)
+
+stopifnot(
+  nrow(Mean_annual_precipitation_events_by_site) == 28,
+  all(is.finite(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  ))
+)
+
+Annual_precipitation_event_summary <- data.frame(
+  Sites=28,
+  Mean_Events_per_Year=mean(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  ),
+  Minimum_Events_per_Year=min(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  ),
+  Maximum_Events_per_Year=max(
+    Mean_annual_precipitation_events_by_site$
+      Mean_Annual_Precipitation_Events
+  )
+)
+
+write.csv(
+  Mean_annual_precipitation_events_by_site,
+  file.path(Table_path,"Mean_annual_precipitation_events_by_site.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Annual_precipitation_event_summary,
+  file.path(Table_path,"Annual_precipitation_event_summary.csv"),
+  row.names=FALSE,
+  na=""
+)
+
 # Step 2. Site-level management summaries ====================
 # Summarize management data
 Management_site_summary <- Management_df %>%
@@ -347,6 +523,145 @@ Site_summary <- Site_summary %>%
       )
     )
   )
+
+# Summaries of physical site properties and agricultural land use
+Site_characteristics_overview <- data.frame(
+  Characteristic=c(
+    "Surface monitoring sites",
+    "Updated land-cover classes",
+    "Cultivated-crop sites",
+    "Pasture/hay sites",
+    "Crop-rotation categories",
+    "Detailed soil series",
+    "Soil infiltration groups",
+    "Soil drainage classes",
+    "Sites with tile drainage"
+  ),
+  Count=c(
+    n_distinct(Site_summary$Field_Name),
+    n_distinct(Site_summary$LandCover_Updated,na.rm=TRUE),
+    sum(Site_summary$LandCover_Updated == "Cultivated Crops",na.rm=TRUE),
+    sum(Site_summary$LandCover_Updated == "Pasture/Hay",na.rm=TRUE),
+    n_distinct(Site_summary$CropRotation,na.rm=TRUE),
+    n_distinct(Site_summary$SoilType,na.rm=TRUE),
+    n_distinct(Site_summary$Hydrologic_Group,na.rm=TRUE),
+    n_distinct(Site_summary$DrainageClass,na.rm=TRUE),
+    sum(Site_summary$Tile == "Yes",na.rm=TRUE)
+  ),
+  Definition=c(
+    "Unique surface-runoff monitoring Site IDs",
+    "Number of categories in the updated site-level land-cover classification",
+    "Sites classified as Cultivated Crops",
+    "Sites classified as Pasture/Hay",
+    "Distinct site-level crop-rotation descriptions",
+    "Distinct dominant soil-series descriptions",
+    "Grouped soil-infiltration categories used in the analysis",
+    "Distinct site-level soil-drainage classes",
+    "Sites with site-level tile drainage"
+  ),
+  stringsAsFactors=FALSE
+)
+
+summarize_site_continuous <- function(x,variable_name,unit_name){
+  x <- x[is.finite(x)]
+  data.frame(
+    Variable=variable_name,
+    Unit=unit_name,
+    Observations=length(x),
+    Mean=mean(x),
+    Standard_Deviation=sd_or_zero(x),
+    Median=median(x),
+    Minimum=min(x),
+    Maximum=max(x),
+    stringsAsFactors=FALSE
+  )
+}
+
+Site_continuous_summary <- bind_rows(
+  summarize_site_continuous(
+    Site_summary$MeanSlope_per,
+    "Mean basin slope across sites",
+    "%"
+  ),
+  summarize_site_continuous(
+    Site_summary$BasinArea_ac,
+    "Monitored basin area across sites",
+    "acres"
+  ),
+  summarize_site_continuous(
+    Site_summary$Mean_Total_Tillage_Passes,
+    "Site-average total tillage passes",
+    "passes per site-water-year"
+  ),
+  summarize_site_continuous(
+    Management_df$Tillage_Total,
+    "Total tillage passes across site-water-years",
+    "passes per site-water-year"
+  ),
+  summarize_site_continuous(
+    Site_summary$Mean_Current_Perennial_Fraction,
+    "Site-average current-crop perennial fraction",
+    "fraction"
+  )
+)
+
+summarize_site_categories <- function(df,column_name,characteristic_name){
+  df %>%
+    transmute(
+      Category=if_else(
+        is.na(.data[[column_name]]) |
+          trimws(as.character(.data[[column_name]])) == "",
+        "Missing",
+        as.character(.data[[column_name]])
+      )
+    ) %>%
+    count(Category,name="Sites") %>%
+    mutate(
+      Characteristic=characteristic_name,
+      Percent_of_Sites=100*Sites/nrow(df)
+    ) %>%
+    select(Characteristic,Category,Sites,Percent_of_Sites)
+}
+
+Site_categorical_summary <- bind_rows(
+  summarize_site_categories(
+    Site_summary,"LandCover_Updated","Updated land cover"
+  ),
+  summarize_site_categories(
+    Site_summary,"CropRotation","Crop rotation"
+  ),
+  summarize_site_categories(
+    Site_summary,"SoilType","Dominant soil series"
+  ),
+  summarize_site_categories(
+    Site_summary,"Hydrologic_Group","Soil infiltration group"
+  ),
+  summarize_site_categories(
+    Site_summary,"DrainageClass","Soil drainage class"
+  ),
+  summarize_site_categories(
+    Site_summary,"FarmEnterprise","Farm enterprise"
+  ),
+  summarize_site_categories(
+    Site_summary,"Tile","Site-level tile drainage"
+  )
+)
+
+Site_characteristics_by_site <- Site_summary %>%
+  transmute(
+    Site_ID=Field_Name,
+    Updated_Land_Cover=LandCover_Updated,
+    Crop_Rotation=CropRotation,
+    Mean_Tillage_Passes=Mean_Total_Tillage_Passes,
+    Mean_Slope_Percent=MeanSlope_per,
+    Dominant_Soil_Series=SoilType,
+    Soil_Infiltration_Group=as.character(Hydrologic_Group),
+    Soil_Drainage_Class=DrainageClass,
+    Tile_Drainage=Tile,
+    Basin_Area_Acres=BasinArea_ac,
+    Mean_Current_Perennial_Fraction=Mean_Current_Perennial_Fraction
+  ) %>%
+  arrange(Site_ID)
 
 # Step 3. Monthly means and uncertainty across years across all sites ==========
 # First average across monitored sites within each calendar year-month
@@ -533,6 +848,34 @@ write.csv(
 )
 
 write.csv(
+  Site_characteristics_overview,
+  file.path(Table_path,"Site_characteristics_overview.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Site_continuous_summary,
+  file.path(Table_path,"Site_continuous_characteristics.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Site_categorical_summary,
+  file.path(Table_path,"Site_categorical_characteristics.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
+  Site_characteristics_by_site,
+  file.path(Table_path,"Site_characteristics_by_site.csv"),
+  row.names=FALSE,
+  na=""
+)
+
+write.csv(
   Site_year_summary,
   file.path(Table_path,"Site_year_summary.csv"),
   row.names=FALSE,
@@ -639,9 +982,66 @@ save_figure_pair(
   height=9
 )
 
+# TerraClimate mean annual precipitation, 2003-2023 ======
+# Combine monthly files; verify overlapping months before retaining one copy
+PPT_files <- file.path(Project_path,"00_Data","Raw",c(
+  "agg_terraclimate_ppt_2003_2013_GLOBE.nc",
+  "agg_terraclimate_ppt_2013_2023_GLOBE.nc"
+))
+stopifnot(all(file.exists(PPT_files)))
+PPT_parts <- lapply(PPT_files,function(f) terra::rast(f,subds="ppt"))
+stopifnot(terra::compareGeom(PPT_parts[[1]],PPT_parts[[2]]))
+PPT_all <- c(PPT_parts[[1]],PPT_parts[[2]])
+PPT_dates <- as.Date(terra::time(PPT_all))
+stopifnot(!anyNA(PPT_dates))
+for(duplicate_date in unique(PPT_dates[duplicated(PPT_dates)])){
+  idx <- which(PPT_dates == duplicate_date)
+  stopifnot(isTRUE(all.equal(terra::values(PPT_all[[idx[1]]]),
+                            terra::values(PPT_all[[idx[2]]]),
+                            check.attributes=FALSE)))
+}
+PPT_keep <- which(!duplicated(PPT_dates) &
+                   PPT_dates >= as.Date("2003-01-01") &
+                   PPT_dates <= as.Date("2023-12-01"))
+PPT_keep <- PPT_keep[order(PPT_dates[PPT_keep])]
+PPT_dates <- PPT_dates[PPT_keep]
+stopifnot(identical(format(PPT_dates,"%Y-%m"),
+                    format(seq(as.Date("2003-01-01"),as.Date("2023-12-01"),by="month"),"%Y-%m")))
+PPT_boundary <- terra::vect(sf::st_transform(WI_outline,4326))
+PPT_WI <- terra::mask(terra::crop(PPT_all[[PPT_keep]],PPT_boundary),
+                      PPT_boundary,touches=FALSE)
+names(PPT_WI) <- paste0("PPT_",format(PPT_dates,"%Y_%m"))
+PPT_annual <- terra::tapp(PPT_WI,as.integer(format(PPT_dates,"%Y")),sum,na.rm=FALSE)
+PPT_mean_annual <- terra::app(PPT_annual,mean,na.rm=FALSE)
+names(PPT_mean_annual) <- "Precipitation_mm"
+PPT_output_path <- file.path(Processed_path,"TerraClimate")
+dir.create(PPT_output_path,recursive=TRUE,showWarnings=FALSE)
+terra::writeRaster(PPT_WI,file.path(PPT_output_path,"Wisconsin_PPT_monthly_2003_2023_mm.tif"),overwrite=TRUE)
+terra::writeRaster(PPT_mean_annual,file.path(PPT_output_path,"Wisconsin_PPT_mean_annual_2003_2023_mm.tif"),overwrite=TRUE)
+PPT_map_df <- as.data.frame(PPT_mean_annual,xy=TRUE,na.rm=TRUE)
+# Yellow indicates lower precipitation; blue indicates higher precipitation
+PPT_map_colors <- c("#ffff33","#b8e0b3","#41b6c4","#225ea8","#082567")
+PPT_map_limits <- range(PPT_map_df$Precipitation_mm)
+PPT_legend_plot <- ggplot(PPT_map_df,aes(x,y,fill=Precipitation_mm)) +
+  geom_tile() +
+  scale_fill_gradientn(colors=PPT_map_colors,limits=PPT_map_limits,
+    name="Mean annual precipitation, 2003-2023 (mm)",
+    guide=guide_colorbar(title.position="top",barwidth=grid::unit(12,"cm"),
+      barheight=grid::unit(0.4,"cm"),frame.colour="black",frame.linewidth=0.4)) +
+  theme_void() + theme(legend.position="bottom",legend.title=element_text(size=16),
+                      legend.text=element_text(size=14))
+PPT_legend_layout <- ggplotGrob(PPT_legend_plot)
+PPT_legend_grob <- PPT_legend_layout$grobs[[
+  which(PPT_legend_layout$layout$name == "guide-box-bottom")
+]]
+
 # Base map
 Map_base <- ggplot() +
-  geom_sf(data=WI_counties,fill="#aec8df",alpha=0.8,color="grey70") +
+  geom_tile(data=PPT_map_df,aes(x=x,y=y,fill=Precipitation_mm),
+            width=terra::res(PPT_mean_annual)[1],height=terra::res(PPT_mean_annual)[2]) +
+  scale_fill_gradientn(colors=PPT_map_colors,limits=PPT_map_limits,guide="none") +
+  ggnewscale::new_scale_fill() +
+  geom_sf(data=WI_counties,fill=NA,color="grey75",linewidth=0.15) +
   geom_sf(data=WI_outline,fill=NA,color="black",linewidth=0.5) +
   coord_sf(
     xlim=range(Site_summary$LONG_approx,na.rm=TRUE)+c(-0.6,0.6),
@@ -869,8 +1269,9 @@ make_map_figure <- function(size_var,size_title){
   cowplot::plot_grid(
     map_grid,
     size_legend,
+    PPT_legend_grob,
     ncol=1,
-    rel_heights=c(1,0.08)
+    rel_heights=c(1,0.08,0.08)
   )
 }
 
@@ -1039,6 +1440,72 @@ save_figure_pair(
   file.path(Figure_path,"02_Site_event_and_depth_bars"),
   width=16,
   height=10
+)
+
+# Annual precipitation and runoff depth across the 28 sites
+# Use the same complete-year means and standard deviations as Figure 2
+stopifnot(
+  nrow(Site_plot_df) == 28L,
+  dplyr::n_distinct(Site_plot_df$Field_Name) == 28L,
+  all(is.finite(Site_plot_df$Mean_Annual_Precipitation_mm)),
+  all(is.finite(Site_plot_df$Mean_Annual_Runoff_mm))
+)
+
+Figure_annual_depth_scatter <- ggplot(
+  Site_plot_df,
+  aes(
+    x=Mean_Annual_Precipitation_mm,
+    y=Mean_Annual_Runoff_mm
+  )
+) +
+  geom_errorbar(
+    aes(ymin=Annual_Runoff_Lower,ymax=Annual_Runoff_Upper,
+        color=Hydrologic_Group),
+    width=10,
+    linewidth=0.6,
+    alpha=0.25
+  ) +
+  geom_errorbar(
+    aes(
+      xmin=Annual_Precipitation_Lower,
+      xmax=Annual_Precipitation_Upper,
+      color=Hydrologic_Group
+    ),
+    orientation="y",
+    width=8,
+    linewidth=0.6,
+    alpha=0.25
+  ) +
+  geom_point(
+    aes(fill=Hydrologic_Group),
+    shape=21,
+    size=5,
+    stroke=0.85,
+    color="black"
+  ) +
+  scale_fill_manual(values=DF_infiltration_colors) +
+  scale_y_continuous(limits=c(0,NA),expand=expansion(mult=c(0.02,0.06))) +
+  scale_color_manual(values=DF_infiltration_colors,guide="none") +
+  labs(
+    x="Annual precipitation depth (mm)",
+    y="Annual runoff depth (mm)",
+    fill="Soil infiltration group"
+  ) +
+  DF_plot_theme +
+  theme(
+    legend.position="bottom",
+    axis.title=element_text(size=21),
+    axis.text=element_text(size=18),
+    legend.title=element_text(size=19),
+    legend.text=element_text(size=17)
+  ) +
+  guides(fill=guide_legend(nrow=1,title.position="top"))
+
+save_figure_pair(
+  Figure_annual_depth_scatter,
+  file.path(Figure_path,"02B_Annual_precipitation_runoff_depth_scatter"),
+  width=12,
+  height=9
 )
 
 # Step 8. Monthly bar plots with uncertainty ==================
@@ -2023,6 +2490,262 @@ save_figure_pair(
   height=10
 )
 
+# Alternative depth-only view with frozen and non-frozen contributions stacked
+summarize_total_freeze_depth <- function(event_df){
+  Freeze_grid %>%
+    left_join(
+      event_df,
+      by=c(
+        "Calendar_Year",
+        "Month_Number",
+        "Month",
+        "Frozen_Status"
+      )
+    ) %>%
+    mutate(Depth_mm=replace_na(Depth_mm,0)) %>%
+    group_by(
+      Calendar_Year,
+      Month_Number,
+      Month,
+      Monitored_Sites
+    ) %>%
+    summarise(
+      Total_Depth_per_Site_mm=sum(Depth_mm)/first(Monitored_Sites),
+      .groups="drop"
+    ) %>%
+    group_by(Month_Number,Month) %>%
+    summarise(
+      Mean_Total_Depth_mm=mean(Total_Depth_per_Site_mm),
+      SD_Total_Depth_mm=sd_or_zero(Total_Depth_per_Site_mm),
+      .groups="drop"
+    ) %>%
+    mutate(
+      Total_Depth_Lower=pmax(
+        0,
+        Mean_Total_Depth_mm-SD_Total_Depth_mm
+      ),
+      Total_Depth_Upper=
+        Mean_Total_Depth_mm+SD_Total_Depth_mm
+    )
+}
+
+P_freeze_total_depth <- summarize_total_freeze_depth(P_freeze_event)
+Q_freeze_total_depth <- summarize_total_freeze_depth(Q_freeze_event)
+
+# Wisconsin-average monthly ET climatology, 2003-2023 ======
+# Weight geographic grid cells by their area, then average each month across years
+ET_source <- terra::rast(file.path(Project_path,"00_Data","Raw",
+  "agg_terraclimate_aet_1950_CurrentYear_GLOBE.nc"),subds="aet")
+ET_dates <- as.Date(terra::time(ET_source))
+ET_keep <- which(ET_dates >= as.Date("2003-01-01") &
+                   ET_dates <= as.Date("2023-12-01"))
+ET_keep <- ET_keep[order(ET_dates[ET_keep])]
+ET_dates <- ET_dates[ET_keep]
+stopifnot(identical(format(ET_dates,"%Y-%m"),
+  format(seq(as.Date("2003-01-01"),as.Date("2023-12-01"),by="month"),"%Y-%m")))
+ET_boundary <- terra::vect(sf::st_transform(WI_outline,4326))
+ET_WI <- terra::mask(terra::crop(ET_source[[ET_keep]],ET_boundary),
+                      ET_boundary,touches=FALSE)
+ET_values <- terra::values(ET_WI)
+ET_area <- as.vector(terra::values(terra::cellSize(ET_WI[[1]],unit="km")))
+ET_valid <- rowSums(is.finite(ET_values)) == ncol(ET_values)
+stopifnot(any(ET_valid))
+ET_state_monthly <- data.frame(
+  Date=ET_dates,
+  ET_mm=colSums(ET_values[ET_valid,,drop=FALSE]*ET_area[ET_valid]) /
+    sum(ET_area[ET_valid])
+)
+ET_climatology <- ET_state_monthly %>%
+  mutate(Month_Number=as.integer(format(Date,"%m"))) %>%
+  group_by(Month_Number) %>%
+  summarise(Mean_ET_mm=mean(ET_mm),SD_ET_mm=sd(ET_mm),Years=n(),.groups="drop") %>%
+  mutate(Month=factor(month.abb[Month_Number],levels=month.abb),
+         ET_Lower=Mean_ET_mm-SD_ET_mm,
+         ET_Upper=Mean_ET_mm+SD_ET_mm)
+ET_curve_color <- RColorBrewer::brewer.pal(9,"Set1")[3]
+stopifnot(all(ET_climatology$Years == 21))
+write.csv(ET_climatology,file.path(Table_path,"Wisconsin_monthly_ET_climatology_2003_2023.csv"),row.names=FALSE)
+
+Freeze_stacked_depth_ymax <- 1.05*max(
+  P_freeze_total_depth$Total_Depth_Upper,
+  Q_freeze_total_depth$Total_Depth_Upper,
+  ET_climatology$ET_Upper,
+  na.rm=TRUE
+)
+
+Freeze_stacked_depth_bar <- function(
+    component_df,
+    total_df,
+    title,
+    y_limit){
+  ggplot(
+    component_df %>%
+      mutate(
+        Frozen_Status=factor(
+          Frozen_Status,
+          levels=c("Non-Frozen","Frozen")
+        )
+      ),
+    aes(
+      Month,
+      Mean_Depth_mm,
+      fill=Frozen_Status
+    )
+  ) +
+    geom_col(
+      position="stack",
+      width=0.72,
+      color="black"
+    ) +
+    geom_errorbar(
+      data=total_df,
+      aes(
+        x=Month,
+        ymin=Total_Depth_Lower,
+        ymax=Total_Depth_Upper
+      ),
+      inherit.aes=FALSE,
+      width=0.18,
+      linewidth=0.5
+    ) +
+    scale_fill_manual(values=DF_frozen_colors) +
+    scale_y_continuous(limits=c(min(0,ET_climatology$ET_Lower),y_limit)) +
+    labs(
+      title=title,
+      x=NULL,
+      y="Mean monthly total per site (mm)",
+      fill=NULL
+    ) +
+    DF_plot_theme +
+    theme(legend.position="top")
+}
+
+Figure_frozen_stacked_depth <- (
+  Freeze_stacked_depth_bar(
+    P_freeze_monthly,
+    P_freeze_total_depth,
+    "A. Precipitation depth",
+    Freeze_stacked_depth_ymax
+  ) +
+    (Freeze_stacked_depth_bar(
+      Q_freeze_monthly,
+      Q_freeze_total_depth,
+      "B. Runoff depth",
+      Freeze_stacked_depth_ymax
+    ) +
+      geom_errorbar(data=ET_climatology,
+        aes(x=Month,ymin=ET_Lower,ymax=ET_Upper),
+        inherit.aes=FALSE,color=ET_curve_color,width=0.18,linewidth=0.7) +
+      geom_line(data=ET_climatology,
+        aes(x=Month,y=Mean_ET_mm,group=1,color="WI mean ET (2003-2023)"),
+        inherit.aes=FALSE,linewidth=1.2) +
+      geom_point(data=ET_climatology,
+        aes(x=Month,y=Mean_ET_mm,color="WI mean ET (2003-2023)"),
+        inherit.aes=FALSE,size=2.5) +
+      scale_color_manual(values=setNames(ET_curve_color,"WI mean ET (2003-2023)"),name=NULL) +
+      labs(y="Mean monthly depth (mm)"))
+) +
+  plot_layout(ncol=2,guides="collect") &
+  theme(legend.position="top")
+
+save_figure_pair(
+  Figure_frozen_stacked_depth,
+  file.path(
+    Figure_path,
+    "07B_Frozen_nonfrozen_monthly_depth_stacked"
+  ),
+  width=15,
+  height=5.8
+)
+
+# TerraClimate actual evapotranspiration over Wisconsin =======
+# Monthly totals in mm; terra applies the NetCDF scale factor automatically
+TerraClimate_path <- file.path(
+  Project_path,"00_Data","Raw",
+  "agg_terraclimate_aet_1950_CurrentYear_GLOBE.nc"
+)
+if(file.exists(TerraClimate_path)){
+  AET_raw <- terra::rast(TerraClimate_path,subds="aet")
+  AET_dates <- as.Date(terra::time(AET_raw))
+  stopifnot(
+    length(AET_dates) == terra::nlyr(AET_raw),
+    !anyNA(AET_dates),
+    !anyDuplicated(format(AET_dates,"%Y-%m"))
+  )
+  AET_boundary <- terra::vect(sf::st_transform(WI_outline,4326))
+  AET_WI <- terra::mask(
+    terra::crop(AET_raw,AET_boundary),
+    AET_boundary,touches=FALSE
+  )
+  AET_output_path <- file.path(Processed_path,"TerraClimate")
+  dir.create(AET_output_path,recursive=TRUE,showWarnings=FALSE)
+  names(AET_WI) <- paste0("AET_",format(AET_dates,"%Y_%m"))
+  terra::writeRaster(
+    AET_WI,file.path(AET_output_path,"Wisconsin_AET_monthly_mm.tif"),
+    overwrite=TRUE
+  )
+
+  # Annual totals require all twelve months; averages use complete years
+  AET_year <- as.integer(format(AET_dates,"%Y"))
+  AET_complete_years <- as.integer(names(which(table(AET_year) == 12)))
+  stopifnot(length(AET_complete_years) > 0)
+  AET_keep <- AET_year %in% AET_complete_years
+  AET_annual <- terra::tapp(
+    AET_WI[[which(AET_keep)]],AET_year[AET_keep],sum,na.rm=FALSE
+  )
+  AET_mean_annual <- terra::app(AET_annual,mean,na.rm=FALSE)
+  names(AET_mean_annual) <- "AET_mm"
+  AET_monthly_mean <- terra::tapp(
+    AET_WI,as.integer(format(AET_dates,"%m")),mean,na.rm=FALSE
+  )
+  names(AET_monthly_mean) <- month.abb
+  terra::writeRaster(
+    AET_mean_annual,
+    file.path(AET_output_path,"Wisconsin_AET_mean_annual_mm.tif"),
+    overwrite=TRUE
+  )
+  AET_annual_plot_df <- as.data.frame(AET_mean_annual,xy=TRUE,na.rm=TRUE)
+  AET_monthly_plot_df <- as.data.frame(AET_monthly_mean,xy=TRUE,na.rm=TRUE) %>%
+    pivot_longer(all_of(month.abb),names_to="Month",values_to="AET_mm") %>%
+    mutate(Month=factor(Month,levels=month.abb))
+  AET_period <- paste(range(AET_complete_years),collapse="-")
+  AET_map <- function(df,legend_title){
+    ggplot(df,aes(x=x,y=y,fill=AET_mm)) +
+      geom_raster() +
+      geom_sf(data=sf::st_transform(WI_outline,4326),
+              inherit.aes=FALSE,fill=NA,color="black",linewidth=0.5) +
+      scale_fill_viridis_c(
+        name=legend_title,option="C",
+        guide=guide_colorbar(
+          barwidth=grid::unit(8,"cm"),barheight=grid::unit(0.45,"cm"),
+          frame.colour="black",frame.linewidth=0.4
+        )
+      ) +
+      coord_sf(crs=sf::st_crs(4326),default_crs=sf::st_crs(4326),
+               xlim=c(-93,-86.7),ylim=c(42.4,47.2),expand=FALSE) +
+      labs(x=NULL,y=NULL) +
+      DF_plot_theme +
+      theme(axis.text=element_blank(),axis.ticks=element_blank(),
+            legend.position="bottom",legend.title=element_text(size=18),
+            legend.text=element_text(size=16),strip.text=element_text(size=18))
+  }
+  Figure_aet_annual <- AET_map(AET_annual_plot_df,"Annual AET (mm)") +
+    labs(title=paste("Mean annual actual evapotranspiration:",AET_period))
+  Figure_aet_monthly <- AET_map(AET_monthly_plot_df,"Monthly AET (mm)") +
+    facet_wrap(~Month,ncol=4) +
+    labs(title=paste("Mean monthly actual evapotranspiration:",AET_period))
+  save_figure_pair(
+    Figure_aet_annual,file.path(Figure_path,"08A_TerraClimate_AET_mean_annual"),
+    width=10,height=9
+  )
+  save_figure_pair(
+    Figure_aet_monthly,file.path(Figure_path,"08B_TerraClimate_AET_monthly_climatology"),
+    width=16,height=13
+  )
+  message("TerraClimate AET: ",length(AET_dates)," months, ",
+          min(AET_dates)," to ",max(AET_dates),"; clipped to Wisconsin.")
+}
+
 # Step 13. Generate exploratory HTML report ===================
 Complete_site_years <- Site_year_summary %>%
   filter(Complete_Monitoring_Year) %>%
@@ -2203,12 +2926,114 @@ Monthly_report_table <- Monthly_climatology %>%
 RC_report_table <- RC_group_summary %>%
   arrange(Grouping,desc(Median_RC))
 
+Site_continuous_report <- Site_continuous_summary %>%
+  rename(
+    `Standard deviation`=Standard_Deviation
+  )
+
+Site_categorical_report <- Site_categorical_summary %>%
+  rename(
+    `Percent of sites`=Percent_of_Sites
+  )
+
+Site_details_report <- Site_characteristics_by_site
+names(Site_details_report) <- c(
+  "Site ID",
+  "Updated land cover",
+  "Crop rotation",
+  "Mean tillage passes",
+  "Mean slope (%)",
+  "Dominant soil series",
+  "Soil infiltration group",
+  "Soil drainage class",
+  "Tile drainage",
+  "Basin area (acres)",
+  "Mean current perennial fraction"
+)
+
 Report_body <- c(
   "<div class=\"callout\"><strong>Processing review:</strong> all seasonal management definitions passed validation. Hydrologic depths and intensities in the analysis-ready data and figures are in millimetres.</div>",
   "<h2>Data summary</h2>",
   "<p>Non-frozen events contributions are calculated within each complete calendar year and then averaged across years. Event-depth use millimetres.</p>",
   data_frame_to_html(Data_summary_table,digits=2),
   Key_findings,
+  "<h2>Precipitation events generating runoff</h2>",
+  "<p>For each site, the proportion is the number of precipitation events with <code>Associated_Q = TRUE</code> divided by all precipitation events in that site's complete processed record. The across-site mean, minimum, and maximum below summarize the 28 site-level percentages; the mean is not a pooled event-level percentage.</p>",
+  "<h3>Summary across the 28 sites</h3>",
+  data_frame_to_html(Runoff_generation_across_sites,digits=2),
+  "<h3>Proportion by site</h3>",
+  data_frame_to_html(
+    Runoff_generation_by_site %>%
+      rename(
+        `Site ID`=Field_Name,
+        `Total precipitation events`=Total_Precipitation_Events,
+        `Events generating runoff`=
+          Precipitation_Events_Generating_Runoff,
+        `Proportion generating runoff (%)`=
+          Proportion_Generating_Runoff_Percent
+      ),
+    digits=2
+  ),
+  "<h2>Annual precipitation depth</h2>",
+  "<p>Annual precipitation depths use complete 12-month field-years only. The site-level distribution gives each of the 28 site means equal weight, regardless of monitoring duration. The field-year distribution gives each of the 117 complete field-years equal weight.</p>",
+  "<h3>Summary across sites and field-years</h3>",
+  data_frame_to_html(
+    Annual_precipitation_depth_summary %>%
+      rename(
+        `Number of observations`=Observations,
+        `Mean (mm)`=Mean_mm,
+        `Minimum (mm)`=Minimum_mm,
+        `Maximum (mm)`=Maximum_mm
+      ),
+    digits=2
+  ),
+  "<h3>Mean annual precipitation and runoff depth by site</h3>",
+  data_frame_to_html(
+    Mean_annual_precipitation_by_site %>%
+      rename(
+        `Site ID`=Field_Name,
+        `Complete field-years`=Complete_Field_Years,
+        `Mean annual precipitation (mm)`=
+          Mean_Annual_Precipitation_mm,
+        `Mean annual runoff (mm)`=Mean_Annual_Runoff_mm
+      ),
+    digits=2
+  ),
+  "<h2>Annual precipitation-event numbers</h2>",
+  "<p>These are the site-level mean annual precipitation-event numbers shown in Figure 2A. Each site mean uses complete 12-month monitoring years; the standard deviation is the among-year error bar displayed in the figure.</p>",
+  "<h3>Summary across the 28 sites</h3>",
+  data_frame_to_html(
+    Annual_precipitation_event_summary %>%
+      rename(
+        `Mean events per year`=Mean_Events_per_Year,
+        `Minimum events per year`=Minimum_Events_per_Year,
+        `Maximum events per year`=Maximum_Events_per_Year
+      ),
+    digits=2
+  ),
+  "<h3>Mean annual precipitation-event number by site</h3>",
+  data_frame_to_html(
+    Mean_annual_precipitation_events_by_site %>%
+      rename(
+        `Site ID`=Field_Name,
+        `Complete field-years`=Complete_Field_Years,
+        `Mean events per year`=Mean_Annual_Precipitation_Events,
+        `Among-year standard deviation`=
+          SD_Annual_Precipitation_Events
+      ),
+    digits=2
+  ),
+  "<h2>Site characteristics summary</h2>",
+  "<p>Fixed site properties are summarized across the 28 surface-runoff monitoring sites. Site-average tillage passes and perennial fractions are means across available site-water-years; they are management summaries rather than fixed physical properties.</p>",
+  "<h3>Site and land-use counts</h3>",
+  data_frame_to_html(Site_characteristics_overview,digits=0),
+  "<h3>Continuous site and management characteristics</h3>",
+  data_frame_to_html(Site_continuous_report,digits=2),
+  "<h3>Land-cover, crop, and soil categories</h3>",
+  "<p>Counts and percentages use one record per monitoring site. Detailed soil series and crop-rotation descriptions are retained rather than collapsed into broader classes; the grouped soil-infiltration variable is also shown because it is used in subsequent analyses.</p>",
+  data_frame_to_html(Site_categorical_report,digits=1),
+  "<h3>Characteristics of individual monitoring sites</h3>",
+  data_frame_to_html(Site_details_report,digits=2),
   "<h2>Management-variable quality check</h2>",
   "<p>Tillage values remain basin-weighted pass totals. Rows with supplied basin coverage below 100% are not renormalized, so uncovered portions do not receive an assumed management value.</p>",
   data_frame_to_html(Management_audit_table,digits=2),
@@ -2217,11 +3042,11 @@ Report_body <- c(
   "<p>All points represent surface-runoff monitoring sites. The six panels show perennial crop fraction, tillage intensity, soil infiltration group, site-level tile drainage, updated land cover, and mean slope. </p>",
   embedded_figure_html(
     file.path(Figure_path,"01A_Site_maps_sized_by_runoff_depth.png"),
-    "Figure 1A. Discovery Farms surface-runoff sites. Point size represents mean annual surface-runoff depth calculated from complete 12-month monitoring years."
+    "Figure 1A. Discovery Farms surface-runoff sites. Point size represents mean annual surface-runoff depth calculated from complete 12-month monitoring years. The background shows TerraClimate mean annual precipitation for 2003-2023, calculated by summing monthly precipitation within each year and averaging the 21 annual totals."
   ),
   embedded_figure_html(
     file.path(Figure_path,"01B_Site_maps_sized_by_runoff_events.png"),
-    "Figure 1B. Discovery Farms surface-runoff sites shown with six explanatory-variable color schemes. Point size represents mean annual runoff-event number calculated from complete 12-month monitoring years."
+    "Figure 1B. Discovery Farms surface-runoff sites shown with six explanatory-variable color schemes. Point size represents mean annual runoff-event number calculated from complete 12-month monitoring years. The background shows TerraClimate mean annual precipitation for 2003-2023, calculated by summing monthly precipitation within each year and averaging the 21 annual totals."
   ),
   "<h3>Sites with the largest mean annual runoff depth</h3>",
   data_frame_to_html(Top_runoff_sites,digits=2),
@@ -2230,6 +3055,10 @@ Report_body <- c(
   embedded_figure_html(
     file.path(Figure_path,"02_Site_event_and_depth_bars.png"),
     "Figure 2. Mean annual precipitation-event number, runoff-event number, precipitation depth, and surface-runoff depth by site. Error bars show one standard deviation across complete monitoring years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
+  ),
+  embedded_figure_html(
+    file.path(Figure_path,"02B_Annual_precipitation_runoff_depth_scatter.png"),
+    "Figure 2B. Mean annual runoff depth versus mean annual precipitation depth across the 28 monitoring sites. Each point represents one site and is filled by soil infiltration group. Horizontal and vertical error bars show one standard deviation across complete monitoring years for precipitation and runoff depth, respectively; lower bounds are truncated at zero, consistent with Figure 2."
   ),
   "<h2>Monthly climatology and variation among years</h2>",
   "<p>Monthly totals are first calculated for each monitored site-month. They are then averaged within calendar year and summarized across years.</p>",
@@ -2243,7 +3072,14 @@ Report_body <- c(
   ),
   embedded_figure_html(
     file.path(Figure_path,"07_Frozen_nonfrozen_monthly_patterns.png"),
-    "Figure 5. Average monthly event numbers and depths grouped by frozen and non-frozen soil conditions, with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
+    "Figure 5A. Average monthly event numbers and depths grouped by frozen and non-frozen soil conditions, with error bars showing one standard deviation across years. Paired precipitation and runoff panels use common y-axis scales for event number and depth."
+  ),
+  embedded_figure_html(
+    file.path(
+      Figure_path,
+      "07B_Frozen_nonfrozen_monthly_depth_stacked.png"
+    ),
+    "Figure 5B. Average monthly precipitation and runoff depths partitioned into stacked frozen and non-frozen contributions. Black error bars show one standard deviation of total monthly depth across years. The green curve in the runoff panel shows Wisconsin-wide monthly actual evapotranspiration (ET) from TerraClimate: grid-cell-area-weighted means within Wisconsin, averaged for each calendar month over 2003-2023. Green error bars show plus or minus one standard deviation across the 21 annual values for each calendar month, not spatial variation among grid cells. ET represents the statewide climatology, whereas the bars represent monitored-site averages. Precipitation and runoff panels use a common y-axis scale, with ET shown on the same depth scale."
   ),
   "<h3>Monthly summary statistics</h3>",
   data_frame_to_html(Monthly_report_table,digits=2),
